@@ -89,14 +89,18 @@
             
             try {
                 console.log('🔐 Testing login with:', { email, password: '***' });
-                console.log('🌐 API URL:', `${API_BASE_URL}/api/auth/login`);
+                console.log('🌐 API URL:', `${API_BASE_URL}/api/auth`);
                 
-                const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+                const response = await fetch(`${API_BASE_URL}/api/auth`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ email, password })
+                    body: JSON.stringify({ 
+                        action: 'login',
+                        email, 
+                        password 
+                    })
                 });
                 
                 console.log('📡 Response status:', response.status);

@@ -472,13 +472,17 @@
         loginBtn.textContent = 'Signing in...';
         
         try {
-            console.log('🔐 Attempting login with URL:', `${API_BASE_URL}/api/auth/login`);
-            const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+            console.log('🔐 Attempting login with URL:', `${API_BASE_URL}/api/auth`);
+            const response = await fetch(`${API_BASE_URL}/api/auth`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({ 
+                    action: 'login',
+                    email, 
+                    password 
+                })
             });
 
             console.log('📡 Login response status:', response.status);
@@ -542,23 +546,23 @@
         registerBtn.textContent = 'Creating account...';
         
         try {
-            console.log('📝 Attempting registration with URL:', `${API_BASE_URL}/api/auth/register`);
-            const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+            console.log('📝 Attempting registration with URL:', `${API_BASE_URL}/api/auth`);
+            const response = await fetch(`${API_BASE_URL}/api/auth`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ 
+                    action: 'register',
                     email, 
                     password, 
                     full_name: name, 
                     phone, 
                     role,
-                    company: {
-                        name: companyName,
-                        email: companyEmail,
-                        phone: companyPhone
-                    }
+                    company_name: companyName,
+                    company_email: companyEmail,
+                    company_phone: companyPhone,
+                    company_address: 'Not specified'
                 })
             });
 
