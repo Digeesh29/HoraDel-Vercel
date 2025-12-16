@@ -9,15 +9,16 @@
     { "src": "js/**", "use": "@vercel/static" }
   ],
   "routes": [
-    { "src": "/api/simple-test", "dest": "/api/simple-test.js" },
-    { "src": "/api/simple-dashboard", "dest": "/api/simple-dashboard.js" },
-    { "src": "/api/dashboard/summary", "dest": "/api/simple-dashboard.js" },
-    { "src": "/api/dashboard-summary", "dest": "/api/simple-dashboard.js" },
+    { "src": "/api/dashboard/summary", "dest": "/api/dashboard.js" },
+    { "src": "/api/dashboard", "dest": "/api/dashboard.js" },
+    { "src": "/api/bookings", "dest": "/api/bookings.js" },
+    { "src": "/api/vehicles", "dest": "/api/vehicles.js" },
+    { "src": "/api/companies", "dest": "/api/companies.js" },
+    { "src": "/api/add-sample-data", "dest": "/api/add-sample-data.js" },
     { "src": "/api/debug", "dest": "/api/debug.js" },
     { "src": "/api/health", "dest": "/api/health.js" },
-    { "src": "/api/test-client", "dest": "/api/test-client.js" },
-    { "src": "/login-test", "dest": "/api/login-test.js" },
     { "src": "/login", "dest": "/auth.html" },
+    { "src": "/setup", "dest": "/setup-data.html" },
     { "src": "/admin", "dest": "/index.html" },
     { "src": "/client", "dest": "/Client/dashboard.html" },
     { "src": "/(.*)", "dest": "/$1" }
