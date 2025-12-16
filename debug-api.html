@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Debug - HoraDel Transport</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .info { background-color: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        button { margin: 5px; padding: 10px 15px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>HoraDel Transport - API Debug Tool</h1>
+    <p>This page helps debug API connectivity issues on Vercel.</p>
+    
+    <div id="results"></div>
+    
+    <h2>Test API Endpoints</h2>
+    <button onclick="testEndpoint('/api/test')">Test Health Check</button>
+    <button onclick="testEndpoint('/api/companies')">Test Companies</button>
+    <button onclick="testEndpoint('/api/dashboard')">Test Dashboard</button>
+    <button onclick="testEndpoint('/api/vehicles')">Test Vehicles</button>
+    <button onclick="testEndpoint('/api/bookings')">Test Bookings</button>
+    <button onclick="testEndpoint('/api/ratecards')">Test Ratecards</button>
+    <button onclick="testEndpoint('/api/reports/summary?dateFrom=2024-12-01&dateTo=2024-12-31&companyId=All&city=All')">Test Reports Summary</button>
+    <button onclick="testAllEndpoints()">Test All Endpoints</button>
+    <button onclick="clearResults()">Clear Results</button>
+
+    <script>
+        const API_BASE_URL = window.location.origin;
+        
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        async function testEndpoint(endpoint) {
+            const fullUrl = `${API_BASE_URL}${endpoint}`;
+            addResult(`🔍 Testing: ${fullUrl}`, 'info');
+            
+            try {
+                const startTime = Date.now();
+                const response = await fetch(fullUrl);
+                const endTime = Date.now();
+                const responseTime = endTime - startTime;
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(`✅ ${endpoint} - Success (${responseTime}ms)<br><pre>${JSON.stringify(data, null, 2)}</pre>`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    addResult(`❌ ${endpoint} - HTTP ${response.status}<br><pre>${errorText}</pre>`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ ${endpoint} - Network Error<br><pre>${error.message}</pre>`, 'error');
+            }
+        }
+        
+        async function testAllEndpoints() {
+            clearResults();
+            addResult('🚀 Starting comprehensive API test...', 'info');
+            
+            const endpoints = [
+                '/api/test', 
+                '/api/companies', 
+                '/api/dashboard',
+                '/api/dashboard-summary', 
+                '/api/vehicles', 
+                '/api/bookings',
+                '/api/ratecards',
+                '/api/reports/summary?dateFrom=2024-12-01&dateTo=2024-12-31&companyId=All&city=All',
+                '/api/reports/company-summary?dateFrom=2024-12-01&dateTo=2024-12-31&companyId=All&city=All'
+            ];
+            
+            for (const endpoint of endpoints) {
+                await testEndpoint(endpoint);
+                await new Promise(resolve => setTimeout(resolve, 500)); // Small delay between tests
+            }
+            
+            addResult('✅ All tests completed!', 'success');
+        }
+        
+        // Auto-run basic test on page load
+        window.addEventListener('load', () => {
+            addResult('🌐 Current URL: ' + window.location.href, 'info');
+            addResult('🔧 API Base URL: ' + API_BASE_URL, 'info');
+            testEndpoint('/api/test');
+        });
+    </script>
+</body>
+</html>

@@ -16,8 +16,10 @@ module.exports = async (req, res) => {
         
         // Handle different dashboard endpoints
         const url = req.url || '';
+        console.log('🔍 Dashboard URL:', url);
         
-        if (url.includes('/summary') || req.method === 'GET') {
+        // Handle /summary endpoint or default GET
+        if (url.includes('/summary') || url === '/dashboard' || req.method === 'GET') {
             // Dashboard summary - COPIED FROM YOUR dashboard-router.js
             const { companyId } = req.query;
             const today = new Date().toISOString().split('T')[0];
@@ -133,9 +135,37 @@ module.exports = async (req, res) => {
             });
         }
 
-        return res.status(404).json({
-            success: false,
-            error: 'Dashboard endpoint not found'
+        // If no specific endpoint matched, return basic dashboard data
+        const { count: totalBookings } = await supabase
+            .from('bookings')
+            .select('*', { count: 'exact', head: true });
+
+        const { count: totalCompanies } = await supabase
+            .from('companies')
+            .select('*', { count: 'exact', head: true });
+
+        return res.json({
+            success: true,
+            data: {
+                stats: {
+                    todayBookings: 0,
+                    totalBookings: totalBookings || 0,
+                    totalInTransit: 0,
+                    allTimeDelivered: 0,
+                    activeVehicles: 0,
+                    parcelsInTransit: 0,
+                    pendingDeliveries: 0
+                },
+                recentBookings: [],
+                trend: {
+                    labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+                    data: [0, 0, 0, 0, 0, 0, 0]
+                },
+                companyDistribution: {
+                    labels: ['Companies'],
+                    data: [totalCompanies || 0]
+                }
+            }
         });
 
     } catch (error) {
