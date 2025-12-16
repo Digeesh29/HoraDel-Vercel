@@ -472,8 +472,8 @@
         loginBtn.textContent = 'Signing in...';
         
         try {
-            console.log('🔐 Attempting login with URL:', `${API_BASE_URL}/api/auth/login`);
-            const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+            console.log('🔐 Attempting login with URL:', `${API_BASE_URL}/api/login`);
+            const response = await fetch(`${API_BASE_URL}/api/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
