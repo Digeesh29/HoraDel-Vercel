@@ -9,11 +9,15 @@ module.exports = (req, res) => {
         return res.status(200).end();
     }
 
+    console.log('🔍 Simple test API called:', req.method, req.url);
+
     res.json({
         success: true,
         message: 'Simple test API working!',
         method: req.method,
         url: req.url,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        vercel: true,
+        environment: process.env.NODE_ENV || 'development'
     });
 };
