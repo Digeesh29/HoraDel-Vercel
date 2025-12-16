@@ -1,46 +1,25 @@
-// Companies API endpoint
-const supabase = require('../config/supabase');
+// Use your exact companies router for Vercel
+const express = require('express');
+const companiesRouter = require('../routes/companies-router');
 
-module.exports = async (req, res) => {
+// Create a mini Express app to handle the router
+const app = express();
+app.use(express.json());
+
+// CORS middleware
+app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     
-    try {
-        if (req.method === 'GET') {
-            const { data, error } = await supabase
-                .from('companies')
-                .select('*')
-                .order('name');
-
-            if (error) throw error;
-
-            res.json({
-                success: true,
-                data: data || []
-            });
-        } else if (req.method === 'POST') {
-            const companyData = req.body;
-            
-            const { data, error } = await supabase
-                .from('companies')
-                .insert([companyData])
-                .select()
-                .single();
-
-            if (error) throw error;
-
-            res.json({
-                success: true,
-                data: data
-            });
-        } else {
-            res.status(405).json({ error: 'Method not allowed' });
-        }
-    } catch (error) {
-        console.error('Companies API error:', error);
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
     }
-};
+    next();
+});
+
+// Use your exact router
+app.use('/', companiesRouter);
+
+// Export for Vercel
+module.exports = app;
