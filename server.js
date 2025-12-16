@@ -45,6 +45,12 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.static(__dirname)); // Serve all static files
 
+// Explicit static file routes for Vercel
+app.use('/Client', express.static(path.join(__dirname, 'Client')));
+app.use('/js', express.static(path.join(__dirname, 'js')));
+app.use('/css', express.static(path.join(__dirname, 'css')));
+app.use('/pages', express.static(path.join(__dirname, 'pages')));
+
 // API Routes
 app.use('/api/dashboard', require('./routes/dashboard-router'));
 app.use('/api/bookings', require('./routes/bookings-router'));
@@ -55,8 +61,21 @@ app.use('/api/drivers', require('./routes/drivers-router'));
 app.use('/api/reports', require('./routes/reports-router'));
 app.use('/api/auth', require('./routes/auth-router'));
 
+// Additional API endpoints
+app.get('/api/debug', require('./api/debug'));
+app.get('/api/test-client', require('./api/test-client'));
+app.get('/login-test', require('./api/login-test'));
+
 // Health check endpoint
 app.get('/health', (req, res) => {
+    res.json({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development'
+    });
+});
+
+app.get('/api/health', (req, res) => {
     res.json({
         status: 'healthy',
         timestamp: new Date().toISOString(),

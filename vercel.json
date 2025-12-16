@@ -1,79 +1,8 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "api/**/*.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "*.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "**/*.html",
-      "use": "@vercel/static"
+  "functions": {
+    "server.js": {
+      "maxDuration": 30
     }
-  ],
-  "routes": [
-    {
-      "src": "/api/auth/login",
-      "dest": "/api/auth/login.js"
-    },
-    {
-      "src": "/api/dashboard/summary",
-      "dest": "/api/dashboard/summary.js"
-    },
-    {
-      "src": "/api/companies",
-      "dest": "/api/companies.js"
-    },
-    {
-      "src": "/api/health",
-      "dest": "/api/health.js"
-    },
-    {
-      "src": "/api/debug",
-      "dest": "/api/debug.js"
-    },
-    {
-      "src": "/login-test",
-      "dest": "/api/login-test.js"
-    },
-    {
-      "src": "/test",
-      "dest": "/test.html"
-    },
-    {
-      "src": "/api/bookings",
-      "dest": "/api/bookings.js"
-    },
-    {
-      "src": "/api/test-client",
-      "dest": "/api/test-client.js"
-    },
-    {
-      "src": "/api/login-test",
-      "dest": "/api/login-test.js"
-    },
-    {
-      "src": "/",
-      "dest": "/auth.html"
-    },
-    {
-      "src": "/login",
-      "dest": "/auth.html"
-    },
-    {
-      "src": "/admin",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/client",
-      "dest": "/Client/dashboard.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
-  ]
+  }
 }
