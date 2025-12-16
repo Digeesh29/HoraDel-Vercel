@@ -51,15 +51,125 @@ app.use('/js', express.static(path.join(__dirname, 'js')));
 app.use('/css', express.static(path.join(__dirname, 'css')));
 app.use('/pages', express.static(path.join(__dirname, 'pages')));
 
-// API Routes
-app.use('/api/dashboard', require('./routes/dashboard-router'));
-app.use('/api/bookings', require('./routes/bookings-router'));
-app.use('/api/vehicles', require('./routes/vehicles-router'));
-app.use('/api/ratecards', require('./routes/ratecards-router'));
-app.use('/api/companies', require('./routes/companies-router'));
-app.use('/api/drivers', require('./routes/drivers-router'));
-app.use('/api/reports', require('./routes/reports-router'));
-app.use('/api/auth', require('./routes/auth-router'));
+// API Routes with error handling
+console.log('🔧 Loading API routes...');
+
+try {
+    app.use('/api/dashboard', require('./routes/dashboard-router'));
+    console.log('✅ Dashboard router loaded');
+} catch (err) {
+    console.error('❌ Dashboard router error:', err.message);
+}
+
+try {
+    app.use('/api/bookings', require('./routes/bookings-router'));
+    console.log('✅ Bookings router loaded');
+} catch (err) {
+    console.error('❌ Bookings router error:', err.message);
+}
+
+try {
+    app.use('/api/vehicles', require('./routes/vehicles-router'));
+    console.log('✅ Vehicles router loaded');
+} catch (err) {
+    console.error('❌ Vehicles router error:', err.message);
+}
+
+try {
+    app.use('/api/ratecards', require('./routes/ratecards-router'));
+    console.log('✅ Ratecards router loaded');
+} catch (err) {
+    console.error('❌ Ratecards router error:', err.message);
+}
+
+try {
+    app.use('/api/companies', require('./routes/companies-router'));
+    console.log('✅ Companies router loaded');
+} catch (err) {
+    console.error('❌ Companies router error:', err.message);
+}
+
+try {
+    app.use('/api/drivers', require('./routes/drivers-router'));
+    console.log('✅ Drivers router loaded');
+} catch (err) {
+    console.error('❌ Drivers router error:', err.message);
+}
+
+try {
+    app.use('/api/reports', require('./routes/reports-router'));
+    console.log('✅ Reports router loaded');
+} catch (err) {
+    console.error('❌ Reports router error:', err.message);
+}
+
+try {
+    app.use('/api/auth', require('./routes/auth-router'));
+    console.log('✅ Auth router loaded');
+} catch (err) {
+    console.error('❌ Auth router error:', err.message);
+}
+
+// Test endpoint to verify server is working
+app.get('/api/test', (req, res) => {
+    res.json({
+        success: true,
+        message: 'Server is working',
+        timestamp: new Date().toISOString(),
+        routes: [
+            '/api/dashboard/summary',
+            '/api/companies',
+            '/api/bookings',
+            '/api/vehicles'
+        ]
+    });
+});
+
+// Fallback dashboard summary endpoint
+app.get('/api/dashboard-summary', async (req, res) => {
+    try {
+        const supabase = require('./config/supabase');
+        
+        // Simple dashboard data
+        const { count: totalBookings } = await supabase
+            .from('bookings')
+            .select('*', { count: 'exact', head: true });
+
+        const { count: totalCompanies } = await supabase
+            .from('companies')
+            .select('*', { count: 'exact', head: true });
+
+        res.json({
+            success: true,
+            data: {
+                stats: {
+                    todayBookings: 0,
+                    totalBookings: totalBookings || 0,
+                    totalInTransit: 0,
+                    allTimeDelivered: 0,
+                    activeVehicles: 0,
+                    parcelsInTransit: 0,
+                    pendingDeliveries: 0
+                },
+                recentBookings: [],
+                trend: {
+                    labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+                    data: [0, 0, 0, 0, 0, 0, 0]
+                },
+                companyDistribution: {
+                    labels: ['Companies'],
+                    data: [totalCompanies || 0]
+                }
+            }
+        });
+    } catch (error) {
+        console.error('❌ Fallback dashboard error:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
 
 // Additional API endpoints
 app.get('/api/debug', require('./api/debug'));
