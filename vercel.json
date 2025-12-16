@@ -1,8 +1,25 @@
 {
   "version": 2,
-  "functions": {
-    "server.js": {
-      "maxDuration": 30
-    }
-  }
+  "builds": [
+    { "src": "api/**/*.js", "use": "@vercel/node" },
+    { "src": "*.html", "use": "@vercel/static" },
+    { "src": "Client/**", "use": "@vercel/static" },
+    { "src": "pages/**", "use": "@vercel/static" },
+    { "src": "css/**", "use": "@vercel/static" },
+    { "src": "js/**", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/api/simple-test", "dest": "/api/simple-test.js" },
+    { "src": "/api/simple-dashboard", "dest": "/api/simple-dashboard.js" },
+    { "src": "/api/dashboard/summary", "dest": "/api/simple-dashboard.js" },
+    { "src": "/api/dashboard-summary", "dest": "/api/simple-dashboard.js" },
+    { "src": "/api/debug", "dest": "/api/debug.js" },
+    { "src": "/api/health", "dest": "/api/health.js" },
+    { "src": "/api/test-client", "dest": "/api/test-client.js" },
+    { "src": "/login-test", "dest": "/api/login-test.js" },
+    { "src": "/login", "dest": "/auth.html" },
+    { "src": "/admin", "dest": "/index.html" },
+    { "src": "/client", "dest": "/Client/dashboard.html" },
+    { "src": "/(.*)", "dest": "/$1" }
+  ]
 }
