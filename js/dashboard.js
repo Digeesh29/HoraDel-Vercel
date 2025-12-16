@@ -26,9 +26,18 @@ async function initAdminDashboardPage() {
         // Show loading state
         showLoadingState();
 
+        // Debug API_BASE_URL
+        console.log('🔍 API_BASE_URL value:', API_BASE_URL);
+        
         // Fetch complete dashboard summary from API
         console.log('📊 Fetching dashboard summary from:', `${API_BASE_URL}/dashboard/summary`);
-        const response = await fetch(`${API_BASE_URL}/dashboard/summary`);
+        let response = await fetch(`${API_BASE_URL}/dashboard/summary`);
+        
+        // If main endpoint fails, try fallback
+        if (!response.ok) {
+            console.log('⚠️ Main dashboard endpoint failed, trying fallback...');
+            response = await fetch(`${API_BASE_URL}/dashboard-summary`);
+        }
         
         console.log('📡 Response status:', response.status, response.statusText);
         
