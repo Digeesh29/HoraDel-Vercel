@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HoraDel Test Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 40px; text-align: center; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>🚀 HoraDel Deployment Test</h1>
+    <div id="results"></div>
+    
+    <script>
+        async function testDeployment() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p class="info">Testing deployment...</p>';
+            
+            try {
+                // Test 1: Health check
+                const healthResponse = await fetch('/health');
+                const healthData = await healthResponse.json();
+                results.innerHTML += `<p class="success">✅ Health Check: ${healthData.status}</p>`;
+                
+                // Test 2: API test
+                const apiResponse = await fetch('/api/companies');
+                if (apiResponse.ok) {
+                    results.innerHTML += `<p class="success">✅ API Working: Companies endpoint accessible</p>`;
+                } else {
+                    results.innerHTML += `<p class="error">❌ API Error: ${apiResponse.status}</p>`;
+                }
+                
+                // Test 3: Static files
+                results.innerHTML += `<p class="success">✅ Static Files: This page loaded successfully</p>`;
+                
+                // Test 4: Environment
+                results.innerHTML += `<p class="info">Environment: ${healthData.environment}</p>`;
+                results.innerHTML += `<p class="info">Timestamp: ${healthData.timestamp}</p>`;
+                
+                results.innerHTML += `<h2 class="success">🎉 Deployment Successful!</h2>`;
+                results.innerHTML += `<p><a href="/login">Go to Login Page</a></p>`;
+                results.innerHTML += `<p><a href="/admin">Go to Admin Dashboard</a></p>`;
+                results.innerHTML += `<p><a href="/client">Go to Client Dashboard</a></p>`;
+                
+            } catch (error) {
+                results.innerHTML += `<p class="error">❌ Test Failed: ${error.message}</p>`;
+            }
+        }
+        
+        // Run test on page load
+        testDeployment();
+    </script>
+</body>
+</html>

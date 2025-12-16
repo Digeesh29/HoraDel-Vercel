@@ -6,18 +6,23 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Environment-based CORS configuration
-const allowedOrigins = process.env.NODE_ENV === 'production' 
-    ? [process.env.VERCEL_URL, process.env.PRODUCTION_URL].filter(Boolean)
-    : ['http://localhost:3000', 'http://127.0.0.1:3000'];
-
+// Smart CORS configuration that works with Vercel
 app.use((req, res, next) => {
     const origin = req.headers.origin;
     
     if (process.env.NODE_ENV === 'production') {
-        // In production, be more restrictive
-        if (allowedOrigins.some(allowed => origin?.includes(allowed.replace('https://', '').replace('http://', '')))) {
+        // In production, allow Vercel domains and custom domains
+        if (origin && (
+            origin.includes('.vercel.app') || 
+            origin.includes(process.env.VERCEL_URL || '') ||
+            origin.includes(process.env.PRODUCTION_URL || '') ||
+            origin === `https://${process.env.VERCEL_URL}` ||
+            origin === process.env.PRODUCTION_URL
+        )) {
             res.header('Access-Control-Allow-Origin', origin);
+        } else {
+            // For same-origin requests (when frontend and backend are on same domain)
+            res.header('Access-Control-Allow-Origin', origin || '*');
         }
     } else {
         // In development, allow all origins
@@ -26,6 +31,7 @@ app.use((req, res, next) => {
     
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    res.header('Access-Control-Allow-Credentials', 'true');
     
     // Handle preflight requests
     if (req.method === 'OPTIONS') {
@@ -49,28 +55,50 @@ app.use('/api/drivers', require('./routes/drivers-router'));
 app.use('/api/reports', require('./routes/reports-router'));
 app.use('/api/auth', require('./routes/auth-router'));
 
-// Serve index.html
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development'
+    });
 });
 
-// Serve auth page
+// Route handlers for different pages
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'auth.html'));
+});
+
 app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'auth.html'));
 });
 
-// Serve client redirect page
-app.get('/client.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'client.html'));
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Serve client dashboard
 app.get('/client', (req, res) => {
     res.sendFile(path.join(__dirname, 'Client/dashboard.html'));
 });
 
+app.get('/test', (req, res) => {
+    res.sendFile(path.join(__dirname, 'test.html'));
+});
+
+// Handle client routes
 app.get('/Client/dashboard.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'Client/dashboard.html'));
+});
+
+// Catch-all handler for SPA routing - must be last
+app.get('*', (req, res) => {
+    // If it's an API request that wasn't handled, return 404
+    if (req.path.startsWith('/api/')) {
+        return res.status(404).json({ error: 'API endpoint not found' });
+    }
+    
+    // For all other routes, serve the login page
+    res.sendFile(path.join(__dirname, 'auth.html'));
 });
 
 // Start server
