@@ -85,6 +85,10 @@ app.get('/test', (req, res) => {
     res.sendFile(path.join(__dirname, 'test.html'));
 });
 
+app.get('/login-test', (req, res) => {
+    res.sendFile(path.join(__dirname, 'login-test.html'));
+});
+
 // Handle client routes
 app.get('/Client/dashboard.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'Client/dashboard.html'));

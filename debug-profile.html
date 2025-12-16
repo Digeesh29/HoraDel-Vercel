@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Profile Data</title>
+</head>
+<body>
+    <h1>Debug Profile Data</h1>
+    <div id="results"></div>
+    
+    <script>
+        async function debugProfile() {
+            const results = document.getElementById('results');
+            
+            // Check localStorage
+            const companyId = localStorage.getItem('companyId');
+            const companyName = localStorage.getItem('companyName');
+            const userId = localStorage.getItem('userId');
+            
+            results.innerHTML += `<h2>localStorage Data:</h2>`;
+            results.innerHTML += `<p>Company ID: ${companyId}</p>`;
+            results.innerHTML += `<p>Company Name: ${companyName}</p>`;
+            results.innerHTML += `<p>User ID: ${userId}</p>`;
+            
+            if (!companyId) {
+                results.innerHTML += `<p style="color: red;">❌ No company ID found!</p>`;
+                return;
+            }
+            
+            try {
+                // Test API calls
+                results.innerHTML += `<h2>API Tests:</h2>`;
+                
+                // Test 1: All bookings
+                const allResponse = await fetch('/api/bookings');
+                const allData = await allResponse.json();
+                results.innerHTML += `<p>All bookings: ${allData.data?.length || 0}</p>`;
+                
+                // Test 2: Filtered bookings
+                const filteredResponse = await fetch(`/api/bookings?companyId=${companyId}`);
+                const filteredData = await filteredResponse.json();
+                results.innerHTML += `<p>Filtered bookings: ${filteredData.data?.length || 0}</p>`;
+                
+                // Show sample data
+                if (filteredData.data && filteredData.data.length > 0) {
+                    results.innerHTML += `<h3>Sample Filtered Bookings:</h3>`;
+                    filteredData.data.slice(0, 3).forEach(booking => {
+                        results.innerHTML += `<p>LR: ${booking.lr_number}, Company ID: ${booking.company_id}, Status: ${booking.status}</p>`;
+                    });
+                }
+                
+                // Company distribution
+                if (allData.data && allData.data.length > 0) {
+                    const distribution = {};
+                    allData.data.forEach(b => {
+                        const cId = b.company_id;
+                        distribution[cId] = (distribution[cId] || 0) + 1;
+                    });
+                    
+                    results.innerHTML += `<h3>Company Distribution:</h3>`;
+                    Object.entries(distribution).forEach(([id, count]) => {
+                        const highlight = id == companyId ? ' style="background: yellow;"' : '';
+                        results.innerHTML += `<p${highlight}>Company ${id}: ${count} bookings</p>`;
+                    });
+                }
+                
+            } catch (error) {
+                results.innerHTML += `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+        
+        // Run on load
+        debugProfile();
+    </script>
+</body>
+</html>

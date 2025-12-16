@@ -472,6 +472,7 @@
         loginBtn.textContent = 'Signing in...';
         
         try {
+            console.log('🔐 Attempting login with URL:', `${API_BASE_URL}/api/auth/login`);
             const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
                 method: 'POST',
                 headers: {
@@ -480,7 +481,9 @@
                 body: JSON.stringify({ email, password })
             });
 
+            console.log('📡 Login response status:', response.status);
             const result = await response.json();
+            console.log('📊 Login result:', result);
 
             if (result.success) {
                 // Store user data
@@ -503,9 +506,9 @@
                 // Redirect based on role
                 setTimeout(() => {
                     if (result.user.role === 'admin') {
-                        window.location.href = '/index.html';
+                        window.location.href = '/admin';
                     } else {
-                        window.location.href = '/client.html';
+                        window.location.href = '/client';
                     }
                 }, 1000);
             } else {
@@ -539,6 +542,7 @@
         registerBtn.textContent = 'Creating account...';
         
         try {
+            console.log('📝 Attempting registration with URL:', `${API_BASE_URL}/api/auth/register`);
             const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
                 method: 'POST',
                 headers: {
@@ -602,9 +606,9 @@
         if (userRole && userEmail) {
             console.log('User already authenticated, redirecting...');
             if (userRole === 'admin') {
-                window.location.href = '/index.html';
+                window.location.href = '/admin';
             } else if (userRole === 'client') {
-                window.location.href = '/client.html';
+                window.location.href = '/client';
             }
         }
     });
