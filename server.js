@@ -125,6 +125,71 @@ app.get('/api/test', (req, res) => {
     });
 });
 
+// Direct dashboard summary endpoint (bypassing router)
+app.get('/api/dashboard/summary', async (req, res) => {
+    try {
+        console.log('📊 Direct dashboard summary endpoint called');
+        const supabase = require('./config/supabase');
+        
+        const { companyId } = req.query;
+        console.log('🏢 Company filter:', companyId || 'All companies');
+        
+        // Get basic counts
+        let bookingsQuery = supabase.from('bookings').select('*', { count: 'exact', head: true });
+        if (companyId) {
+            bookingsQuery = bookingsQuery.eq('company_id', companyId);
+        }
+        const { count: totalBookings } = await bookingsQuery;
+
+        let companiesQuery = supabase.from('companies').select('*', { count: 'exact', head: true });
+        const { count: totalCompanies } = await companiesQuery;
+
+        // Get recent bookings
+        let recentQuery = supabase
+            .from('bookings')
+            .select(`*, company:companies(name)`)
+            .order('booking_date', { ascending: false })
+            .limit(10);
+        if (companyId) {
+            recentQuery = recentQuery.eq('company_id', companyId);
+        }
+        const { data: recentBookings } = await recentQuery;
+
+        console.log('✅ Dashboard data:', { totalBookings, totalCompanies, recentCount: recentBookings?.length });
+
+        res.json({
+            success: true,
+            data: {
+                stats: {
+                    todayBookings: 0,
+                    totalBookings: totalBookings || 0,
+                    totalInTransit: 0,
+                    allTimeDelivered: 0,
+                    activeVehicles: 0,
+                    parcelsInTransit: 0,
+                    pendingDeliveries: 0
+                },
+                recentBookings: recentBookings || [],
+                trend: {
+                    labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+                    data: [0, 0, 0, 0, 0, 0, 0]
+                },
+                companyDistribution: {
+                    labels: ['Companies'],
+                    data: [totalCompanies || 0]
+                }
+            }
+        });
+    } catch (error) {
+        console.error('❌ Direct dashboard error:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message,
+            details: error.stack
+        });
+    }
+});
+
 // Fallback dashboard summary endpoint
 app.get('/api/dashboard-summary', async (req, res) => {
     try {
@@ -164,6 +229,70 @@ app.get('/api/dashboard-summary', async (req, res) => {
         });
     } catch (error) {
         console.error('❌ Fallback dashboard error:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// Direct companies endpoint
+app.get('/api/companies', async (req, res) => {
+    try {
+        console.log('🏢 Direct companies endpoint called');
+        const supabase = require('./config/supabase');
+        
+        const { data, error } = await supabase
+            .from('companies')
+            .select('*')
+            .order('name');
+
+        if (error) throw error;
+
+        console.log(`✅ Found ${data?.length || 0} companies`);
+        res.json({
+            success: true,
+            data: data || []
+        });
+    } catch (error) {
+        console.error('❌ Direct companies error:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// Direct bookings endpoint
+app.get('/api/bookings', async (req, res) => {
+    try {
+        console.log('📋 Direct bookings endpoint called');
+        const supabase = require('./config/supabase');
+        const { companyId, limit } = req.query;
+        
+        let query = supabase
+            .from('bookings')
+            .select(`*, company:companies(id, name)`)
+            .order('booking_date', { ascending: false });
+
+        if (companyId) {
+            query = query.eq('company_id', companyId);
+        }
+        
+        if (limit) {
+            query = query.limit(parseInt(limit));
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+
+        console.log(`✅ Found ${data?.length || 0} bookings`);
+        res.json({
+            success: true,
+            data: data || []
+        });
+    } catch (error) {
+        console.error('❌ Direct bookings error:', error);
         res.status(500).json({
             success: false,
             error: error.message
