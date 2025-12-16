@@ -1,8 +1,8 @@
-// Use your exact companies router for Vercel
+// Use your exact companies router - same as localhost
 const express = require('express');
 const companiesRouter = require('../routes/companies-router');
 
-// Create a mini Express app to handle the router
+// Create Express app instance
 const app = express();
 app.use(express.json());
 
@@ -18,8 +18,8 @@ app.use((req, res, next) => {
     next();
 });
 
-// Use your exact router
+// Use your router exactly like in server.js
 app.use('/', companiesRouter);
 
-// Export for Vercel
+// Export the app for Vercel
 module.exports = app;

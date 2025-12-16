@@ -302,8 +302,6 @@ app.get('/api/bookings', async (req, res) => {
 
 // Additional API endpoints
 app.get('/api/debug', require('./api/debug'));
-app.get('/api/test-client', require('./api/test-client'));
-app.get('/login-test', require('./api/login-test'));
 
 // Health check endpoint
 app.get('/health', (req, res) => {

@@ -23,6 +23,7 @@
     { "src": "/api/debug", "dest": "/api/debug.js" },
     { "src": "/login", "dest": "/auth.html" },
     { "src": "/test-auth", "dest": "/test-auth.html" },
+    { "src": "/quick-test", "dest": "/quick-test.html" },
     { "src": "/admin", "dest": "/index.html" },
     { "src": "/client", "dest": "/Client/dashboard.html" },
     { "src": "/(.*)", "dest": "/$1" }
