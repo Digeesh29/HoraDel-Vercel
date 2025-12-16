@@ -16,6 +16,7 @@
     { "src": "/api/companies", "dest": "/api/companies.js" },
     { "src": "/api/ratecards", "dest": "/api/ratecards.js" },
     { "src": "/api/reports/(.*)", "dest": "/api/reports.js?endpoint=$1" },
+    { "src": "/api/auth", "dest": "/api/auth.js" },
     { "src": "/api/add-sample-data", "dest": "/api/add-sample-data.js" },
     { "src": "/api/debug", "dest": "/api/debug.js" },
     { "src": "/login", "dest": "/auth.html" },
