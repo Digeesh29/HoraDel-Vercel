@@ -1,0 +1,92 @@
+<!-- CLIENT BOOKING PAGE -->
+
+<!-- Booking Form Card -->
+<div class="card" style="margin-bottom: 32px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+        <div>
+            <h3 style="margin: 0 0 4px 0; color: #111827;">Parcel Entry Form</h3>
+            <p style="margin: 0; color: #6b7280; font-size: 14px;">Fill in the details to add a new parcel</p>
+        </div>
+        <div>
+            <span id="lrChip" style="background: #f1f3f5; padding: 8px 12px; border-radius: 18px; font-weight: 700; font-size: 14px;">LR1764865563772</span>
+        </div>
+    </div>
+
+    <form id="parcelForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+        <div class="form-group">
+            <label style="display: block; font-weight: 500; color: #374151; margin-bottom: 8px;">Consignee Name *</label>
+            <input id="company" type="text" required style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;">
+        </div>
+
+        <div class="form-group">
+            <label style="display: block; font-weight: 500; color: #374151; margin-bottom: 8px;">Address *</label>
+            <input id="address" type="text" required style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;">
+        </div>
+
+        <div class="form-group">
+            <label style="display: block; font-weight: 500; color: #374151; margin-bottom: 8px;">City *</label>
+            <input id="city" type="text" required style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;">
+        </div>
+
+        <div class="form-group">
+            <label style="display: block; font-weight: 500; color: #374151; margin-bottom: 8px;">Phone Number *</label>
+            <input id="phone" type="tel" required style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;">
+        </div>
+
+        <div class="form-group">
+            <label style="display: block; font-weight: 500; color: #374151; margin-bottom: 8px;">No. of Articles *</label>
+            <input id="articles" type="number" min="1" required style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;">
+        </div>
+
+        <div class="form-group">
+            <label style="display: block; font-weight: 500; color: #374151; margin-bottom: 8px;">Parcel Type</label>
+            <select id="parcelType" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;">
+                <option>Standard</option>
+                <option>Express</option>
+            </select>
+        </div>
+
+        <div style="grid-column: 1 / -1; display: flex; gap: 12px; margin-top: 20px;">
+            <button id="createSingleBtn" type="button" style="background: #16a34a; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer;">Create Single Booking</button>
+            <button id="addParcelBtn" type="button" style="background: linear-gradient(135deg, #111827 0%, #374151 100%); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer;">+ Add to Batch</button>
+            <button type="reset" style="background: transparent; color: #6b7280; border: 2px solid #e5e7eb; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer;">Clear Form</button>
+        </div>
+    </form>
+</div>
+
+<!-- Batch Table Card -->
+<div class="card">
+    <h3 style="margin: 0 0 24px 0; color: #111827;">Parcels in Current Batch</h3>
+
+    <div id="batchEmpty" style="text-align: center; padding: 60px; border-radius: 10px; border: 2px dashed #e5e7eb; color: #9ca3af;">
+        <span class="material-symbols-outlined" style="font-size: 48px; color: #d1d5db; margin-bottom: 16px;">add_circle</span>
+        <div style="font-weight: 600; margin-bottom: 8px; color: #6b7280;">No parcels added yet</div>
+        <div style="color: #9ca3af;">Fill the form above and click "Add Parcel to Batch" to get started</div>
+    </div>
+
+    <div id="batchTableWrapper" style="display: none;">
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #f9fafb;">
+                        <th style="padding: 12px 24px; text-align: left; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">#</th>
+                        <th style="padding: 12px 24px; text-align: left; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">Consignee</th>
+                        <th style="padding: 12px 24px; text-align: left; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">City</th>
+                        <th style="padding: 12px 24px; text-align: left; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">Articles</th>
+                        <th style="padding: 12px 24px; text-align: left; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">Type</th>
+                        <th style="padding: 12px 24px; text-align: left; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="batchTableBody"></tbody>
+            </table>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; padding-top: 24px; border-top: 1px solid #e5e7eb;">
+            <div style="color: #6b7280;">LR: <span id="lrBottom" style="font-weight: 600;">LR1764865563772</span></div>
+            <div style="display: flex; gap: 12px;">
+                <button id="submitBatch" style="background: #16a34a; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer;">Submit Batch</button>
+                <button id="clearBatch" style="background: transparent; color: #dc2626; border: 2px solid #dc2626; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer;">Clear</button>
+            </div>
+        </div>
+    </div>
+</div>

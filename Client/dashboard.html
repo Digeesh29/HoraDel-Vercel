@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HoraDel Client Portal</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/Client/css/style.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-circle">HD</div>
+            <div>
+                <div class="brand-title">HoraDel Client</div>
+                <div class="brand-sub">Transport Portal</div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <button class="nav-item active" data-page="client-dashboard">
+                <span class="material-symbols-outlined">grid_view</span> Dashboard
+            </button>
+            <button class="nav-item" data-page="client-booking">
+                <span class="material-symbols-outlined">receipt_long</span> New Booking
+            </button>
+            <button class="nav-item" data-page="client-bookings">
+                <span class="material-symbols-outlined">inventory_2</span> Parcel Management
+            </button>
+            <button class="nav-item" data-page="client-profile">
+                <span class="material-symbols-outlined">person</span> Profile
+            </button>
+        </nav>
+
+        <div class="sidebar-footer">
+            &copy; 2024 HoraDel<br>Transport V1.0.2
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <header class="topbar">
+            <h2 class="page-title" id="pageTitle">Dashboard</h2>
+            <div class="user-profile">
+                <div class="icon-btn"><span class="material-symbols-outlined">notifications</span></div>
+                <div class="avatar" id="userAvatar" style="cursor: pointer;">CL</div>
+                <span id="userName" style="cursor: pointer;">Client User</span>
+                <button class="icon-btn" id="logoutBtn" title="Logout" style="margin-left: 12px;">
+                    <span class="material-symbols-outlined">logout</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Dynamic page content will be injected here -->
+        <div id="content" style="padding:32px; height:100%; overflow-y:auto;"></div>
+    </main>
+</div>
+
+<!-- CONFIG + MAIN + PAGE JS -->
+<script src="/Client/js/client-config.js?v=2"></script>
+<script src="/Client/js/client-main.js?v=2"></script>
+<script src="/Client/js/client-dashboard.js?v=2"></script>
+<script src="/Client/js/booking.js?v=2"></script>
+<script src="/Client/js/client-bookings.js?v=2"></script>
+<script src="/Client/js/client-profile.js?v=2"></script>
+
+<!-- Auto-load Dashboard on page load -->
+<script>
+    // Wait for DOM to be ready
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 HoraDel Client Portal Loading...');
+        console.log('🔍 Current URL:', window.location.href);
+        console.log('🔍 Script tags:', Array.from(document.querySelectorAll('script')).map(s => s.src));
+        console.log('🔍 Admin functions exist:', {
+            initDashboardPage: typeof window.initDashboardPage,
+            initAdminDashboardPage: typeof window.initAdminDashboardPage
+        });
+        
+        // Check if we're accidentally in admin interface
+        if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
+            console.log('🚨 ERROR: Client is accessing admin interface!');
+            console.log('🔄 Redirecting to correct client URL...');
+            window.location.href = '/Client/dashboard.html';
+            return;
+        }
+        
+        // Check authentication
+        const userRole = localStorage.getItem('userRole');
+        const userEmail = localStorage.getItem('userEmail');
+        
+        if (!userRole || !userEmail) {
+            console.log('❌ Not authenticated, redirecting to login');
+            window.location.href = '/login';
+            return;
+        }
+        
+        if (userRole !== 'client') {
+            console.log('❌ Not client user, redirecting');
+            if (userRole === 'admin') {
+                window.location.href = '/index.html';
+            } else {
+                window.location.href = '/login';
+            }
+            return;
+        }
+        
+        console.log('✅ Client authenticated, loading client portal');
+        
+        // Update user display
+        const userName = localStorage.getItem('userName') || 'Client User';
+        document.getElementById('userName').textContent = userName;
+        
+        // Load dashboard page by default
+        const dashboardBtn = document.querySelector('.nav-item[data-page="client-dashboard"]');
+        if (dashboardBtn) {
+            dashboardBtn.click();
+            console.log('✅ Client Dashboard loaded');
+        }
+    });
+</script>
+</body>
+</html>

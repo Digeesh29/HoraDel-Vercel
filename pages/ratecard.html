@@ -1,0 +1,83 @@
+<div class="page">
+
+    <!-- HEADER + ACTIONS -->
+    <div class="dashboard-section" style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px;">
+        <div>
+            <h3 class="dashboard-section-title" style="margin:0 0 4px;">Rate Card Management</h3>
+            <p style="font-size:13px; color:#6b7280; margin:0;">
+                Manage pricing for each company
+            </p>
+        </div>
+
+        <button class="btn btn-black" id="openRateModal">
+            <span class="material-symbols-outlined" style="vertical-align:middle; font-size:18px;">add</span>
+            Add New Rate Card
+        </button>
+    </div>
+
+    <!-- SIMPLE TABLE CARD -->
+    <div class="rate-card-container">
+        <div class="rate-card-header">
+            <div class="rate-card-col">Company Name</div>
+            <div class="rate-card-col">Per Article Rate</div>
+            <div class="rate-card-col">Actions</div>
+        </div>
+        <div id="rateCardTableBody" class="rate-card-body"></div>
+    </div>
+</div>
+
+<!-- ADD / EDIT RATE CARD MODAL -->
+<div class="modal-overlay" id="rateModal">
+    <div class="modal" style="max-width:600px;">
+        <div class="modal-header">
+            <h3 class="modal-title" id="rateModalTitle">Add New Rate Card</h3>
+            <button class="close-btn" id="closeRateModal">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Company Name *</label>
+                <select id="rCompany" class="form-input">
+                    <option value="">Select a company...</option>
+                </select>
+                <div style="margin-top: 8px;">
+                    <input type="text" id="rCompanyNew" class="form-input" placeholder="Or enter new company name" style="display: none;">
+                    <button type="button" id="addNewCompanyBtn" class="btn btn-outline btn-sm" style="font-size: 12px; padding: 6px 12px;">
+                        <span class="material-symbols-outlined" style="font-size: 14px; margin-right: 4px;">add</span>
+                        Add New Company
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Per Article Rate *</label>
+                <div style="position:relative;">
+                    <span style="position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:14px; color:#9ca3af;">₹</span>
+                    <input type="number" id="rPerArticle" class="form-input" style="padding-left:36px;" placeholder="Enter rate">
+                </div>
+            </div>
+
+            <!-- CALCULATION PREVIEW -->
+            <div style="margin-top:16px; padding:16px; border-radius:8px; background:#f3f4f6; border:1px solid #e5e7eb;">
+                <div style="font-weight:600; margin-bottom:12px; color:#374151; font-size:14px;">Simple Pricing Calculator</div>
+                
+                <div style="margin-bottom: 12px;">
+                    <label style="font-size: 12px; color: #6b7280; margin-bottom: 4px; display: block;">Sample Articles</label>
+                    <input type="number" id="previewArticles" value="50" min="1" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 13px;">
+                </div>
+                
+                <div id="calculationBreakdown" style="font-size: 13px; color: #374151; background: white; padding: 12px; border-radius: 6px; border: 1px solid #e5e7eb;">
+                    <div style="margin-bottom: 8px;"><strong>Calculation:</strong></div>
+                    <div id="breakdownDetails">Enter per article rate to see calculation</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-outline" id="cancelRateModal">Cancel</button>
+            <button class="btn btn-black" id="saveRateCard">Save Changes</button>
+        </div>
+    </div>
+</div>

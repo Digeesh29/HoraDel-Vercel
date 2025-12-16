@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HoraDel Authentication</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* LEFT SIDE */
+        .left {
+            flex: 1;
+            background: linear-gradient(135deg, #111827 0%, #374151 100%);
+            color: white;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 60px;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .title {
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 24px;
+        }
+
+        .description {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 60px;
+            line-height: 1.6;
+        }
+
+        .features {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            margin-bottom: 60px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .feature-item h4 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .feature-item p {
+            font-size: 14px;
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+
+        .footer {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        /* RIGHT SIDE */
+        .right {
+            flex: 1;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px;
+        }
+
+        .form-box {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .form-box h2 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .form-sub {
+            font-size: 16px;
+            color: #6b7280;
+            margin-bottom: 32px;
+        }
+
+        .form-tabs {
+            display: flex;
+            margin-bottom: 32px;
+            background: #f3f4f6;
+            border-radius: 8px;
+            padding: 4px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #6b7280;
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: #111827;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-box label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
+            margin-top: 20px;
+        }
+
+        .input-box {
+            position: relative;
+        }
+
+        .input-box input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .input-box input:focus {
+            outline: none;
+            border-color: #111827;
+            box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.1);
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #111827 0%, #374151 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin: 24px 0;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .auth-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .success-message {
+            background: #ecfdf5;
+            color: #059669;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .demo-credentials {
+            margin-top: 24px;
+            padding: 16px;
+            background: #f9fafb;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .demo-credentials h4 {
+            color: #374151;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .demo-credentials p {
+            margin-bottom: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .left {
+                padding: 40px 20px;
+            }
+            
+            .title {
+                font-size: 36px;
+            }
+            
+            .right {
+                padding: 40px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- LEFT SIDE -->
+    <div class="left">
+
+        <div class="logo-area">
+            <div class="logo-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 3h13v13H3z"/>
+                    <path d="M16 8h4l2 3v5h-6z"/>
+                    <circle cx="7.5" cy="16.5" r="1.5"/>
+                    <circle cx="18.5" cy="16.5" r="1.5"/>
+                </svg>
+            </div>
+            <span class="logo-text"><b>HoraDel</b></span>
+        </div>
+
+        <div>
+            <h1 class="title">Welcome to<br>Your Transport<br>Portal</h1>
+
+            <p class="description">
+                Manage bookings, track parcels, and streamline<br>
+                your logistics operations with ease.
+            </p>
+
+            <div class="features">
+
+                <!-- TRUCK ICON -->
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 3h13v13H3z"/>
+                            <path d="M16 8h4l2 3v5h-6z"/>
+                            <circle cx="7.5" cy="16.5" r="1.5"/>
+                            <circle cx="18.5" cy="16.5" r="1.5"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4>Real-time Tracking</h4>
+                        <p>Monitor your parcels at every step</p>
+                    </div>
+                </div>
+
+                <!-- SHIELD ICON -->
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2l7 4v6c0 5-4 10-7 10s-7-5-7-10V6z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4>Secure & Reliable</h4>
+                        <p>Your data is protected with enterprise-grade security</p>
+                    </div>
+                </div>
+
+                <!-- CLOCK ICON -->
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 6v6l4 2"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4>Fast Booking</h4>
+                        <p>Create and manage bookings in seconds</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <p class="footer">© 2025 HoraDel Transport. All rights reserved.</p>
+
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="right">
+
+        <div class="form-box">
+            <h2 id="formTitle">Sign In</h2>
+            <p class="form-sub">Enter your credentials to access your account</p>
+
+            <div class="form-tabs">
+                <button class="tab-btn active" id="loginTab">Login</button>
+                <button class="tab-btn" id="registerTab">Register</button>
+            </div>
+
+            <div class="error-message" id="errorMessage"></div>
+            <div class="success-message" id="successMessage"></div>
+
+            <!-- LOGIN FORM -->
+            <form id="loginForm">
+                <label>Email Address</label>
+                <div class="input-box">
+                    <input type="email" id="loginEmail" placeholder="you@example.com" required>
+                </div>
+
+                <label>Password</label>
+                <div class="input-box">
+                    <input type="password" id="loginPassword" placeholder="••••••••" required>
+                </div>
+
+                <button type="submit" class="auth-btn" id="loginBtn">Sign In to Portal</button>
+            </form>
+
+            <!-- REGISTER FORM -->
+            <form id="registerForm" style="display: none;">
+                <label>Company Name</label>
+                <div class="input-box">
+                    <input type="text" id="registerCompanyName" placeholder="Your company name" required>
+                </div>
+
+                <label>Company Email</label>
+                <div class="input-box">
+                    <input type="email" id="registerCompanyEmail" placeholder="company@example.com" required>
+                </div>
+
+                <label>Company Phone</label>
+                <div class="input-box">
+                    <input type="tel" id="registerCompanyPhone" placeholder="+91-9876543210" required>
+                </div>
+
+                <label>Full Name</label>
+                <div class="input-box">
+                    <input type="text" id="registerName" placeholder="Your full name" required>
+                </div>
+
+                <label>Email Address</label>
+                <div class="input-box">
+                    <input type="email" id="registerEmail" placeholder="you@example.com" required>
+                </div>
+
+                <label>Phone Number</label>
+                <div class="input-box">
+                    <input type="tel" id="registerPhone" placeholder="+91-9876543210">
+                </div>
+
+                <label>Password</label>
+                <div class="input-box">
+                    <input type="password" id="registerPassword" placeholder="••••••••" required>
+                </div>
+
+                <button type="submit" class="auth-btn" id="registerBtn">Create Account</button>
+            </form>
+
+            <div class="demo-credentials">
+                <h4>Demo Credentials:</h4>
+                <p><strong>Admin:</strong> admin@horadel.com / admin123</p>
+                <p><strong>Client:</strong> client@company.com / client123</p>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    const API_BASE_URL = window.location.origin;
+    
+    // Tab switching
+    document.getElementById('loginTab').addEventListener('click', () => {
+        document.getElementById('loginTab').classList.add('active');
+        document.getElementById('registerTab').classList.remove('active');
+        document.getElementById('loginForm').style.display = 'block';
+        document.getElementById('registerForm').style.display = 'none';
+        document.getElementById('formTitle').textContent = 'Sign In';
+        clearMessages();
+    });
+
+    document.getElementById('registerTab').addEventListener('click', () => {
+        document.getElementById('registerTab').classList.add('active');
+        document.getElementById('loginTab').classList.remove('active');
+        document.getElementById('registerForm').style.display = 'block';
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('formTitle').textContent = 'Create Account';
+        clearMessages();
+    });
+
+    // Login form
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        const loginBtn = document.getElementById('loginBtn');
+        
+        clearMessages();
+        loginBtn.disabled = true;
+        loginBtn.textContent = 'Signing in...';
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Store user data
+                localStorage.setItem('userRole', result.user.role);
+                localStorage.setItem('userEmail', result.user.email);
+                localStorage.setItem('userName', result.user.full_name);
+                localStorage.setItem('userId', result.user.id);
+                
+                // Store company information
+                if (result.user.company) {
+                    localStorage.setItem('companyId', result.user.company.id);
+                    localStorage.setItem('companyName', result.user.company.name);
+                    localStorage.setItem('companyEmail', result.user.company.email);
+                } else if (result.user.company_id) {
+                    localStorage.setItem('companyId', result.user.company_id);
+                }
+                
+                showSuccess('Login successful! Redirecting...');
+                
+                // Redirect based on role
+                setTimeout(() => {
+                    if (result.user.role === 'admin') {
+                        window.location.href = '/index.html';
+                    } else {
+                        window.location.href = '/client.html';
+                    }
+                }, 1000);
+            } else {
+                showError(result.error || 'Login failed');
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            showError('Network error. Please try again.');
+        } finally {
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'Sign In to Portal';
+        }
+    });
+
+    // Register form
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const companyName = document.getElementById('registerCompanyName').value;
+        const companyEmail = document.getElementById('registerCompanyEmail').value;
+        const companyPhone = document.getElementById('registerCompanyPhone').value;
+        const name = document.getElementById('registerName').value;
+        const email = document.getElementById('registerEmail').value;
+        const phone = document.getElementById('registerPhone').value;
+        const password = document.getElementById('registerPassword').value;
+        const role = 'client'; // Always register as client
+        const registerBtn = document.getElementById('registerBtn');
+        
+        clearMessages();
+        registerBtn.disabled = true;
+        registerBtn.textContent = 'Creating account...';
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    email, 
+                    password, 
+                    full_name: name, 
+                    phone, 
+                    role,
+                    company: {
+                        name: companyName,
+                        email: companyEmail,
+                        phone: companyPhone
+                    }
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                showSuccess('Account created successfully! Please login.');
+                document.getElementById('registerForm').reset();
+                // Switch to login tab
+                document.getElementById('loginTab').click();
+            } else {
+                showError(result.error || 'Registration failed');
+            }
+        } catch (error) {
+            console.error('Registration error:', error);
+            showError('Network error. Please try again.');
+        } finally {
+            registerBtn.disabled = false;
+            registerBtn.textContent = 'Create Account';
+        }
+    });
+
+    function showError(message) {
+        const errorEl = document.getElementById('errorMessage');
+        errorEl.textContent = message;
+        errorEl.style.display = 'block';
+    }
+
+    function showSuccess(message) {
+        const successEl = document.getElementById('successMessage');
+        successEl.textContent = message;
+        successEl.style.display = 'block';
+    }
+
+    function clearMessages() {
+        document.getElementById('errorMessage').style.display = 'none';
+        document.getElementById('successMessage').style.display = 'none';
+    }
+
+    // Check if user is already logged in
+    document.addEventListener('DOMContentLoaded', function() {
+        const userRole = localStorage.getItem('userRole');
+        const userEmail = localStorage.getItem('userEmail');
+        
+        if (userRole && userEmail) {
+            console.log('User already authenticated, redirecting...');
+            if (userRole === 'admin') {
+                window.location.href = '/index.html';
+            } else if (userRole === 'client') {
+                window.location.href = '/client.html';
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

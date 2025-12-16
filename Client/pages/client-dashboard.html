@@ -1,0 +1,56 @@
+<!-- CLIENT DASHBOARD PAGE -->
+
+<!-- Welcome Section -->
+<div class="welcome-section" style="background: linear-gradient(135deg, #111827 0%, #374151 100%); color: white; padding: 32px; border-radius: 12px; margin-bottom: 32px;">
+    <h1 style="margin: 0 0 8px 0; font-size: 28px;">Welcome to HoraDel Transport</h1>
+    <p style="margin: 0; opacity: 0.9; font-size: 16px;" id="companyWelcome">Track your shipments and manage your bookings</p>
+</div>
+
+<!-- Stats Grid -->
+<div class="dashboard-cards">
+    <div class="dashboard-card">
+        <div class="dashboard-card-title">Today's Bookings</div>
+        <div class="dashboard-card-value" id="todayBookings">12</div>
+    </div>
+    <div class="dashboard-card">
+        <div class="dashboard-card-title">Pending Delivery</div>
+        <div class="dashboard-card-value" id="pendingDelivery">8</div>
+    </div>
+    <div class="dashboard-card">
+        <div class="dashboard-card-title">Total Delivered</div>
+        <div class="dashboard-card-value" id="totalDelivered">156</div>
+    </div>
+    <div class="dashboard-card">
+        <div class="dashboard-card-title">In Transit</div>
+        <div class="dashboard-card-value" id="inTransit">5</div>
+    </div>
+</div>
+
+<!-- Recent Bookings Table -->
+<div class="table-container" style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden; margin-top: 32px;">
+    <div style="padding: 24px 24px 0 24px;">
+        <h3 style="margin: 0 0 16px 0; color: #111827;">Your Recent Bookings</h3>
+    </div>
+    
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f9fafb;">
+                    <th style="padding: 12px 24px; text-align: left; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">LR Number</th>
+                    <th style="padding: 12px 24px; text-align: left; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">Date</th>
+                    <th style="padding: 12px 24px; text-align: left; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">Destination</th>
+                    <th style="padding: 12px 24px; text-align: left; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">Articles</th>
+                    <th style="padding: 12px 24px; text-align: left; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">Status</th>
+                    <th style="padding: 12px 24px; text-align: left; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="recentBookingsTable">
+                <tr>
+                    <td colspan="6" style="padding: 40px; text-align: center; color: #6b7280;">
+                        Loading your recent bookings...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

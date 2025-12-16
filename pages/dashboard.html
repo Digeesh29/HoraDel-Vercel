@@ -1,0 +1,122 @@
+<div class="page">
+
+    <!-- STATS CARDS -->
+    <div class="dashboard-cards stats-row">
+        <div class="dashboard-card stat-card">
+            <div class="stat-top">
+                <div class="stat-icon">
+                    <span class="material-symbols-outlined">inventory_2</span>
+                </div>
+                <span class="stat-change stat-up" id="dashBookingsGrowth">+0%</span>
+            </div>
+            <div class="stat-label">Total Bookings Today</div>
+            <div class="stat-value" id="dashBookings">0</div>
+        </div>
+
+        <div class="dashboard-card stat-card">
+            <div class="stat-top">
+                <div class="stat-icon">
+                    <span class="material-symbols-outlined">local_shipping</span>
+                </div>
+                <span class="stat-change stat-up" id="dashActiveVehiclesGrowth">+0%</span>
+            </div>
+            <div class="stat-label">Active Vehicles</div>
+            <div class="stat-value" id="dashActiveVehicles">0</div>
+        </div>
+
+        <div class="dashboard-card stat-card">
+            <div class="stat-top">
+                <div class="stat-icon">
+                    <span class="material-symbols-outlined">package_2</span>
+                </div>
+                <span class="stat-change stat-up" id="dashParcelsGrowth">+0%</span>
+            </div>
+            <div class="stat-label">Parcels in Transit</div>
+            <div class="stat-value" id="dashParcels">0</div>
+        </div>
+
+        <div class="dashboard-card stat-card">
+            <div class="stat-top">
+                <div class="stat-icon">
+                    <span class="material-symbols-outlined">schedule</span>
+                </div>
+                <span class="stat-change stat-up" id="dashPendingGrowth">+0%</span>
+            </div>
+            <div class="stat-label">Pending Deliveries</div>
+            <div class="stat-value" id="dashPending">0</div>
+        </div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="chart-row">
+        <div class="chart-card">
+            <div class="chart-card-title">Bookings Trend</div>
+            <div class="chart-card-body">
+                <canvas id="dashTrendChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-card-title">Company-wise Load Distribution</div>
+            <div class="chart-card-body">
+                <canvas id="dashLoadChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOTAL STATS OVERVIEW -->
+    <div class="dashboard-cards" style="margin-top: 32px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px;">
+        <div class="dashboard-card stat-card">
+            <div class="stat-top">
+                <div class="stat-icon" style="background: #3b82f6;">
+                    <span class="material-symbols-outlined">receipt_long</span>
+                </div>
+            </div>
+            <div class="stat-label">Total Bookings</div>
+            <div class="stat-value" id="dashTotalBookings">0</div>
+        </div>
+
+        <div class="dashboard-card stat-card">
+            <div class="stat-top">
+                <div class="stat-icon" style="background: #f59e0b;">
+                    <span class="material-symbols-outlined">local_shipping</span>
+                </div>
+            </div>
+            <div class="stat-label">Total In-Transit</div>
+            <div class="stat-value" id="dashTotalInTransit">0</div>
+        </div>
+
+        <div class="dashboard-card stat-card">
+            <div class="stat-top">
+                <div class="stat-icon" style="background: #10b981;">
+                    <span class="material-symbols-outlined">check_circle</span>
+                </div>
+            </div>
+            <div class="stat-label">Total Delivered</div>
+            <div class="stat-value" id="dashTotalDelivered">0</div>
+        </div>
+    </div>
+
+    <!-- LATEST BOOKINGS TABLE -->
+    <div class="table-responsive table-card">
+        <div class="table-card-header">
+            <h3 class="dashboard-section-title" style="margin:0;">Not Assigned Bookings</h3>
+            <button class="btn btn-outline btn-sm" id="viewAllBookingsBtn">View All</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>LR No.</th>
+                    <th>Date</th>
+                    <th>Company</th>
+                    <th>Consignee</th>
+                    <th>Destination</th>
+                    <th>Articles</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="dashTableBody"></tbody>
+        </table>
+    </div>
+</div>

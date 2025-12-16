@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HORADELtransport Admin</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/styles.css?v=6">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Client Detection and Redirect -->
+    <script>
+        // Check if user is a client and redirect immediately
+        const userRole = localStorage.getItem('userRole');
+        if (userRole === 'client') {
+            console.log('🔄 Client user detected in admin interface, redirecting to client dashboard');
+            // Stop all script execution and redirect immediately
+            document.addEventListener('DOMContentLoaded', function(e) {
+                e.stopImmediatePropagation();
+            });
+            // Redirect immediately
+            window.location.replace('/client.html');
+            // Stop further script execution
+            throw new Error('Client user redirected from admin interface');
+        }
+    </script>
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-circle">HD</div>
+            <div>
+                <div class="brand-title">HoraDel Admin</div>
+                <div class="brand-sub">Transport Control Panel</div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <button class="nav-item active" data-page="dashboard">
+                <span class="material-symbols-outlined">grid_view</span> Dashboard
+            </button>
+            <button class="nav-item" data-page="bookings">
+                <span class="material-symbols-outlined">receipt_long</span> All Bookings
+            </button>
+            <button class="nav-item" data-page="vehicles">
+                <span class="material-symbols-outlined">local_shipping</span> Vehicles
+            </button>
+            <button class="nav-item" data-page="ratecard">
+                <span class="material-symbols-outlined">payments</span> Rate Card
+            </button>
+            <button class="nav-item" data-page="reports">
+                <span class="material-symbols-outlined">bar_chart</span> Reports
+            </button>
+            <button class="nav-item" data-page="profile">
+                <span class="material-symbols-outlined">person</span> Profile
+            </button>
+        </nav>
+
+        <div class="sidebar-footer">
+            &copy; 2024 HoraDel<br>Transport V1.0.2
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <header class="topbar">
+            <h2 class="page-title" id="pageTitle">Dashboard</h2>
+            <div class="user-profile">
+                <div class="icon-btn"><span class="material-symbols-outlined">notifications</span></div>
+                <div class="avatar" id="userAvatar" style="cursor: pointer;">AD</div>
+                <span id="userName" style="cursor: pointer;">Admin</span>
+                <button class="icon-btn" id="logoutBtn" title="Logout" style="margin-left: 12px;">
+                    <span class="material-symbols-outlined">logout</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Dynamic page content will be injected here -->
+        <div id="content" style="padding:32px; height:100%; overflow-y:auto;"></div>
+    </main>
+</div>
+
+<!-- CLIENT PROTECTION - Prevent admin scripts from loading for client users -->
+<script>
+    // Final check before loading admin scripts
+    if (localStorage.getItem('userRole') === 'client') {
+        console.log('🚫 BLOCKING admin scripts for client user');
+        window.location.replace('/client.html');
+        throw new Error('Admin scripts blocked for client user');
+    }
+</script>
+
+<!-- CONFIG + MAIN + PAGE JS -->
+<script src="js/config.js"></script>
+<script src="js/main.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/bookings.js"></script>
+<script src="js/vehicles.js?v=13"></script>
+<script src="js/ratecard.js?v=2"></script>
+<script src="js/reports.js"></script>
+<script src="js/profile.js"></script>
+
+<!-- Auto-load Dashboard on page load -->
+<script>
+    // Wait for DOM to be ready
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 HoraDel Admin Panel Loading...');
+        
+        // Check authentication
+        const userRole = localStorage.getItem('userRole');
+        const userEmail = localStorage.getItem('userEmail');
+        
+        if (!userRole || !userEmail) {
+            // Not authenticated, redirect to login
+            console.log('❌ Not authenticated, redirecting to login');
+            window.location.href = '/login';
+            return;
+        }
+        
+        if (userRole !== 'admin') {
+            // Not admin, redirect to appropriate page
+            console.log('❌ Not admin user, redirecting');
+            if (userRole === 'client') {
+                window.location.href = 'Client/dashboard.html';
+            } else {
+                window.location.href = '/login';
+            }
+            return;
+        }
+        
+        console.log('✅ Admin authenticated, loading admin panel');
+        
+        // Update user display
+        const userName = localStorage.getItem('userName') || 'Admin';
+        document.getElementById('userName').textContent = userName;
+        
+        // Load dashboard page by default
+        const dashboardBtn = document.querySelector('.nav-item[data-page="dashboard"]');
+        if (dashboardBtn) {
+            dashboardBtn.click();
+            console.log('✅ Dashboard loaded');
+        }
+    });
+</script>
+</body>
+</html>

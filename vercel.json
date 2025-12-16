@@ -1,0 +1,42 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/Client/(.*)",
+      "dest": "/Client/$1"
+    },
+    {
+      "src": "/(.*\\.(css|js|html|png|jpg|jpeg|gif|svg|ico))",
+      "dest": "/$1"
+    },
+    {
+      "src": "/",
+      "dest": "/auth.html"
+    },
+    {
+      "src": "/login",
+      "dest": "/auth.html"
+    },
+    {
+      "src": "/admin",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/client",
+      "dest": "/Client/dashboard.html"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
