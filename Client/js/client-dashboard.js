@@ -30,7 +30,7 @@ async function initClientDashboardPage() {
 
 function logout() {
     localStorage.clear();
-    window.location.href = '/auth.html';
+    window.location.href = '/login';
 }
 
 async function loadClientDashboardData() {

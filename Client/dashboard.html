@@ -89,7 +89,7 @@
         if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
             console.log('🚨 ERROR: Client is accessing admin interface!');
             console.log('🔄 Redirecting to correct client URL...');
-            window.location.href = '/Client/dashboard.html';
+            window.location.href = '/client';
             return;
         }
         
@@ -106,7 +106,7 @@
         if (userRole !== 'client') {
             console.log('❌ Not client user, redirecting');
             if (userRole === 'admin') {
-                window.location.href = '/index.html';
+                window.location.href = '/admin';
             } else {
                 window.location.href = '/login';
             }
