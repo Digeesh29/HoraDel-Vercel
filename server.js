@@ -51,69 +51,15 @@ app.use('/js', express.static(path.join(__dirname, 'js')));
 app.use('/css', express.static(path.join(__dirname, 'css')));
 app.use('/pages', express.static(path.join(__dirname, 'pages')));
 
-// API Routes - with error handling for Vercel
-try {
-    app.use('/api/dashboard', require('./routes/dashboard-router'));
-    console.log('✅ Dashboard router loaded');
-} catch (err) {
-    console.error('❌ Dashboard router failed:', err.message);
-}
-
-try {
-    app.use('/api/bookings', require('./routes/bookings-router'));
-    console.log('✅ Bookings router loaded');
-} catch (err) {
-    console.error('❌ Bookings router failed:', err.message);
-}
-
-try {
-    app.use('/api/vehicles', require('./routes/vehicles-router'));
-    console.log('✅ Vehicles router loaded');
-} catch (err) {
-    console.error('❌ Vehicles router failed:', err.message);
-    // Fallback to direct API
-    app.use('/api/vehicles', require('./api/vehicles'));
-}
-
-try {
-    app.use('/api/ratecards', require('./routes/ratecards-router'));
-    console.log('✅ Ratecards router loaded');
-} catch (err) {
-    console.error('❌ Ratecards router failed:', err.message);
-    app.use('/api/ratecards', require('./api/ratecards'));
-}
-
-try {
-    app.use('/api/companies', require('./routes/companies-router'));
-    console.log('✅ Companies router loaded');
-} catch (err) {
-    console.error('❌ Companies router failed:', err.message);
-    app.use('/api/companies', require('./api/companies'));
-}
-
-try {
-    app.use('/api/drivers', require('./routes/drivers-router'));
-    console.log('✅ Drivers router loaded');
-} catch (err) {
-    console.error('❌ Drivers router failed:', err.message);
-    app.use('/api/drivers', require('./api/drivers'));
-}
-
-try {
-    app.use('/api/reports', require('./routes/reports-router'));
-    console.log('✅ Reports router loaded');
-} catch (err) {
-    console.error('❌ Reports router failed:', err.message);
-    app.use('/api/reports', require('./api/reports'));
-}
-
-try {
-    app.use('/api/auth', require('./routes/auth-router'));
-    console.log('✅ Auth router loaded');
-} catch (err) {
-    console.error('❌ Auth router failed:', err.message);
-    app.use('/api/auth', require('./api/auth/login'));
-}
+// API Routes
+app.use('/api/dashboard', require('./routes/dashboard-router'));
+app.use('/api/bookings', require('./routes/bookings-router'));
+app.use('/api/vehicles', require('./routes/vehicles-router'));
+app.use('/api/ratecards', require('./routes/ratecards-router'));
+app.use('/api/companies', require('./routes/companies-router'));
+app.use('/api/drivers', require('./routes/drivers-router'));
+app.use('/api/reports', require('./routes/reports-router'));
+app.use('/api/auth', require('./routes/auth-router'));
 
 // Additional API endpoints
 app.get('/api/debug', require('./api/debug'));
