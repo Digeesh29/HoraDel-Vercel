@@ -1,35 +1,10 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "api/**/*.js",
-      "use": "@vercel/node"
-    }
-  ],
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/",
-      "dest": "/auth.html"
-    },
-    {
-      "src": "/login",
-      "dest": "/auth.html"
-    },
-    {
-      "src": "/admin",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/client",
-      "dest": "/Client/dashboard.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
+    { "src": "/api/ratecards", "dest": "/api/reports.js" },
+    { "src": "/login", "dest": "/auth.html" },
+    { "src": "/admin", "dest": "/index.html" },
+    { "src": "/client", "dest": "/Client/dashboard.html" },
+    { "src": "/(.*)", "dest": "/$1" }
   ]
 }
