@@ -28,6 +28,22 @@
       "dest": "/api/debug.js"
     },
     {
+      "src": "/login-test",
+      "dest": "/login-test.html"
+    },
+    {
+      "src": "/test",
+      "dest": "/test.html"
+    },
+    {
+      "src": "/api/bookings",
+      "dest": "/api/bookings.js"
+    },
+    {
+      "src": "/api/test-client",
+      "dest": "/api/test-client.js"
+    },
+    {
       "src": "/",
       "dest": "/auth.html"
     },
