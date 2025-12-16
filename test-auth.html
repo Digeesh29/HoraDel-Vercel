@@ -15,6 +15,7 @@
 <body>
     <h1>🔐 Auth API Test</h1>
     
+    <button onclick="testSimple()">Test Simple API</button>
     <button onclick="testLogin()">Test Login</button>
     <button onclick="testDebug()">Test Debug</button>
     
@@ -23,12 +24,32 @@
     <script>
         const API_BASE_URL = window.location.origin + '/api';
         
+        async function testSimple() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<div>Testing simple API...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/simple-test`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    results.innerHTML = `<div class="result success">✅ Simple API Working: ${result.message}</div>`;
+                } else {
+                    results.innerHTML = `<div class="result error">❌ Simple API Failed</div>`;
+                }
+            } catch (error) {
+                results.innerHTML = `<div class="result error">❌ Simple API Error: ${error.message}</div>`;
+            }
+        }
+        
         async function testLogin() {
             const results = document.getElementById('results');
             results.innerHTML = '<div>Testing login...</div>';
             
             try {
                 console.log('🔐 Testing login API...');
+                console.log('🔍 Testing URL:', `${API_BASE_URL}/auth/login`);
+                
                 const response = await fetch(`${API_BASE_URL}/auth/login`, {
                     method: 'POST',
                     headers: {
@@ -41,8 +62,19 @@
                 });
                 
                 console.log('📡 Response status:', response.status);
-                const result = await response.json();
-                console.log('📊 Response data:', result);
+                console.log('📡 Response headers:', response.headers);
+                
+                const responseText = await response.text();
+                console.log('📡 Raw response:', responseText);
+                
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('JSON parse error:', parseError);
+                    results.innerHTML = `<div class="result error">❌ Invalid JSON Response:<br><pre>${responseText.substring(0, 200)}...</pre></div>`;
+                    return;
+                }
                 
                 if (result.success) {
                     results.innerHTML = `<div class="result success">✅ Login Success: ${result.user.email} (${result.user.role})</div>`;

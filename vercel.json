@@ -19,6 +19,7 @@
     { "src": "/api/reports", "dest": "/api/reports.js" },
     { "src": "/api/auth/(.*)", "dest": "/api/auth.js" },
     { "src": "/api/auth", "dest": "/api/auth.js" },
+    { "src": "/api/simple-test", "dest": "/api/simple-test.js" },
     { "src": "/api/add-sample-data", "dest": "/api/add-sample-data.js" },
     { "src": "/api/debug", "dest": "/api/debug.js" },
     { "src": "/login", "dest": "/auth.html" },
