@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HoraDel - Setup Sample Data</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+        
+        .status {
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-weight: 500;
+        }
+        
+        .status.loading {
+            background: #e3f2fd;
+            color: #1976d2;
+            border: 2px solid #bbdefb;
+        }
+        
+        .status.success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 2px solid #c8e6c9;
+        }
+        
+        .status.error {
+            background: #ffebee;
+            color: #c62828;
+            border: 2px solid #ffcdd2;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            min-width: 200px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn.secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .data-info {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .data-info h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .data-info ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .data-info li {
+            padding: 5px 0;
+            color: #666;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .links {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #eee;
+        }
+        
+        .links a {
+            color: #667eea;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 500;
+        }
+        
+        .links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🚛 HoraDel</div>
+        <div class="subtitle">Transport Management System - Data Setup</div>
+        
+        <div id="status" class="status" style="display: none;"></div>
+        
+        <div class="data-info">
+            <h3>🚀 Setup Process:</h3>
+            <ul>
+                <li>• <strong>Step 1:</strong> Setup Demo Users (admin & client accounts)</li>
+                <li>• <strong>Step 2:</strong> Test Login API (verify authentication works)</li>
+                <li>• <strong>Step 3:</strong> Add Sample Data (companies & bookings)</li>
+                <li>• <strong>Step 4:</strong> Test Dashboard (verify data displays)</li>
+            </ul>
+        </div>
+        
+        <button id="addDataBtn" class="btn" onclick="addSampleData()">
+            🔧 Add Sample Data
+        </button>
+        
+        <button id="testSupabaseBtn" class="btn secondary" onclick="testSupabase()">
+            🔍 Test Supabase Connection
+        </button>
+        
+        <button id="testAuthBtn" class="btn secondary" onclick="testAuth()">
+            🔐 Test Login API
+        </button>
+        
+        <button id="setupUsersBtn" class="btn" onclick="setupUsers()">
+            👥 Setup Demo Users
+        </button>
+        
+        <button id="testDashboardBtn" class="btn secondary" onclick="testDashboard()">
+            📊 Test Dashboard API
+        </button>
+        
+        <div class="links">
+            <a href="/admin">🔐 Admin Dashboard</a>
+            <a href="/client">👤 Client Portal</a>
+            <a href="/auth.html">🏠 Login Page</a>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = window.location.origin + '/api';
+        
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.className = `status ${type}`;
+            status.innerHTML = message;
+            status.style.display = 'block';
+        }
+        
+        function showLoading(message) {
+            showStatus(`<span class="spinner"></span>${message}`, 'loading');
+        }
+        
+        async function addSampleData() {
+            const btn = document.getElementById('addDataBtn');
+            btn.disabled = true;
+            
+            try {
+                showLoading('Creating sample companies and bookings...');
+                
+                const response = await fetch(`${API_BASE_URL}/add-sample-data`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    showStatus(`✅ ${result.message}<br><br>📊 Created: ${result.data.companies} companies, ${result.data.bookings} bookings`, 'success');
+                    
+                    // Enable test button
+                    document.getElementById('testDashboardBtn').disabled = false;
+                } else {
+                    showStatus(`❌ Error: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus(`❌ Network Error: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+        
+        async function testDashboard() {
+            const btn = document.getElementById('testDashboardBtn');
+            btn.disabled = true;
+            
+            try {
+                showLoading('Testing dashboard API...');
+                
+                const response = await fetch(`${API_BASE_URL}/simple-dashboard`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    const stats = result.data.stats;
+                    showStatus(`✅ Dashboard API Working!<br><br>📊 Stats:<br>• Total Bookings: ${stats.totalBookings}<br>• In-Transit: ${stats.totalInTransit}<br>• Delivered: ${stats.allTimeDelivered}<br>• Recent Bookings: ${result.data.recentBookings.length}`, 'success');
+                } else {
+                    showStatus(`❌ Dashboard Error: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus(`❌ Dashboard Test Failed: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+        
+        // Test Supabase connection
+        async function testSupabase() {
+            try {
+                showLoading('Testing Supabase connection...');
+                
+                const response = await fetch(`${API_BASE_URL}/debug`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    const supabase = result.debug.supabase;
+                    const allSet = supabase.url === '✅ Set' && supabase.anon_key === '✅ Set';
+                    
+                    if (allSet) {
+                        showStatus(`✅ Supabase Connection OK<br><br>📊 Environment Variables:<br>• URL: ${supabase.url}<br>• Anon Key: ${supabase.anon_key}<br>• Service Key: ${supabase.service_key}`, 'success');
+                    } else {
+                        showStatus(`❌ Supabase Configuration Issue<br><br>📊 Environment Variables:<br>• URL: ${supabase.url}<br>• Anon Key: ${supabase.anon_key}<br>• Service Key: ${supabase.service_key}`, 'error');
+                    }
+                } else {
+                    showStatus(`❌ Debug API Error: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus(`❌ Connection Test Failed: ${error.message}`, 'error');
+            }
+        }
+        
+        // Test authentication API
+        async function testAuth() {
+            try {
+                showLoading('Testing login API...');
+                
+                const response = await fetch(`${API_BASE_URL}/auth`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'login',
+                        email: 'admin@horadel.com',
+                        password: 'admin123'
+                    })
+                });
+                
+                console.log('🔍 Auth response status:', response.status);
+                const result = await response.json();
+                console.log('🔍 Auth response data:', result);
+                
+                if (result.success) {
+                    showStatus(`✅ Login API Working!<br><br>👤 Test Login Successful:<br>• Email: admin@horadel.com<br>• Role: ${result.user.role}<br>• Name: ${result.user.full_name}`, 'success');
+                } else {
+                    showStatus(`❌ Login API Error: ${result.error}<br><br>🔍 Debug Info:<br>• Response Status: ${response.status}<br>• Error Message: ${result.message || 'No additional details'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus(`❌ Login Test Failed: ${error.message}`, 'error');
+            }
+        }
+        
+        // Setup demo users
+        async function setupUsers() {
+            const btn = document.getElementById('setupUsersBtn');
+            btn.disabled = true;
+            
+            try {
+                showLoading('Setting up demo users...');
+                
+                const response = await fetch(`${API_BASE_URL}/setup-users`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    showStatus(`✅ ${result.message}<br><br>👥 Demo Accounts:<br>• Admin: admin@horadel.com / admin123<br>• Client: client@company.com / client123<br><br>📊 Total Users: ${result.data.totalUsers || result.data.existingUsers}`, 'success');
+                    
+                    // Enable test button
+                    document.getElementById('testAuthBtn').disabled = false;
+                } else {
+                    showStatus(`❌ Error: ${result.error}<br><br>💡 Hint: ${result.hint || result.message}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus(`❌ Setup Failed: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+        
+        // Auto-test Supabase connection on page load
+        window.addEventListener('load', () => {
+            setTimeout(testSupabase, 500);
+        });
+    </script>
+</body>
+</html>
