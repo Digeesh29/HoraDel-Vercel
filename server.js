@@ -110,6 +110,11 @@ try {
     console.error('❌ Auth router error:', err.message);
 }
 
+// Backward-compat alias for older clients hitting /api/login
+app.post('/api/login', (req, res) => {
+    res.redirect(308, '/api/auth/login');
+});
+
 // Test endpoint to verify server is working
 app.get('/api/test', (req, res) => {
     res.json({
