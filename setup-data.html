@@ -166,18 +166,14 @@
         <div class="data-info">
             <h3>🚀 Setup Process:</h3>
             <ul>
-                <li>• <strong>Step 1:</strong> Setup Demo Users (admin & client accounts)</li>
+                <li>• <strong>Step 1:</strong> Test Supabase Connection</li>
                 <li>• <strong>Step 2:</strong> Test Login API (verify authentication works)</li>
                 <li>• <strong>Step 3:</strong> Add Sample Data (companies & bookings)</li>
                 <li>• <strong>Step 4:</strong> Test Dashboard (verify data displays)</li>
             </ul>
         </div>
         
-        <button id="addDataBtn" class="btn" onclick="addSampleData()">
-            🔧 Add Sample Data
-        </button>
-        
-        <button id="testSupabaseBtn" class="btn secondary" onclick="testSupabase()">
+        <button id="testSupabaseBtn" class="btn" onclick="testSupabase()">
             🔍 Test Supabase Connection
         </button>
         
@@ -185,8 +181,8 @@
             🔐 Test Login API
         </button>
         
-        <button id="setupUsersBtn" class="btn" onclick="setupUsers()">
-            👥 Setup Demo Users
+        <button id="addDataBtn" class="btn" onclick="addSampleData()">
+            🔧 Add Sample Data
         </button>
         
         <button id="testDashboardBtn" class="btn secondary" onclick="testDashboard()">
@@ -247,12 +243,12 @@
             try {
                 showLoading('Testing dashboard API...');
                 
-                const response = await fetch(`${API_BASE_URL}/simple-dashboard`);
+                const response = await fetch(`${API_BASE_URL}/dashboard/summary`);
                 const result = await response.json();
                 
                 if (result.success) {
-                    const stats = result.data.stats;
-                    showStatus(`✅ Dashboard API Working!<br><br>📊 Stats:<br>• Total Bookings: ${stats.totalBookings}<br>• In-Transit: ${stats.totalInTransit}<br>• Delivered: ${stats.allTimeDelivered}<br>• Recent Bookings: ${result.data.recentBookings.length}`, 'success');
+                    const stats = result.data;
+                    showStatus(`✅ Dashboard API Working!<br><br>📊 Stats:<br>• Total Bookings: ${stats.totalBookings}<br>• Total Revenue: ${stats.totalRevenue}<br>• Average Revenue: ${stats.averageRevenue}`, 'success');
                 } else {
                     showStatus(`❌ Dashboard Error: ${result.error}`, 'error');
                 }
@@ -295,13 +291,12 @@
             try {
                 showLoading('Testing login API...');
                 
-                const response = await fetch(`${API_BASE_URL}/auth`, {
+                const response = await fetch(`${API_BASE_URL}/login`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        action: 'login',
                         email: 'admin@horadel.com',
                         password: 'admin123'
                     })
@@ -319,33 +314,6 @@
             } catch (error) {
                 console.error('Error:', error);
                 showStatus(`❌ Login Test Failed: ${error.message}`, 'error');
-            }
-        }
-        
-        // Setup demo users
-        async function setupUsers() {
-            const btn = document.getElementById('setupUsersBtn');
-            btn.disabled = true;
-            
-            try {
-                showLoading('Setting up demo users...');
-                
-                const response = await fetch(`${API_BASE_URL}/setup-users`);
-                const result = await response.json();
-                
-                if (result.success) {
-                    showStatus(`✅ ${result.message}<br><br>👥 Demo Accounts:<br>• Admin: admin@horadel.com / admin123<br>• Client: client@company.com / client123<br><br>📊 Total Users: ${result.data.totalUsers || result.data.existingUsers}`, 'success');
-                    
-                    // Enable test button
-                    document.getElementById('testAuthBtn').disabled = false;
-                } else {
-                    showStatus(`❌ Error: ${result.error}<br><br>💡 Hint: ${result.hint || result.message}`, 'error');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showStatus(`❌ Setup Failed: ${error.message}`, 'error');
-            } finally {
-                btn.disabled = false;
             }
         }
         

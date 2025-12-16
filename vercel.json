@@ -1,25 +1,16 @@
 {
   "version": 2,
   "routes": [
-    {
-      "src": "/",
-      "dest": "/auth.html"
-    },
-    {
-      "src": "/login",
-      "dest": "/auth.html"
-    },
-    {
-      "src": "/admin",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/client",
-      "dest": "/Client/dashboard.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
+    { "src": "/api/ratecards", "dest": "/api/reports.js" },
+    { "src": "/api/reports/summary", "dest": "/api/reports.js" },
+    { "src": "/api/reports/revenue-trend", "dest": "/api/reports.js" },
+    { "src": "/api/reports/company-summary", "dest": "/api/reports.js" },
+    { "src": "/api/reports/parcel-type-distribution", "dest": "/api/reports.js" },
+    { "src": "/api/reports/vehicle-dispatch", "dest": "/api/reports.js" },
+    { "src": "/setup", "dest": "/setup-data.html" },
+    { "src": "/login", "dest": "/auth.html" },
+    { "src": "/admin", "dest": "/index.html" },
+    { "src": "/client", "dest": "/Client/dashboard.html" },
+    { "src": "/(.*)", "dest": "/$1" }
   ]
 }
