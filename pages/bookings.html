@@ -59,25 +59,26 @@
     </div>
 
     <!-- RESULTS SECTION -->
-    <div class="results-card">
-        <div class="results-header">
-            <h3 class="results-title">All Bookings (<span id="bookingsCount">0</span>)</h3>
+    <div class="table-card">
+        <div class="table-card-header">
+            <h3 style="font-size: 16px; font-weight: 600; margin: 0; color: var(--text-main);">
+                All Bookings (<span id="bookingsCount">0</span>)
+            </h3>
         </div>
         
-        <div class="table-responsive">
-            <table class="modern-table">
+        <div class="table-responsive" style="padding: 0; border: none; box-shadow: none;">
+            <table style="width: 100%; border-collapse: collapse;">
                 <thead>
-                    <tr>
-                        <th>LR No.</th>
-                        <th>Date</th>
-                        <th>Company</th>
-                        <th>Consignee</th>
-                        <th>Destination</th>
-                        <th>Articles</th>
-                        <th>Vehicle No.</th>
-                        <th>Type</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                    <tr style="background: #f9fafb; border-bottom: 1px solid var(--border-light);">
+                        <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-muted);">LR No.</th>
+                        <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-muted);">Date</th>
+                        <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-muted);">Company</th>
+                        <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-muted);">Consignee</th>
+                        <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-muted);">Destination</th>
+                        <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-muted);">Articles</th>
+                        <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-muted);">Vehicle</th>
+                        <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-muted);">Status</th>
+                        <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-muted);">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="bookingsTableBody"></tbody>

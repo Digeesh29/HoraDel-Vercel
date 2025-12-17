@@ -115,8 +115,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const content = document.getElementById("content");
 
     function loadPage(page) {
-        fetch(`pages/${page}.html`)
-            .then(r => r.text())
+        // Use absolute path to ensure it works on Vercel
+        const pagePath = `/pages/${page}.html`;
+        
+        fetch(pagePath)
+            .then(r => {
+                if (!r.ok) {
+                    throw new Error(`Failed to load page: ${pagePath}`);
+                }
+                return r.text();
+            })
             .then(html => {
                 content.innerHTML = html;
 
@@ -127,6 +135,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (page === "ratecard") initRateCardPage();
                 if (page === "reports") initReportsPage();
                 if (page === "profile") initProfilePage();
+            })
+            .catch(err => {
+                console.error('Error loading page:', err);
+                content.innerHTML = `<div style="padding:20px;color:#ef4444;">
+                    <h3>Error Loading Page</h3>
+                    <p>Failed to load ${page}.html</p>
+                    <p style="font-size:12px;color:#666;">${err.message}</p>
+                </div>`;
             });
     }
 
@@ -197,4 +213,73 @@ document.addEventListener("DOMContentLoaded", () => {
     // Load default page (dashboard)
     console.log('📊 Loading dashboard...');
     loadPage("dashboard");
+});
+
+// Mobile Menu Toggle Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Create mobile menu toggle button
+    const topbar = document.querySelector('.topbar');
+    if (topbar) {
+        // Create mobile menu structure
+        const topbarLeft = document.createElement('div');
+        topbarLeft.className = 'topbar-left';
+        
+        const mobileToggle = document.createElement('button');
+        mobileToggle.className = 'mobile-menu-toggle';
+        mobileToggle.innerHTML = '<span class="material-symbols-outlined">menu</span>';
+        
+        // Move page title to topbar-left
+        const pageTitle = topbar.querySelector('.page-title');
+        if (pageTitle) {
+            topbarLeft.appendChild(mobileToggle);
+            topbarLeft.appendChild(pageTitle);
+        } else {
+            topbarLeft.appendChild(mobileToggle);
+        }
+        
+        // Insert topbar-left as first child
+        topbar.insertBefore(topbarLeft, topbar.firstChild);
+        
+        // Create mobile overlay
+        const mobileOverlay = document.createElement('div');
+        mobileOverlay.className = 'mobile-overlay';
+        document.body.appendChild(mobileOverlay);
+        
+        const sidebar = document.querySelector('.sidebar');
+        
+        // Toggle mobile menu
+        mobileToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('mobile-open');
+            mobileOverlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('mobile-open') ? 'hidden' : '';
+        });
+        
+        // Close menu when clicking overlay
+        mobileOverlay.addEventListener('click', function() {
+            sidebar.classList.remove('mobile-open');
+            mobileOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+        
+        // Close menu when clicking nav items
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('mobile-open');
+                    mobileOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('mobile-open');
+                mobileOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+    }
 });
