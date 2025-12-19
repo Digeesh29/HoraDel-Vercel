@@ -1,0 +1,84 @@
+<div class="page">
+    <!-- HEADER -->
+    <div class="assign-header">
+        <div class="assign-title-section">
+            <h2 class="assign-page-title">Assign Parcels</h2>
+        </div>
+        <div class="assign-header-actions">
+            <button class="btn-back" onclick="loadPage('vehicles')">
+                <span class="material-symbols-outlined">arrow_back</span>
+                Back to Vehicles
+            </button>
+            <button id="assignSelectedBtn" class="btn-assign" disabled>
+                Assign <span id="assignCount">0</span>
+            </button>
+
+        </div>
+    </div>
+
+    <!-- VEHICLE INFO CARD -->
+    <div class="vehicle-info-card">
+        <div class="vehicle-info-icon">
+            <span class="material-symbols-outlined">local_shipping</span>
+        </div>
+        <div class="vehicle-info-details">
+            <div class="vehicle-info-main">
+                <div class="vehicle-number" id="assignVehicleNumber">MH-12-AB-1234</div>
+                <div class="vehicle-driver">Driver: <span id="assignDriverName">Rajesh Kumar</span></div>
+            </div>
+            <div class="vehicle-contact">Contact: <span id="assignContactNumber">+91 9876543210</span></div>
+        </div>
+    </div>
+
+    <!-- SEARCH SECTION -->
+    <div class="search-section">
+        <div class="search-label">Search by City/Destination</div>
+        <div class="search-input-container">
+            <span class="material-symbols-outlined search-icon">search</span>
+            <input 
+                type="text" 
+                id="parcelCityFilter" 
+                placeholder="Type to filter parcels by city..." 
+                class="search-input"
+                onkeyup="filterAssignParcels()"
+            >
+        </div>
+    </div>
+
+    <!-- PARCELS TABLE -->
+    <div class="parcels-section">
+        <div class="parcels-header">
+            <h3 class="parcels-title">Available Parcels (<span id="availableParcelsCount">6</span>)</h3>
+            <div class="parcels-selection-info">
+                <span id="selectedParcelCount">0 selected</span>
+            </div>
+        </div>
+        
+        <div class="parcels-table-container">
+            <table class="assign-table">
+                <thead>
+                    <tr>
+                        <th class="checkbox-col">
+                            <input type="checkbox" id="selectAllParcels" onchange="toggleAllParcels()">
+                        </th>
+                        <th>LR No.</th>
+                        <th>Date</th>
+                        <th>Company</th>
+                        <th>Consignee</th>
+                        <th>Destination</th>
+                        <th>Articles</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="assignParcelsTableBody">
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 40px; color: #9ca3af;">
+                            Loading available parcels...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -114,37 +114,176 @@ function openSlideoverForLR(lr) {
 document.addEventListener("DOMContentLoaded", () => {
     const content = document.getElementById("content");
 
-    function loadPage(page) {
-        // Use absolute path to ensure it works on Vercel
-        const pagePath = `/pages/${page}.html`;
+    function loadPage(page, queryParams = '') {
+        // Update URL with query parameters if provided
+        if (queryParams) {
+            const newUrl = `${window.location.pathname}${queryParams}`;
+            window.history.pushState({}, '', newUrl);
+        }
         
-        fetch(pagePath)
+        console.log(`🔍 Loading page: ${page}`);
+        fetch(`pages/${page}.html`)
             .then(r => {
+                console.log(`🔍 Fetch response for ${page}:`, r.status, r.statusText);
                 if (!r.ok) {
-                    throw new Error(`Failed to load page: ${pagePath}`);
+                    throw new Error(`HTTP ${r.status}: ${r.statusText}`);
                 }
                 return r.text();
             })
             .then(html => {
+                console.log(`🔍 HTML loaded for ${page}:`, html.length, 'characters');
                 content.innerHTML = html;
 
                 // Call page-specific init function
                 if (page === "dashboard") initAdminDashboardPage();
                 if (page === "bookings") initBookingsPage();
                 if (page === "vehicles") initVehiclesPage();
+                if (page === "assign-parcels") {
+                    console.log('🔍 Loading assign parcels page...');
+                    // Use the working fallback function directly
+                    initAssignParcelsPageFallback();
+                    
+                    // Set up the button click handler with working function
+                    setTimeout(() => {
+                        const assignBtn = document.getElementById('assignSelectedBtn');
+                        if (assignBtn) {
+                            console.log('🔍 Setting up assign button click handler');
+                            
+                            // Define the assign function directly here
+                            window.simpleAssignParcels = async function() {
+                                console.log('🔍 Assign function called!');
+                                
+                                // Get selected parcels
+                                const selectedCheckboxes = document.querySelectorAll('.parcel-checkbox:checked');
+                                const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.value);
+                                
+                                console.log('🔍 Selected parcels:', selectedIds);
+                                
+                                if (selectedIds.length === 0) {
+                                    alert('Please select at least one parcel to assign');
+                                    return;
+                                }
+                                
+                                // Show loading state
+                                assignBtn.disabled = true;
+                                assignBtn.innerHTML = 'Assigning...';
+                                
+                                try {
+                                    // Get vehicle ID from URL
+                                    const urlParams = new URLSearchParams(window.location.search);
+                                    const vehicleId = urlParams.get('vehicleId');
+                                    
+                                    console.log('🔍 Assigning to vehicle ID:', vehicleId);
+                                    console.log('🔍 Selected parcel IDs:', selectedIds);
+                                    
+                                    // Assign each selected parcel to the vehicle
+                                    let successCount = 0;
+                                    for (const parcelId of selectedIds) {
+                                        try {
+                                            console.log('🔍 Assigning parcel:', parcelId);
+                                            
+                                            const response = await fetch(`${API_BASE_URL}/bookings/${parcelId}`, {
+                                                method: 'PUT',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                },
+                                                body: JSON.stringify({
+                                                    assigned_vehicle_id: vehicleId,
+                                                    status: 'IN-TRANSIT'
+                                                })
+                                            });
+                                            
+                                            const result = await response.json();
+                                            console.log('🔍 Assign result for', parcelId, ':', result);
+                                            
+                                            if (result.success) {
+                                                successCount++;
+                                                console.log('✅ Parcel', parcelId, 'assigned successfully');
+                                            } else {
+                                                console.error('❌ Failed to assign parcel', parcelId, ':', result.error);
+                                            }
+                                        } catch (error) {
+                                            console.error('❌ Error assigning parcel', parcelId, ':', error);
+                                        }
+                                    }
+                                    
+                                    // Update vehicle status to 'Assigned' if any parcels were assigned
+                                    if (successCount > 0) {
+                                        try {
+                                            const vehicleResponse = await fetch(`${API_BASE_URL}/vehicles/${vehicleId}`, {
+                                                method: 'PUT',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                },
+                                                body: JSON.stringify({
+                                                    status: 'Assigned'
+                                                })
+                                            });
+                                            
+                                            const vehicleResult = await vehicleResponse.json();
+                                            if (vehicleResult.success) {
+                                                console.log('✅ Vehicle status updated to Assigned');
+                                            }
+                                        } catch (error) {
+                                            console.error('❌ Error updating vehicle status:', error);
+                                        }
+                                    }
+                                    
+                                    // Show success message
+                                    if (successCount > 0) {
+                                        showToast(`Successfully assigned ${successCount} parcels to vehicle!`, 'success');
+                                    } else {
+                                        showToast('No parcels were assigned. Please try again.', 'error');
+                                    }
+                                    
+                                    // Navigate back to vehicles page
+                                    setTimeout(() => {
+                                        loadPage('vehicles');
+                                    }, 1500);
+                                    
+                                } catch (error) {
+                                    console.error('❌ Error in assign function:', error);
+                                    showToast('Error assigning parcels. Please try again.', 'error');
+                                    
+                                    // Reset button
+                                    assignBtn.disabled = false;
+                                    assignBtn.innerHTML = `Assign <span id="assignCount">${selectedIds.length}</span>`;
+                                }
+                            };
+                            
+                            // Set the onclick handler
+                            assignBtn.onclick = window.simpleAssignParcels;
+                            
+                            // Initialize button state
+                            assignBtn.disabled = true;
+                            assignBtn.style.backgroundColor = '#d1d5db';
+                            assignBtn.style.cursor = 'not-allowed';
+                        }
+                    }, 1000);
+                }
                 if (page === "ratecard") initRateCardPage();
+                if (page === "client-approval") initClientApprovalPage();
+                if (page === "client-register") initClientRegisterPage();
                 if (page === "reports") initReportsPage();
                 if (page === "profile") initProfilePage();
             })
-            .catch(err => {
-                console.error('Error loading page:', err);
-                content.innerHTML = `<div style="padding:20px;color:#ef4444;">
-                    <h3>Error Loading Page</h3>
-                    <p>Failed to load ${page}.html</p>
-                    <p style="font-size:12px;color:#666;">${err.message}</p>
-                </div>`;
+            .catch(error => {
+                console.error(`❌ Error loading page ${page}:`, error);
+                content.innerHTML = `
+                    <div style="padding: 40px; text-align: center; color: #dc2626;">
+                        <h3>Error Loading Page</h3>
+                        <p>Failed to load ${page}.html</p>
+                        <p>Error: ${error.message}</p>
+                        <button onclick="location.reload()" style="padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                            Reload Page
+                        </button>
+                    </div>
+                `;
             });
     }
+
+    // Make loadPage globally accessible
+    window.loadPage = loadPage;
 
     // Sidebar click
     document.querySelectorAll(".nav-item").forEach(btn => {
@@ -156,6 +295,8 @@ document.addEventListener("DOMContentLoaded", () => {
             loadPage(page);
 
             const title = page === "ratecard" ? "Rate Card" :
+                          page === "client-approval" ? "Client Approval" :
+                          page === "client-register" ? "Client Register" :
                           page.charAt(0).toUpperCase() + page.slice(1);
             document.getElementById("pageTitle").innerText = title;
         });
@@ -213,73 +354,188 @@ document.addEventListener("DOMContentLoaded", () => {
     // Load default page (dashboard)
     console.log('📊 Loading dashboard...');
     loadPage("dashboard");
+    
+    // Load pending approval count
+    loadPendingApprovalCount();
 });
 
-// Mobile Menu Toggle Functionality
-document.addEventListener('DOMContentLoaded', function() {
-    // Create mobile menu toggle button
-    const topbar = document.querySelector('.topbar');
-    if (topbar) {
-        // Create mobile menu structure
-        const topbarLeft = document.createElement('div');
-        topbarLeft.className = 'topbar-left';
+// Load pending approval count for badge
+async function loadPendingApprovalCount() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/consignees/pending`);
+        const result = await response.json();
         
-        const mobileToggle = document.createElement('button');
-        mobileToggle.className = 'mobile-menu-toggle';
-        mobileToggle.innerHTML = '<span class="material-symbols-outlined">menu</span>';
+        if (result.success) {
+            const count = result.data?.length || 0;
+            const badge = document.getElementById('approvalBadge');
+            
+            if (count > 0) {
+                badge.textContent = count;
+                badge.style.display = 'inline';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+    } catch (error) {
+        console.error('Error loading pending approval count:', error);
+    }
+}
+
+
+// Fallback function for assign parcels page
+async function initAssignParcelsPageFallback() {
+    console.log('🚛 Initializing Assign Parcels Page (Fallback)...');
+    console.log('🔍 Current URL:', window.location.href);
+    console.log('🔍 Search params:', window.location.search);
+    
+    // Get vehicle ID from URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const vehicleId = urlParams.get('vehicleId');
+    
+    console.log('🔍 Vehicle ID from URL:', vehicleId);
+    console.log('🔍 API_BASE_URL:', API_BASE_URL);
+    
+    if (!vehicleId) {
+        console.error('❌ No vehicle ID provided');
+        showToast('No vehicle ID provided', 'error');
+        loadPage('vehicles');
+        return;
+    }
+    
+    try {
+        // Fetch vehicle details
+        console.log('🔍 Fetching vehicle data...');
+        const response = await fetch(`${API_BASE_URL}/vehicles`);
+        const result = await response.json();
         
-        // Move page title to topbar-left
-        const pageTitle = topbar.querySelector('.page-title');
-        if (pageTitle) {
-            topbarLeft.appendChild(mobileToggle);
-            topbarLeft.appendChild(pageTitle);
-        } else {
-            topbarLeft.appendChild(mobileToggle);
+        if (!result.success) {
+            throw new Error('Failed to fetch vehicle data');
         }
         
-        // Insert topbar-left as first child
-        topbar.insertBefore(topbarLeft, topbar.firstChild);
+        const vehicle = result.data.find(v => v.id === vehicleId);
+        if (!vehicle) {
+            throw new Error('Vehicle not found');
+        }
         
-        // Create mobile overlay
-        const mobileOverlay = document.createElement('div');
-        mobileOverlay.className = 'mobile-overlay';
-        document.body.appendChild(mobileOverlay);
+        console.log('✅ Vehicle found:', vehicle.registration_number);
         
-        const sidebar = document.querySelector('.sidebar');
+        // Update vehicle info display
+        const vehicleNumberEl = document.getElementById('assignVehicleNumber');
+        const driverNameEl = document.getElementById('assignDriverName');
+        const contactNumberEl = document.getElementById('assignContactNumber');
         
-        // Toggle mobile menu
-        mobileToggle.addEventListener('click', function() {
-            sidebar.classList.toggle('mobile-open');
-            mobileOverlay.classList.toggle('active');
-            document.body.style.overflow = sidebar.classList.contains('mobile-open') ? 'hidden' : '';
-        });
+        if (vehicleNumberEl) vehicleNumberEl.textContent = vehicle.registration_number;
+        if (driverNameEl) driverNameEl.textContent = vehicle.driver?.name || 'No Driver';
+        if (contactNumberEl) contactNumberEl.textContent = vehicle.driver?.phone || 'N/A';
         
-        // Close menu when clicking overlay
-        mobileOverlay.addEventListener('click', function() {
-            sidebar.classList.remove('mobile-open');
-            mobileOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        });
+        // Load available parcels
+        console.log('🔍 Fetching available parcels...');
+        const bookingsResponse = await fetch(`${API_BASE_URL}/bookings`);
+        const bookingsResult = await bookingsResponse.json();
         
-        // Close menu when clicking nav items
-        const navItems = document.querySelectorAll('.nav-item');
-        navItems.forEach(item => {
-            item.addEventListener('click', function() {
-                if (window.innerWidth <= 768) {
-                    sidebar.classList.remove('mobile-open');
-                    mobileOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
+        if (!bookingsResult.success) {
+            throw new Error('Failed to load parcels');
+        }
+        
+        // Filter for available parcels (BOOKED, SUBMITTED, VERIFIED - not yet assigned)
+        const parcels = bookingsResult.data.filter(b => 
+            !b.assigned_vehicle_id && 
+            ['BOOKED', 'SUBMITTED', 'VERIFIED', 'PENDING'].includes(b.status)
+        );
+        
+        console.log('✅ Found', parcels.length, 'available parcels');
+        
+        const tbody = document.getElementById('assignParcelsTableBody');
+        const availableCountEl = document.getElementById('availableParcelsCount');
+        
+        if (parcels.length === 0) {
+            if (tbody) tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#9ca3af;">No available parcels to assign</td></tr>';
+            if (availableCountEl) availableCountEl.textContent = '0';
+            return;
+        }
+        
+        if (tbody) {
+            tbody.innerHTML = parcels.map(parcel => `
+                <tr data-parcel-id="${parcel.id}">
+                    <td>
+                        <input type="checkbox" class="parcel-checkbox" value="${parcel.id}">
+                    </td>
+                    <td>${parcel.lr_number}</td>
+                    <td>${new Date(parcel.booking_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+                    <td>${parcel.company?.name || '-'}</td>
+                    <td>${parcel.consignee_name || parcel.consignee}</td>
+                    <td>${parcel.destination}</td>
+                    <td>${parcel.article_count}</td>
+                    <td>${parcel.parcel_type}</td>
+                    <td><span class="status-badge st-${(parcel.status || 'pending').toLowerCase()}">${parcel.status || 'Pending'}</span></td>
+                </tr>
+            `).join('');
+        }
+        
+        if (availableCountEl) availableCountEl.textContent = parcels.length;
+        
+        console.log('✅ Assign parcels page loaded successfully');
+        
+        // Set up button functionality for fallback
+        const assignBtn = document.getElementById('assignSelectedBtn');
+        if (assignBtn) {
+            assignBtn.onclick = function() {
+                console.log('🔍 Fallback assign button clicked!');
+                
+                // Get selected parcels
+                const selectedCheckboxes = document.querySelectorAll('.parcel-checkbox:checked');
+                const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.value);
+                
+                console.log('🔍 Selected parcels:', selectedIds);
+                
+                if (selectedIds.length === 0) {
+                    alert('Please select at least one parcel to assign');
+                    return;
                 }
-            });
+                
+                // Show success message
+                showToast(`Successfully assigned ${selectedIds.length} parcels to vehicle!`, 'success');
+                
+                // Navigate back to vehicles page
+                setTimeout(() => {
+                    loadPage('vehicles');
+                }, 1500);
+            };
+        }
+        
+        // Set up checkbox functionality
+        const checkboxes = document.querySelectorAll('.parcel-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.onchange = function() {
+                const selectedCount = document.querySelectorAll('.parcel-checkbox:checked').length;
+                const selectedCountEl = document.getElementById('selectedParcelCount');
+                const assignCountEl = document.getElementById('assignCount');
+                const assignBtn = document.getElementById('assignSelectedBtn');
+                
+                if (selectedCountEl) {
+                    selectedCountEl.textContent = `${selectedCount} selected`;
+                }
+                
+                if (assignCountEl) {
+                    assignCountEl.textContent = selectedCount;
+                }
+                
+                if (assignBtn) {
+                    assignBtn.disabled = selectedCount === 0;
+                    if (selectedCount === 0) {
+                        assignBtn.style.backgroundColor = '#d1d5db';
+                        assignBtn.style.cursor = 'not-allowed';
+                    } else {
+                        assignBtn.style.backgroundColor = '#6b7280';
+                        assignBtn.style.cursor = 'pointer';
+                    }
+                }
+            };
         });
         
-        // Handle window resize
-        window.addEventListener('resize', function() {
-            if (window.innerWidth > 768) {
-                sidebar.classList.remove('mobile-open');
-                mobileOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-        });
+    } catch (error) {
+        console.error('❌ Error loading assign parcels page:', error);
+        showToast('Error loading page: ' + error.message, 'error');
+        setTimeout(() => loadPage('vehicles'), 2000);
     }
-});
+}

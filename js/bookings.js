@@ -189,26 +189,25 @@ async function initBookingsPage() {
                 });
 
                 return `
-                    <tr style="border-bottom: 1px solid var(--border-light); transition: background 0.1s;">
-                        <td style="padding: 14px 16px; font-size: 14px; font-weight: 500; color: var(--text-main);">${b.lr_number}</td>
-                        <td style="padding: 14px 16px; font-size: 14px; color: var(--text-main);">${bookingDate}</td>
-                        <td style="padding: 14px 16px; font-size: 14px; color: var(--text-main);">${companyName}</td>
-                        <td style="padding: 14px 16px; font-size: 14px; color: var(--text-main);">${b.consignee_name}</td>
-                        <td style="padding: 14px 16px; font-size: 14px; color: var(--text-main);">${b.destination}</td>
-                        <td style="padding: 14px 16px; font-size: 14px; color: var(--text-main); text-align: center;">${b.article_count}</td>
-                        <td style="padding: 14px 16px; font-size: 14px; color: var(--text-main);">${vehicleDisplay}</td>
-                        <td style="padding: 14px 16px; font-size: 14px;">
+                    <tr>
+                        <td style="font-weight:500;">${b.lr_number}</td>
+                        <td>${bookingDate}</td>
+                        <td>${companyName}</td>
+                        <td>${b.consignee_name}</td>
+                        <td>${b.destination}</td>
+                        <td>${b.article_count}</td>
+                        <td>${vehicleDisplay}</td>
+                        <td>${b.parcel_type}</td>
+                        <td>
                             <span class="status-badge ${badgeClass}">${b.status}</span>
                         </td>
-                        <td style="padding: 14px 16px; font-size: 14px;">
-                            <div style="display: flex; gap: 8px;">
-                                <button class="view-btn-icon" onclick="viewBookingDetails('${b.id}')" title="View Details">
-                                    <span class="material-symbols-outlined" style="font-size:16px;">visibility</span>
-                                </button>
-                                <button class="view-btn-icon" onclick='printBookingPDF(${JSON.stringify(b).replace(/"/g, "&quot;")})' title="Print">
-                                    <span class="material-symbols-outlined" style="font-size:16px;">print</span>
-                                </button>
-                            </div>
+                        <td>
+                            <button class="view-btn-icon" onclick="viewBookingDetails('${b.id}')">
+                                <span class="material-symbols-outlined" style="font-size:18px;">visibility</span>
+                            </button>
+                            <button class="view-btn-icon" onclick='printBookingPDF(${JSON.stringify(b).replace(/"/g, "&quot;")})'>
+                                <span class="material-symbols-outlined" style="font-size:18px;">print</span>
+                            </button>
                         </td>
                     </tr>
                 `;

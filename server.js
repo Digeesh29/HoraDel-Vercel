@@ -104,6 +104,13 @@ try {
 }
 
 try {
+    app.use('/api/consignees', require('./routes/consignees-router'));
+    console.log('✅ Consignees router loaded');
+} catch (err) {
+    console.error('❌ Consignees router error:', err.message);
+}
+
+try {
     app.use('/api/auth', require('./routes/auth-router'));
     console.log('✅ Auth router loaded');
 } catch (err) {

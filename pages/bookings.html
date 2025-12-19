@@ -6,7 +6,8 @@
             <span style="font-weight:600; font-size:15px;">Filters</span>
         </div>
         
-        <div class="filters-grid">
+        <!-- First Row: Date From, Date To, Company, City -->
+        <div class="filters-grid" style="grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px;">
             <div class="filter-group">
                 <label class="filter-label">Date From</label>
                 <input type="date" id="dateFrom" class="filter-input" placeholder="dd-mm-yyyy">
@@ -32,7 +33,8 @@
             </div>
         </div>
         
-        <div class="filters-grid" style="margin-top:16px;">
+        <!-- Second Row: Status, Search LR -->
+        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 16px; margin-bottom: 20px;">
             <div class="filter-group">
                 <label class="filter-label">Status</label>
                 <select id="bookingsStatus" class="filter-input">
@@ -43,7 +45,7 @@
                 </select>
             </div>
             
-            <div class="filter-group" style="grid-column: span 2;">
+            <div class="filter-group">
                 <label class="filter-label">Search LR No.</label>
                 <div style="position:relative;">
                     <span class="material-symbols-outlined" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:18px; color:#9ca3af;">search</span>
@@ -59,26 +61,25 @@
     </div>
 
     <!-- RESULTS SECTION -->
-    <div class="table-card">
-        <div class="table-card-header">
-            <h3 style="font-size: 16px; font-weight: 600; margin: 0; color: var(--text-main);">
-                All Bookings (<span id="bookingsCount">0</span>)
-            </h3>
+    <div class="results-card">
+        <div class="results-header">
+            <h3 class="results-title">All Bookings (<span id="bookingsCount">0</span>)</h3>
         </div>
         
-        <div class="table-responsive" style="padding: 0; border: none; box-shadow: none;">
-            <table style="width: 100%; border-collapse: collapse;">
+        <div class="table-responsive">
+            <table class="modern-table">
                 <thead>
-                    <tr style="background: #f9fafb; border-bottom: 1px solid var(--border-light);">
-                        <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-muted);">LR No.</th>
-                        <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-muted);">Date</th>
-                        <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-muted);">Company</th>
-                        <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-muted);">Consignee</th>
-                        <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-muted);">Destination</th>
-                        <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-muted);">Articles</th>
-                        <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-muted);">Vehicle</th>
-                        <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-muted);">Status</th>
-                        <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-muted);">Actions</th>
+                    <tr>
+                        <th>LR No.</th>
+                        <th>Date</th>
+                        <th>Company</th>
+                        <th>Consignee</th>
+                        <th>Destination</th>
+                        <th>Articles</th>
+                        <th>Vehicle No.</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="bookingsTableBody"></tbody>

@@ -150,13 +150,17 @@ async function loadRecentBookings(companyId) {
                 <tr style="border-bottom: 1px solid #f3f4f6;">
                     <td style="padding: 16px 24px; color: #111827; font-weight: 500;">${booking.lr_number}</td>
                     <td style="padding: 16px 24px; color: #6b7280;">${new Date(booking.booking_date).toLocaleDateString()}</td>
+                    <td style="padding: 16px 24px; color: #6b7280;">${booking.consignee_name || 'N/A'}</td>
                     <td style="padding: 16px 24px; color: #6b7280;">${booking.destination}</td>
                     <td style="padding: 16px 24px; color: #6b7280;">${booking.article_count}</td>
                     <td style="padding: 16px 24px;">
                         <span style="padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; ${getStatusStyle(booking.status)}">${booking.status}</span>
                     </td>
                     <td style="padding: 16px 24px;">
-                        <button onclick="trackShipment('${booking.lr_number}')" style="background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer;">Track</button>
+                        <button onclick="printBooking('${booking.lr_number}')" style="background: #6b7280; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                            <span class="material-symbols-outlined" style="font-size: 14px;">print</span>
+                            Print
+                        </button>
                     </td>
                 </tr>
             `).join('');
@@ -164,7 +168,7 @@ async function loadRecentBookings(companyId) {
             console.log('⚠️ No bookings found for company:', companyId);
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="6" style="padding: 40px; text-align: center; color: #6b7280;">
+                    <td colspan="7" style="padding: 40px; text-align: center; color: #6b7280;">
                         No bookings found for your company. 
                         <br><br>
                         <button onclick="loadPage('client-booking')" style="background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 6px; margin-right: 8px; cursor: pointer;">Create Booking</button>
@@ -179,7 +183,7 @@ async function loadRecentBookings(companyId) {
         if (tableBody) {
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="6" style="padding: 40px; text-align: center; color: #dc2626;">
+                    <td colspan="7" style="padding: 40px; text-align: center; color: #dc2626;">
                         Error loading bookings: ${error.message}
                     </td>
                 </tr>
@@ -253,5 +257,123 @@ async function createTestBooking() {
     } catch (error) {
         console.error('Error creating test booking:', error);
         showToast('Error creating test booking: ' + error.message, 'error');
+    }
+}
+
+// Print booking function
+function printBooking(lrNumber) {
+    try {
+        // Find the booking data from the current table
+        const tableRows = document.querySelectorAll('#recentBookingsTable tr');
+        let bookingData = null;
+        
+        for (let row of tableRows) {
+            const cells = row.querySelectorAll('td');
+            if (cells.length > 0 && cells[0].textContent.trim() === lrNumber) {
+                bookingData = {
+                    lr_number: cells[0].textContent.trim(),
+                    booking_date: cells[1].textContent.trim(),
+                    consignee_name: cells[2].textContent.trim(),
+                    destination: cells[3].textContent.trim(),
+                    article_count: cells[4].textContent.trim(),
+                    status: cells[5].querySelector('span') ? cells[5].querySelector('span').textContent.trim() : cells[5].textContent.trim()
+                };
+                break;
+            }
+        }
+        
+        if (!bookingData) {
+            showToast('Booking data not found', 'error');
+            return;
+        }
+        
+        // Open print window
+        const printWindow = window.open('', '_blank', 'height=600,width=800');
+        if (!printWindow) {
+            showToast('Please allow popups to print', 'error');
+            return;
+        }
+
+        const companyName = getCompanyName() || 'HoraDel Transport';
+        
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Booking Receipt - ${bookingData.lr_number}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 40px; line-height: 1.6; }
+                    .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px; }
+                    .company-name { font-size: 24px; font-weight: bold; color: #333; margin-bottom: 5px; }
+                    .company-tagline { color: #666; font-size: 14px; }
+                    .booking-info { margin: 30px 0; }
+                    .info-row { display: flex; justify-content: space-between; margin: 10px 0; padding: 8px 0; border-bottom: 1px dotted #ccc; }
+                    .label { font-weight: bold; color: #333; }
+                    .value { color: #666; }
+                    .footer { margin-top: 40px; text-align: center; font-size: 12px; color: #999; }
+                    @media print {
+                        body { margin: 0; padding: 20px; }
+                        .no-print { display: none; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div class="company-name">${companyName}</div>
+                    <div class="company-tagline">Transport & Logistics Services</div>
+                </div>
+                
+                <div class="booking-info">
+                    <h2 style="color: #333; margin-bottom: 20px;">Booking Receipt</h2>
+                    
+                    <div class="info-row">
+                        <span class="label">LR Number:</span>
+                        <span class="value">${bookingData.lr_number}</span>
+                    </div>
+                    
+                    <div class="info-row">
+                        <span class="label">Booking Date:</span>
+                        <span class="value">${bookingData.booking_date}</span>
+                    </div>
+                    
+                    <div class="info-row">
+                        <span class="label">Consignee Name:</span>
+                        <span class="value">${bookingData.consignee_name}</span>
+                    </div>
+                    
+                    <div class="info-row">
+                        <span class="label">Destination:</span>
+                        <span class="value">${bookingData.destination}</span>
+                    </div>
+                    
+                    <div class="info-row">
+                        <span class="label">Number of Articles:</span>
+                        <span class="value">${bookingData.article_count}</span>
+                    </div>
+                    
+                    <div class="info-row">
+                        <span class="label">Status:</span>
+                        <span class="value">${bookingData.status}</span>
+                    </div>
+                </div>
+                
+                <div class="footer">
+                    <p>Thank you for choosing ${companyName}</p>
+                    <p>This is a computer generated receipt</p>
+                </div>
+                
+                <script>
+                    window.onload = function() {
+                        window.print();
+                    }
+                </script>
+            </body>
+            </html>
+        `);
+        
+        printWindow.document.close();
+        
+    } catch (error) {
+        console.error('Error printing booking:', error);
+        showToast('Error printing booking', 'error');
     }
 }

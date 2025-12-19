@@ -10,11 +10,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
     <!-- CSS -->
-    <link rel="stylesheet" href="/Client/css/style.css">
+    <link rel="stylesheet" href="/Client/css/style.css?v=3">
 </head>
 <body>
 
 <div class="app-layout">
+
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </button>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- SIDEBAR -->
     <aside class="sidebar">
@@ -35,6 +47,9 @@
             </button>
             <button class="nav-item" data-page="client-bookings">
                 <span class="material-symbols-outlined">inventory_2</span> Parcel Management
+            </button>
+            <button class="nav-item" data-page="client-consignees">
+                <span class="material-symbols-outlined">contacts</span> Consignees
             </button>
             <button class="nav-item" data-page="client-profile">
                 <span class="material-symbols-outlined">person</span> Profile
@@ -66,11 +81,13 @@
 </div>
 
 <!-- CONFIG + MAIN + PAGE JS -->
+<script src="/Client/js/mobile-utils.js"></script>
 <script src="/Client/js/client-config.js?v=2"></script>
 <script src="/Client/js/client-main.js?v=2"></script>
 <script src="/Client/js/client-dashboard.js?v=2"></script>
 <script src="/Client/js/booking.js?v=2"></script>
 <script src="/Client/js/client-bookings.js?v=2"></script>
+<script src="/Client/js/client-consignees.js?v=2"></script>
 <script src="/Client/js/client-profile.js?v=2"></script>
 
 <!-- Auto-load Dashboard on page load -->

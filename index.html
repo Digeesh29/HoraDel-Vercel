@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/styles.css?v=6">
+    <link rel="stylesheet" href="css/styles.css?v=12">
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -36,8 +36,20 @@
 
 <div class="app-layout">
 
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </button>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <!-- SIDEBAR -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="logo-circle">HD</div>
             <div>
@@ -58,6 +70,13 @@
             </button>
             <button class="nav-item" data-page="ratecard">
                 <span class="material-symbols-outlined">payments</span> Rate Card
+            </button>
+            <button class="nav-item" data-page="client-approval">
+                <span class="material-symbols-outlined">approval</span> Client Approval
+                <span id="approvalBadge" style="display: none; background: #dc2626; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: 600; margin-left: 8px;">0</span>
+            </button>
+            <button class="nav-item" data-page="client-register">
+                <span class="material-symbols-outlined">person_add</span> Client Register
             </button>
             <button class="nav-item" data-page="reports">
                 <span class="material-symbols-outlined">bar_chart</span> Reports
@@ -103,11 +122,15 @@
 
 <!-- CONFIG + MAIN + PAGE JS -->
 <script src="js/config.js"></script>
-<script src="js/main.js"></script>
+<script src="js/mobile-utils.js"></script>
 <script src="js/dashboard.js"></script>
 <script src="js/bookings.js"></script>
 <script src="js/vehicles.js?v=13"></script>
+<script src="js/assign-parcels.js?v=1"></script>
 <script src="js/ratecard.js?v=2"></script>
+<script src="js/main.js"></script>
+<script src="js/client-approval.js"></script>
+<script src="js/client-register.js"></script>
 <script src="js/reports.js"></script>
 <script src="js/profile.js"></script>
 

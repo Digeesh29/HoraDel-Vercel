@@ -51,6 +51,7 @@ for (const prefix of prefixes) {
   try { app.use(`${prefix}/companies`, require('../routes/companies-router')); } catch (e) {}
   try { app.use(`${prefix}/drivers`, require('../routes/drivers-router')); } catch (e) {}
   try { app.use(`${prefix}/reports`, require('../routes/reports-router')); } catch (e) {}
+  try { app.use(`${prefix}/consignees`, require('../routes/consignees-router')); } catch (e) {}
   try { app.use(`${prefix}/auth`, require('../routes/auth-router')); } catch (e) {}
 }
 

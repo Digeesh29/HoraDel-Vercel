@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (page === "client-dashboard") initClientDashboardPage();
                 if (page === "client-booking") initClientBookingPage();
                 if (page === "client-bookings") initClientBookingsPage();
+                if (page === "client-consignees") initClientConsigneesPage();
                 if (page === "client-profile") initClientProfilePage();
             })
             .catch(error => {
@@ -41,6 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const title = page === "client-dashboard" ? "Dashboard" :
                           page === "client-booking" ? "New Booking" :
                           page === "client-bookings" ? "Parcel Management" :
+                          page === "client-consignees" ? "Consignees" :
                           page === "client-profile" ? "Profile" :
                           page.charAt(0).toUpperCase() + page.slice(1);
             document.getElementById("pageTitle").innerText = title;
@@ -100,72 +102,3 @@ function initClientBookingsPage() {
 }
 
 // initClientProfilePage is now defined in client-profile.js
-
-// Mobile Menu Toggle Functionality for Client
-document.addEventListener('DOMContentLoaded', function() {
-    // Create mobile menu toggle button
-    const topbar = document.querySelector('.topbar');
-    if (topbar) {
-        // Create mobile menu structure
-        const topbarLeft = document.createElement('div');
-        topbarLeft.className = 'topbar-left';
-        
-        const mobileToggle = document.createElement('button');
-        mobileToggle.className = 'mobile-menu-toggle';
-        mobileToggle.innerHTML = '<span class="material-symbols-outlined">menu</span>';
-        
-        // Move page title to topbar-left
-        const pageTitle = topbar.querySelector('.page-title');
-        if (pageTitle) {
-            topbarLeft.appendChild(mobileToggle);
-            topbarLeft.appendChild(pageTitle);
-        } else {
-            topbarLeft.appendChild(mobileToggle);
-        }
-        
-        // Insert topbar-left as first child
-        topbar.insertBefore(topbarLeft, topbar.firstChild);
-        
-        // Create mobile overlay
-        const mobileOverlay = document.createElement('div');
-        mobileOverlay.className = 'mobile-overlay';
-        document.body.appendChild(mobileOverlay);
-        
-        const sidebar = document.querySelector('.sidebar');
-        
-        // Toggle mobile menu
-        mobileToggle.addEventListener('click', function() {
-            sidebar.classList.toggle('mobile-open');
-            mobileOverlay.classList.toggle('active');
-            document.body.style.overflow = sidebar.classList.contains('mobile-open') ? 'hidden' : '';
-        });
-        
-        // Close menu when clicking overlay
-        mobileOverlay.addEventListener('click', function() {
-            sidebar.classList.remove('mobile-open');
-            mobileOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-        
-        // Close menu when clicking nav items
-        const navItems = document.querySelectorAll('.nav-item');
-        navItems.forEach(item => {
-            item.addEventListener('click', function() {
-                if (window.innerWidth <= 768) {
-                    sidebar.classList.remove('mobile-open');
-                    mobileOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-            });
-        });
-        
-        // Handle window resize
-        window.addEventListener('resize', function() {
-            if (window.innerWidth > 768) {
-                sidebar.classList.remove('mobile-open');
-                mobileOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-        });
-    }
-});

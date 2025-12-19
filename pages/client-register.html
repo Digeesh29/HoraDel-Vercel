@@ -1,0 +1,313 @@
+<!-- ADMIN CLIENT REGISTRATION PAGE -->
+
+<!-- Page Header with Enhanced Styling -->
+<div style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 32px; border-radius: 16px; margin-bottom: 32px; border: 1px solid #e2e8f0;">
+    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+        <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #111827 0%, #374151 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);">
+            <span class="material-symbols-outlined" style="color: white; font-size: 28px;">person_add</span>
+        </div>
+        <div>
+            <h2 style="margin: 0 0 8px 0; color: #111827; font-size: 28px; font-weight: 700;">Client Registration</h2>
+            <p style="margin: 0; color: #64748b; font-size: 16px;">Create new client accounts and manage company registrations</p>
+        </div>
+    </div>
+    
+    <div style="display: flex; gap: 32px; margin-top: 24px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 40px; height: 40px; background: rgba(16, 185, 129, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <span class="material-symbols-outlined" style="color: #10b981; font-size: 20px;">business</span>
+            </div>
+            
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 40px; height: 40px; background: rgba(59, 130, 246, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <span class="material-symbols-outlined" style="color: #3b82f6; font-size: 20px;">account_circle</span>
+            </div>
+           
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 40px; height: 40px; background: rgba(168, 85, 247, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <span class="material-symbols-outlined" style="color: #a855f7; font-size: 20px;">verified</span>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<!-- Enhanced Registration Form -->
+<div class="card" style="margin-bottom: 32px;">
+    
+    <!-- Form Header -->
+    <div style="background: linear-gradient(135deg, #111827 0%, #374151 100%); padding: 24px; color: white; margin: -24px -24px 24px -24px; border-radius: 12px 12px 0 0;">
+        <h3 style="margin: 0 0 8px 0; font-size: 24px; font-weight: 700;">Create New Client Account</h3>
+        <p style="margin: 0; opacity: 0.9; font-size: 16px;">Fill in the information below to register a new client company and user account</p>
+    </div>
+
+    <!-- Form Content -->
+    <form id="clientRegisterForm">
+            <!-- Company Information Section -->
+            <div style="margin-bottom: 48px;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+                    <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                        <span class="material-symbols-outlined" style="color: white; font-size: 18px;">business</span>
+                    </div>
+                    <h4 style="margin: 0; color: #111827; font-size: 20px; font-weight: 700;">Company Information</h4>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+                    <div>
+                        <label style="display: block; font-weight: 500; color: #374151; margin-bottom: 8px;">Company Name *</label>
+                        <input type="text" id="companyName" required style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;" placeholder="Enter company name">
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: 500; color: #374151; margin-bottom: 8px;">Company Email *</label>
+                        <input type="email" id="companyEmail" required style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;" placeholder="company@example.com">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+                    <div class="form-group">
+                        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px; font-size: 14px;">Company Phone *</label>
+                        <div style="position: relative;">
+                            <input type="tel" id="companyPhone" required style="width: 100%; padding: 16px 20px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 16px; transition: all 0.2s ease; background: #fafbfc;" placeholder="+91-9876543210">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px; font-size: 14px;">Company Type</label>
+                        <div style="position: relative;">
+                            <select id="companyType" style="width: 100%; padding: 16px 20px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 16px; transition: all 0.2s ease; background: #fafbfc; cursor: pointer;">
+                                <option value="Corporate">Corporate</option>
+                                <option value="Individual">Individual</option>
+                                <option value="Partnership">Partnership</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px; font-size: 14px;">Company Address</label>
+                    <div style="position: relative;">
+                        <textarea id="companyAddress" style="width: 100%; padding: 16px 20px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 16px; min-height: 100px; resize: vertical; transition: all 0.2s ease; background: #fafbfc;" placeholder="Enter complete company address"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Information Section -->
+            <div style="margin-bottom: 48px;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+                    <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                        <span class="material-symbols-outlined" style="color: white; font-size: 18px;">account_circle</span>
+                    </div>
+                    <h4 style="margin: 0; color: #111827; font-size: 20px; font-weight: 700;">User Information</h4>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+                    <div class="form-group">
+                        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px; font-size: 14px;">Full Name *</label>
+                        <div style="position: relative;">
+                            <input type="text" id="userName" required style="width: 100%; padding: 16px 20px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 16px; transition: all 0.2s ease; background: #fafbfc;" placeholder="Enter full name">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px; font-size: 14px;">Email Address *</label>
+                        <div style="position: relative;">
+                            <input type="email" id="userEmail" required style="width: 100%; padding: 16px 20px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 16px; transition: all 0.2s ease; background: #fafbfc;" placeholder="user@example.com">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                    <div class="form-group">
+                        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px; font-size: 14px;">Phone Number</label>
+                        <div style="position: relative;">
+                            <input type="tel" id="userPhone" style="width: 100%; padding: 16px 20px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 16px; transition: all 0.2s ease; background: #fafbfc;" placeholder="+91-9876543210">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px; font-size: 14px;">Password *</label>
+                        <div style="position: relative;">
+                            <input type="password" id="userPassword" required style="width: 100%; padding: 16px 20px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 16px; transition: all 0.2s ease; background: #fafbfc;" placeholder="Create secure password">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; justify-content: flex-end; gap: 16px; padding-top: 32px; border-top: 2px solid #f1f5f9;">
+                <button type="button" id="resetFormBtn" style="background: white; color: #64748b; border: 2px solid #e2e8f0; padding: 16px 32px; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 16px; transition: all 0.2s ease; display: flex; align-items: center; gap: 8px;">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">refresh</span>
+                    Reset Form
+                </button>
+                <button type="submit" id="registerClientBtn" style="background: linear-gradient(135deg, #111827 0%, #374151 100%); color: white; border: none; padding: 16px 32px; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 16px; transition: all 0.2s ease; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); display: flex; align-items: center; gap: 8px;">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">person_add</span>
+                    Register Client
+                </button>
+            </div>
+    </form>
+</div>
+
+<!-- Enhanced Success/Error Messages -->
+<div id="registerMessage" style="display: none; margin-top: 24px; padding: 20px 24px; border-radius: 12px; font-weight: 500; font-size: 16px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);"></div>
+
+<!-- Enhanced Recent Registrations -->
+<div style="background: white; border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); border: 1px solid #f1f5f9; margin-top: 32px; overflow: hidden;">
+    
+    <!-- Table Header -->
+    <div style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 32px; border-bottom: 2px solid #f1f5f9;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                <span class="material-symbols-outlined" style="color: white; font-size: 18px;">history</span>
+            </div>
+            <div>
+                <h3 style="margin: 0 0 4px 0; color: #111827; font-size: 20px; font-weight: 700;">Recent Client Registrations</h3>
+                <p style="margin: 0; color: #64748b; font-size: 14px;">Track recently registered client accounts and their status</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Content -->
+    <div style="padding: 0;">
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #fafbfc;">
+                        <th style="padding: 20px 24px; text-align: left; font-weight: 700; color: #374151; font-size: 14px; border-bottom: 2px solid #f1f5f9;">Company</th>
+                        <th style="padding: 20px 24px; text-align: left; font-weight: 700; color: #374151; font-size: 14px; border-bottom: 2px solid #f1f5f9;">User</th>
+                        <th style="padding: 20px 24px; text-align: left; font-weight: 700; color: #374151; font-size: 14px; border-bottom: 2px solid #f1f5f9;">Email</th>
+                        <th style="padding: 20px 24px; text-align: left; font-weight: 700; color: #374151; font-size: 14px; border-bottom: 2px solid #f1f5f9;">Phone</th>
+                        <th style="padding: 20px 24px; text-align: left; font-weight: 700; color: #374151; font-size: 14px; border-bottom: 2px solid #f1f5f9;">Registered</th>
+                        <th style="padding: 20px 24px; text-align: left; font-weight: 700; color: #374151; font-size: 14px; border-bottom: 2px solid #f1f5f9;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="recentRegistrationsBody">
+                    <tr>
+                        <td colspan="6" style="padding: 60px; text-align: center; color: #64748b;">
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+                                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center;">
+                                    <span class="material-symbols-outlined" style="font-size: 40px; color: #94a3b8;">person_add</span>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; color: #374151; font-size: 18px; margin-bottom: 4px;">No Recent Registrations</div>
+                                    <div style="color: #64748b; font-size: 14px;">New client registrations will appear here</div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Password Change Modal -->
+<div id="passwordChangeModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 16px; padding: 32px; max-width: 500px; width: 90%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
+            <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <span class="material-symbols-outlined" style="color: white; font-size: 24px;">lock_reset</span>
+            </div>
+            <div>
+                <h3 style="margin: 0 0 4px 0; color: #111827; font-size: 20px; font-weight: 700;">Change Client Password</h3>
+                <p style="margin: 0; color: #64748b; font-size: 14px;">Admin verification required</p>
+            </div>
+        </div>
+
+        <div id="passwordChangeContent">
+            <!-- Step 1: Admin Verification -->
+            <div id="adminVerificationStep">
+                <div style="background: #fef3c7; border: 1px solid #3e3e3c; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="color: #d97706; font-size: 20px;">security</span>
+                        <span style="color: #92400e; font-weight: 600; font-size: 14px;">Admin Password Required</span>
+                    </div>
+                    <p style="margin: 8px 0 0 0; color: #92400e; font-size: 13px;">Please enter your admin password to proceed with changing the client's password.</p>
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px; font-size: 14px;">Your Admin Password *</label>
+                    <input type="password" id="adminPasswordInput" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;" placeholder="Enter your admin password">
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                    <button type="button" id="cancelPasswordChangeBtn" style="background: white; color: #64748b; border: 2px solid #e2e8f0; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px;">Cancel</button>
+                    <button type="button" id="verifyAdminBtn" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px;">Verify & Continue</button>
+                </div>
+            </div>
+
+            <!-- Step 2: New Password Entry -->
+            <div id="newPasswordStep" style="display: none;">
+                <div style="background: #dcfce7; border: 1px solid #16a34a; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="color: #16a34a; font-size: 20px;">verified</span>
+                        <span style="color: #15803d; font-weight: 600; font-size: 14px;">Admin Verified</span>
+                    </div>
+                    <p style="margin: 8px 0 0 0; color: #15803d; font-size: 13px;">You can now set a new password for <span id="clientNameDisplay" style="font-weight: 600;"></span>.</p>
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px; font-size: 14px;">New Password *</label>
+                    <input type="password" id="newPasswordInput" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;" placeholder="Enter new password">
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px; font-size: 14px;">Confirm New Password *</label>
+                    <input type="password" id="confirmPasswordInput" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;" placeholder="Confirm new password">
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                    <button type="button" id="backToVerificationBtn" style="background: white; color: #64748b; border: 2px solid #e2e8f0; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px;">Back</button>
+                    <button type="button" id="changePasswordBtn" style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px;">Change Password</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style></style>
+/* Enhanced Form Styling */
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    background: white;
+}
+
+.form-group input:hover,
+.form-group textarea:hover,
+.form-group select:hover {
+    border-color: #cbd5e1;
+}
+
+#resetFormBtn:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+}
+
+#registerClientBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+}
+
+#registerClientBtn:active {
+    transform: translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .form-group {
+        grid-column: 1 / -1 !important;
+    }
+    
+    div[style*="grid-template-columns: 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+    }
+    
+    div[style*="display: flex; gap: 32px"] {
+        flex-direction: column !important;
+        gap: 16px !important;
+    }
+}
+</style>

@@ -7,30 +7,58 @@
             <h3 style="margin: 0 0 4px 0; color: #111827;">Parcel Entry Form</h3>
             <p style="margin: 0; color: #6b7280; font-size: 14px;">Fill in the details to add a new parcel</p>
         </div>
-        <div>
-            <span id="lrChip" style="background: #f1f3f5; padding: 8px 12px; border-radius: 18px; font-weight: 700; font-size: 14px;">LR1764865563772</span>
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="display: flex; align-items: center; gap: 8px; color: #6b7280; font-size: 14px;">
+                <span class="material-symbols-outlined" style="font-size: 18px;">calendar_today</span>
+                <span id="currentDate"></span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="color: #6b7280; font-size: 14px; font-weight: 500;">LR</span>
+                <span id="lrChip" style="background: #f1f3f5; padding: 8px 12px; border-radius: 18px; font-weight: 700; font-size: 14px;">LR1764865563772</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Consignee Selection Section -->
+    <div style="margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <label style="display: block; font-weight: 500; color: #374151; font-size: 14px;">Select Consignee</label>
+            <button id="manageConsigneesBtn" type="button" style="background: transparent; color: #6366f1; border: none; padding: 4px 8px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                <span class="material-symbols-outlined" style="font-size: 16px;">contacts</span>
+                Manage Consignees
+            </button>
+        </div>
+        
+        <div style="margin-bottom: 8px;">
+            <label style="display: block; font-weight: 400; color: #6b7280; font-size: 13px; margin-bottom: 8px;">Choose Consignee (Required)</label>
+            <select id="consigneeSelect" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px; background: white; cursor: pointer;">
+                <option value="">Loading consignees...</option>
+            </select>
+            <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">
+                Select from your saved consignees
+            </div>
         </div>
     </div>
 
     <form id="parcelForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
         <div class="form-group">
             <label style="display: block; font-weight: 500; color: #374151; margin-bottom: 8px;">Consignee Name *</label>
-            <input id="company" type="text" required style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;">
+            <input id="company" type="text" required readonly style="width: 100%; padding: 12px 16px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; transition: all 0.2s ease; background: #f8fafc; color: #64748b;">
         </div>
 
         <div class="form-group">
             <label style="display: block; font-weight: 500; color: #374151; margin-bottom: 8px;">Address *</label>
-            <input id="address" type="text" required style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;">
+            <input id="address" type="text" required readonly style="width: 100%; padding: 12px 16px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; transition: all 0.2s ease; background: #f8fafc; color: #64748b;">
         </div>
 
         <div class="form-group">
             <label style="display: block; font-weight: 500; color: #374151; margin-bottom: 8px;">City *</label>
-            <input id="city" type="text" required style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;">
+            <input id="city" type="text" required readonly style="width: 100%; padding: 12px 16px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; transition: all 0.2s ease; background: #f8fafc; color: #64748b;">
         </div>
 
         <div class="form-group">
             <label style="display: block; font-weight: 500; color: #374151; margin-bottom: 8px;">Phone Number *</label>
-            <input id="phone" type="tel" required style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;">
+            <input id="phone" type="tel" required readonly style="width: 100%; padding: 12px 16px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; transition: all 0.2s ease; background: #f8fafc; color: #64748b;">
         </div>
 
         <div class="form-group">
@@ -70,6 +98,8 @@
                 <thead>
                     <tr style="background: #f9fafb;">
                         <th style="padding: 12px 24px; text-align: left; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">#</th>
+                        <th style="padding: 12px 24px; text-align: left; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">LR Number</th>
+                        <th style="padding: 12px 24px; text-align: left; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">Date</th>
                         <th style="padding: 12px 24px; text-align: left; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">Consignee</th>
                         <th style="padding: 12px 24px; text-align: left; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">City</th>
                         <th style="padding: 12px 24px; text-align: left; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">Articles</th>
@@ -90,3 +120,4 @@
         </div>
     </div>
 </div>
+

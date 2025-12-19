@@ -97,7 +97,7 @@ async function loadClientBookings(page = 1) {
         
         document.getElementById('clientBookingsTable').innerHTML = `
             <tr>
-                <td colspan="8" style="padding: 40px; text-align: center; color: #dc2626;">
+                <td colspan="6" style="padding: 40px; text-align: center; color: #dc2626;">
                     Error loading parcels. Please try again.
                 </td>
             </tr>
@@ -111,7 +111,7 @@ function renderBookingsTable(bookings) {
     if (!bookings || bookings.length === 0) {
         tableBody.innerHTML = `
             <tr>
-                <td colspan="8" style="padding: 40px; text-align: center; color: #6b7280;">
+                <td colspan="6" style="padding: 40px; text-align: center; color: #6b7280;">
                     No parcels found. <a href="#" onclick="loadPage('client-booking')" style="color: #3b82f6;">Create your first parcel</a>
                 </td>
             </tr>
@@ -123,10 +123,8 @@ function renderBookingsTable(bookings) {
         <tr style="border-bottom: 1px solid #f3f4f6;">
             <td style="padding: 16px 24px; color: #111827; font-weight: 500; font-size: 14px;">${booking.lr_number}</td>
             <td style="padding: 16px 24px; color: #6b7280; font-size: 14px;">${new Date(booking.booking_date).toLocaleDateString()}</td>
-            <td style="padding: 16px 24px; color: #6b7280; font-size: 14px;">${booking.consignee_name}</td>
             <td style="padding: 16px 24px; color: #6b7280; font-size: 14px;">${booking.destination}</td>
             <td style="padding: 16px 24px; color: #6b7280; font-size: 14px;">${booking.article_count}</td>
-            <td style="padding: 16px 24px; color: #6b7280; font-weight: 500; font-size: 14px;">₹${parseFloat(booking.grand_total || 0).toLocaleString('en-IN')}</td>
             <td style="padding: 16px 24px;">
                 <span style="padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: 500; ${getStatusStyle(booking.status)}">${booking.status}</span>
             </td>

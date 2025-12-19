@@ -88,7 +88,6 @@ async function initVehiclesPage() {
                             <span class="material-symbols-outlined vehicle-icon">local_shipping</span>
                             <div>
                                 <div class="vehicle-number">${v.registration_number}</div>
-                                <div class="vehicle-capacity">${v.capacity}</div>
                             </div>
                         </div>
                         <span class="status-badge ${statusClass}">${displayStatus}</span>
@@ -218,7 +217,6 @@ async function viewVehicleDetails(vehicleId) {
         }`;
         document.getElementById('detailDriverName').textContent = vehicle.driver?.name || 'No Driver';
         document.getElementById('detailDriverPhone').textContent = vehicle.driver?.phone || 'N/A';
-        document.getElementById('detailCapacity').textContent = vehicle.capacity;
         
         // Fetch assigned parcels
         const bookingsResponse = await fetch(`${API_BASE_URL}/bookings`);
@@ -229,6 +227,12 @@ async function viewVehicleDetails(vehicleId) {
                 b.assigned_vehicle_id === vehicleId && b.status === 'IN-TRANSIT'
             );
             
+            // Calculate total assigned boxes (sum of article_count)
+            const totalAssignedBoxes = assignedParcels.reduce((total, parcel) => {
+                return total + (parseInt(parcel.article_count) || 0);
+            }, 0);
+            
+            document.getElementById('detailAssignedBoxes').textContent = totalAssignedBoxes;
             document.getElementById('detailParcelCount').textContent = assignedParcels.length;
             
             // Show/hide Close Day button based on assigned parcels
@@ -239,17 +243,27 @@ async function viewVehicleDetails(vehicleId) {
             
             const tbody = document.getElementById('detailParcelsTableBody');
             if (assignedParcels.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#9ca3af;">No parcels assigned</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#9ca3af;">No parcels assigned</td></tr>';
             } else {
                 tbody.innerHTML = assignedParcels.map(parcel => `
                     <tr>
                         <td>${parcel.lr_number}</td>
+                        <td>${new Date(parcel.booking_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
                         <td>${parcel.company?.name || '-'}</td>
                         <td>${parcel.consignee_name}</td>
                         <td>${parcel.destination}</td>
                         <td>${parcel.article_count}</td>
                         <td>${new Date(parcel.updated_at).toLocaleDateString()}</td>
                         <td><span class="status-badge st-assigned">${parcel.status}</span></td>
+                        <td>
+                            ${parcel.status === 'IN-TRANSIT' ? 
+                                `<button class="btn btn-success btn-sm" onclick="markAsDelivered('${parcel.id}', '${parcel.lr_number}')" style="font-size: 12px; padding: 6px 12px;">
+                                    <span class="material-symbols-outlined" style="font-size: 14px; margin-right: 4px;">check_circle</span>
+                                    Mark as Delivered
+                                </button>` : 
+                                '<span style="color: #9ca3af; font-size: 12px;">-</span>'
+                            }
+                        </td>
                     </tr>
                 `).join('');
             }
@@ -312,68 +326,12 @@ function closeVehicleDetailsModal() {
     }
 }
 
-// Assign parcels to existing vehicle
+// Assign parcels to existing vehicle - Navigate to full page
 async function assignParcels(vehicleId) {
-    console.log('Assign parcels to vehicle:', vehicleId);
+    console.log('Navigate to assign parcels page for vehicle:', vehicleId);
     
-    try {
-        // Fetch vehicle details
-        const response = await fetch(`${API_BASE_URL}/vehicles`);
-        const result = await response.json();
-        
-        if (!result.success) return;
-        
-        const vehicle = result.data.find(v => v.id === vehicleId);
-        if (!vehicle) return;
-        
-        // Store vehicle data for assignment
-        vehicleFormData = {
-            vehicleId: vehicle.id,
-            vehicleNo: vehicle.registration_number,
-            driver: vehicle.driver?.name || 'Unknown',
-            contact: vehicle.driver?.phone || 'N/A'
-        };
-        
-        selectedParcels = [];
-        
-        // Update summary
-        document.getElementById('summaryVehicleNo').textContent = vehicle.registration_number;
-        document.getElementById('summaryDriver').textContent = vehicle.driver?.name || 'Unknown';
-        document.getElementById('summaryContact').textContent = vehicle.driver?.phone || 'N/A';
-        
-        // Show parcel selection modal
-        const modal = document.getElementById('selectParcelsModal');
-        console.log('🔍 Modal element:', modal);
-        if (modal) {
-            modal.style.display = 'flex';
-            console.log('✅ Modal displayed');
-        } else {
-            console.error('❌ Modal not found!');
-        }
-        
-        // Update modal for existing vehicle assignment
-        const modalTitle = document.querySelector('#selectParcelsModal .modal-title');
-        if (modalTitle) {
-            modalTitle.textContent = 'Assign Parcels to Vehicle';
-        }
-        
-        const createBtn = document.getElementById('createVehicleWithParcels');
-        console.log('🔍 Assign button element:', createBtn);
-        if (createBtn) {
-            createBtn.textContent = 'Assign Parcels (0)';
-            createBtn.onclick = () => assignParcelsToExistingVehicle(vehicleId);
-            createBtn.style.display = 'block';
-            console.log('✅ Assign button updated and made visible');
-        } else {
-            console.error('❌ Assign button not found!');
-        }
-        
-        // Load available parcels
-        await loadAvailableParcels();
-        
-    } catch (error) {
-        console.error('Error loading vehicle for assignment:', error);
-    }
+    // Navigate to assign parcels page with vehicle ID as parameter
+    loadPage('assign-parcels', `?vehicleId=${vehicleId}`);
 }
 
 // Assign parcels to existing vehicle (separate from creating new vehicle)
@@ -982,3 +940,54 @@ window.toggleParcelSelection = toggleParcelSelection;
 window.closeDayAndClearAssignment = closeDayAndClearAssignment;
 window.filterParcelsByCity = filterParcelsByCity;
 window.clearParcelFilter = clearParcelFilter;
+
+// Mark parcel as delivered
+async function markAsDelivered(parcelId, lrNumber) {
+    try {
+        // Confirm action
+        if (!confirm(`Mark parcel ${lrNumber} as delivered?`)) {
+            return;
+        }
+
+        console.log('🚚 Marking parcel as delivered:', parcelId, lrNumber);
+
+        // Update parcel status to DELIVERED
+        const response = await fetch(`${API_BASE_URL}/bookings/${parcelId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                status: 'DELIVERED'
+            })
+        });
+
+        const result = await response.json();
+        
+        if (result.success) {
+            console.log('✅ Parcel marked as delivered successfully');
+            showToast(`Parcel ${lrNumber} marked as delivered!`, 'success');
+            
+            // Refresh the vehicle details modal to show updated status
+            const currentVehicleId = document.getElementById('detailVehicleNumber').textContent;
+            if (currentVehicleId) {
+                // Find the vehicle ID from the current display
+                const vehiclesResponse = await fetch(`${API_BASE_URL}/vehicles`);
+                const vehiclesResult = await vehiclesResponse.json();
+                
+                if (vehiclesResult.success) {
+                    const vehicle = vehiclesResult.data.find(v => v.registration_number === currentVehicleId);
+                    if (vehicle) {
+                        await viewVehicleDetails(vehicle.id);
+                    }
+                }
+            }
+        } else {
+            console.error('❌ Failed to mark parcel as delivered:', result.error);
+            showToast('Failed to mark parcel as delivered: ' + result.error, 'error');
+        }
+    } catch (error) {
+        console.error('❌ Error marking parcel as delivered:', error);
+        showToast('Error marking parcel as delivered', 'error');
+    }
+}

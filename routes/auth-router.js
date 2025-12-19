@@ -195,12 +195,25 @@ router.post('/register', async (req, res) => {
 // GET /api/auth/users - Get all users (admin only)
 router.get('/users', async (req, res) => {
     try {
+        console.log('🔍 Fetching users with company data...');
+        
         const { data: users, error } = await supabase
             .from('auth_users')
-            .select('id, email, full_name, phone, role, is_active, created_at, last_login')
+            .select(`
+                id, email, full_name, phone, role, is_active, created_at, last_login, company_id,
+                company:companies(id, name, email, phone)
+            `)
             .order('created_at', { ascending: false });
 
-        if (error) throw error;
+        if (error) {
+            console.error('❌ Supabase error:', error);
+            throw error;
+        }
+
+        console.log(`✅ Found ${users?.length || 0} users`);
+        console.log('🔍 Sample user data:', users?.[0]);
+        console.log('🔍 Users with company_id:', users?.filter(u => u.company_id).length);
+        console.log('🔍 Users with company data:', users?.filter(u => u.company).length);
 
         res.json({
             success: true,
@@ -313,6 +326,85 @@ router.put('/change-password', async (req, res) => {
         res.status(500).json({
             success: false,
             error: 'Failed to change password'
+        });
+    }
+});
+
+// PUT /api/auth/admin-change-password - Admin change client password
+router.put('/admin-change-password', async (req, res) => {
+    try {
+        const { userId, newPassword, adminEmail } = req.body;
+
+        if (!userId || !newPassword || !adminEmail) {
+            return res.status(400).json({
+                success: false,
+                error: 'User ID, new password, and admin email are required'
+            });
+        }
+
+        // Verify admin user
+        const { data: admin, error: adminError } = await supabase
+            .from('auth_users')
+            .select('*')
+            .eq('email', adminEmail.toLowerCase())
+            .eq('role', 'admin')
+            .single();
+
+        if (adminError || !admin) {
+            return res.status(403).json({
+                success: false,
+                error: 'Admin verification failed'
+            });
+        }
+
+        // Get target user
+        const { data: user, error: fetchError } = await supabase
+            .from('auth_users')
+            .select('*')
+            .eq('id', userId)
+            .single();
+
+        if (fetchError || !user) {
+            return res.status(404).json({
+                success: false,
+                error: 'User not found'
+            });
+        }
+
+        // Ensure target user is a client
+        if (user.role !== 'client') {
+            return res.status(403).json({
+                success: false,
+                error: 'Can only change passwords for client users'
+            });
+        }
+
+        // Hash new password
+        const newPasswordHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
+
+        // Update password
+        const { error: updateError } = await supabase
+            .from('auth_users')
+            .update({
+                password_hash: newPasswordHash,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', userId);
+
+        if (updateError) throw updateError;
+
+        console.log(`✅ Admin ${adminEmail} changed password for client ${user.email}`);
+
+        res.json({
+            success: true,
+            message: 'Client password changed successfully'
+        });
+
+    } catch (error) {
+        console.error('Error changing client password:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to change client password'
         });
     }
 });
