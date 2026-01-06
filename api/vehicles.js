@@ -1,6 +1,22 @@
 // Vehicles API for Vercel - Serverless function
 const supabase = require('../config/supabase');
 
+// Server-side debug configuration
+const DEBUG_MODE = process.env.NODE_ENV !== 'production';
+
+// Server-side conditional logging functions
+function debugLog(...args) {
+    if (DEBUG_MODE) {
+        console.log(...args);
+    }
+}
+
+function debugError(...args) {
+    if (DEBUG_MODE) {
+        console.error(...args);
+    }
+}
+
 module.exports = async (req, res) => {
     // CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -12,7 +28,7 @@ module.exports = async (req, res) => {
     }
 
     try {
-        console.log('🚛 Vehicles API called:', req.method, req.url);
+        debugLog('🚛 Vehicles API called:', req.method, req.url);
 
         if (req.method === 'GET') {
             // GET /api/vehicles - Get all vehicles
@@ -25,11 +41,11 @@ module.exports = async (req, res) => {
                 .order('registration_number');
 
             if (error) {
-                console.error('❌ Supabase error:', error);
+                debugError('❌ Supabase error:', error);
                 throw error;
             }
 
-            console.log(`✅ Found ${data?.length || 0} vehicles`);
+            debugLog(`✅ Found ${data?.length || 0} vehicles`);
 
             // Get all IN-TRANSIT bookings (assigned to vehicles)
             const { data: bookings, error: bookingsError } = await supabase
@@ -38,7 +54,7 @@ module.exports = async (req, res) => {
                 .eq('status', 'IN-TRANSIT');
 
             if (bookingsError) {
-                console.error('Error fetching bookings:', bookingsError);
+                debugError('Error fetching bookings:', bookingsError);
             }
 
             // Count bookings per vehicle
@@ -144,7 +160,7 @@ module.exports = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('❌ Vehicles API error:', error);
+        debugError('❌ Vehicles API error:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to process vehicles request',

@@ -32,8 +32,8 @@ function getUserCompanyContext() {
 
 // Prevent admin functions from running in client interface
 if (typeof initDashboardPage === 'function') {
-    console.log('🚫 Blocking admin dashboard function in client interface');
+    debugLog('🚫 Blocking admin dashboard function in client interface');
     window.initDashboardPage = function() {
-        console.log('🚫 Admin dashboard blocked in client interface');
+        debugLog('🚫 Admin dashboard blocked in client interface');
     };
 }

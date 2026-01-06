@@ -1,16 +1,16 @@
 // CLIENT DASHBOARD PAGE
 
 async function initClientDashboardPage() {
-    console.log('📊 Initializing Client Dashboard page...');
-    console.log('📊 This is the CLIENT dashboard, not admin dashboard');
+    debugLog('📊 Initializing Client Dashboard page...');
+    debugLog('📊 This is the CLIENT dashboard, not admin dashboard');
     
     // Debug: Check if we have company information
     const companyId = getCompanyId();
     const companyName = getCompanyName();
     
     if (!companyId || !companyName) {
-        console.error('❌ Missing company information!');
-        console.log('Available localStorage keys:', Object.keys(localStorage));
+        debugError('❌ Missing company information!');
+        debugLog('Available localStorage keys:', Object.keys(localStorage));
         
         // Show error message to user
         document.getElementById('content').innerHTML = `
@@ -38,42 +38,42 @@ async function loadClientDashboardData() {
         const companyId = getCompanyId();
         const companyName = getCompanyName();
         
-        console.log('🔍 Client Dashboard Debug Info:');
-        console.log('- Company ID:', companyId);
-        console.log('- Company Name:', companyName);
-        console.log('- API Base URL:', API_BASE_URL);
-        console.log('- All localStorage:', Object.keys(localStorage).map(key => `${key}: ${localStorage.getItem(key)}`));
+        debugLog('🔍 Client Dashboard Debug Info:');
+        debugLog('- Company ID:', companyId);
+        debugLog('- Company Name:', companyName);
+        debugLog('- API Base URL:', API_BASE_URL);
+        debugLog('- All localStorage:', Object.keys(localStorage).map(key => `${key}: ${localStorage.getItem(key)}`));
         
         if (!companyId) {
-            console.error('❌ No company ID found in localStorage');
+            debugError('❌ No company ID found in localStorage');
             showToast('Company information not found. Please login again.', 'error');
             return;
         }
         
-        console.log(`📊 Loading dashboard data for company: ${companyName} (${companyId})`);
+        debugLog(`📊 Loading dashboard data for company: ${companyName} (${companyId})`);
         
         // Update welcome message with company name
         const welcomeElement = document.getElementById('companyWelcome');
         if (welcomeElement) {
             welcomeElement.textContent = `${companyName} - Track your shipments and manage your bookings`;
         } else {
-            console.warn('⚠️ companyWelcome element not found');
+            debugWarn('⚠️ companyWelcome element not found');
         }
         
         // Fetch company-specific dashboard data
         const apiUrl = `${API_BASE_URL}/dashboard/summary?companyId=${companyId}`;
-        console.log('🌐 Fetching from:', apiUrl);
+        debugLog('🌐 Fetching from:', apiUrl);
         
         const response = await fetch(apiUrl);
-        console.log('📡 Response status:', response.status);
+        debugLog('📡 Response status:', response.status);
         
         const result = await response.json();
-        console.log('📊 Dashboard API response:', result);
+        debugLog('📊 Dashboard API response:', result);
         
         if (result.success) {
             // Update stats with real data
             const stats = result.data.stats || result.data;
-            console.log('📈 Stats data:', stats);
+            debugLog('📈 Stats data:', stats);
             
             // Safely update elements with null checks
             const todayBookingsEl = document.getElementById('todayBookings');
@@ -81,7 +81,7 @@ async function loadClientDashboardData() {
             const totalDeliveredEl = document.getElementById('totalDelivered');
             const inTransitEl = document.getElementById('inTransit');
             
-            console.log('📊 Element check:', {
+            debugLog('📊 Element check:', {
                 todayBookings: !!todayBookingsEl,
                 pendingDelivery: !!pendingDeliveryEl,
                 totalDelivered: !!totalDeliveredEl,
@@ -89,28 +89,28 @@ async function loadClientDashboardData() {
             });
             
             if (todayBookingsEl) todayBookingsEl.textContent = stats.todayBookings || '0';
-            else console.warn('⚠️ todayBookings element not found');
+            else debugWarn('⚠️ todayBookings element not found');
             
             if (pendingDeliveryEl) pendingDeliveryEl.textContent = stats.pendingDeliveries || '0';
-            else console.warn('⚠️ pendingDelivery element not found');
+            else debugWarn('⚠️ pendingDelivery element not found');
             
             if (totalDeliveredEl) totalDeliveredEl.textContent = stats.totalDelivered || '0';
-            else console.warn('⚠️ totalDelivered element not found');
+            else debugWarn('⚠️ totalDelivered element not found');
             
             if (inTransitEl) inTransitEl.textContent = stats.inTransit || '0';
-            else console.warn('⚠️ inTransit element not found');
+            else debugWarn('⚠️ inTransit element not found');
             
-            console.log('✅ Client dashboard data loaded for company:', companyName);
+            debugLog('✅ Client dashboard data loaded for company:', companyName);
             
             // Load recent bookings
             await loadRecentBookings(companyId);
         } else {
-            console.error('❌ API returned error:', result.error);
+            debugError('❌ API returned error:', result.error);
             throw new Error(result.error || 'Failed to load dashboard data');
         }
         
     } catch (error) {
-        console.error('❌ Error loading client dashboard data:', error);
+        debugError('❌ Error loading client dashboard data:', error);
         showToast('Error loading dashboard data: ' + error.message, 'error');
         
         // Fallback to default values with null checks
@@ -129,23 +129,23 @@ async function loadClientDashboardData() {
 async function loadRecentBookings(companyId) {
     try {
         const bookingsUrl = `${API_BASE_URL}/bookings?companyId=${companyId}&limit=5`;
-        console.log('📋 Fetching recent bookings from:', bookingsUrl);
+        debugLog('📋 Fetching recent bookings from:', bookingsUrl);
         
         const response = await fetch(bookingsUrl);
-        console.log('📡 Bookings response status:', response.status);
+        debugLog('📡 Bookings response status:', response.status);
         
         const result = await response.json();
-        console.log('📋 Bookings API response:', result);
+        debugLog('📋 Bookings API response:', result);
         
         const tableBody = document.getElementById('recentBookingsTable');
         
         if (!tableBody) {
-            console.error('❌ recentBookingsTable element not found');
+            debugError('❌ recentBookingsTable element not found');
             return;
         }
         
         if (result.success && result.data && result.data.length > 0) {
-            console.log(`✅ Found ${result.data.length} recent bookings`);
+            debugLog(`✅ Found ${result.data.length} recent bookings`);
             tableBody.innerHTML = result.data.map(booking => `
                 <tr style="border-bottom: 1px solid #f3f4f6;">
                     <td style="padding: 16px 24px; color: #111827; font-weight: 500;">${booking.lr_number}</td>
@@ -161,7 +161,7 @@ async function loadRecentBookings(companyId) {
                 </tr>
             `).join('');
         } else {
-            console.log('⚠️ No bookings found for company:', companyId);
+            debugLog('⚠️ No bookings found for company:', companyId);
             tableBody.innerHTML = `
                 <tr>
                     <td colspan="6" style="padding: 40px; text-align: center; color: #6b7280;">
@@ -174,7 +174,7 @@ async function loadRecentBookings(companyId) {
             `;
         }
     } catch (error) {
-        console.error('❌ Error loading recent bookings:', error);
+        debugError('❌ Error loading recent bookings:', error);
         const tableBody = document.getElementById('recentBookingsTable');
         if (tableBody) {
             tableBody.innerHTML = `
@@ -212,7 +212,7 @@ async function createTestBooking() {
             return;
         }
         
-        console.log('🧪 Creating test booking for company:', companyName, companyId);
+        debugLog('🧪 Creating test booking for company:', companyName, companyId);
         
         // Test with your example: 300 articles
         const testBooking = {
@@ -225,7 +225,7 @@ async function createTestBooking() {
             parcelType: 'Standard'
         };
         
-        console.log('🧮 Test Calculation Check:', {
+        debugLog('🧮 Test Calculation Check:', {
             articles: testBooking.articleCount,
             expectedWith100Rate: testBooking.articleCount * 100,
             expectedWith10Rate: testBooking.articleCount * 10
@@ -242,7 +242,7 @@ async function createTestBooking() {
         const result = await response.json();
         
         if (result.success) {
-            console.log('✅ Test booking result:', result.data);
+            debugLog('✅ Test booking result:', result.data);
             showToast(`Test booking created! Total: ₹${result.data.grand_total}`, 'success');
             // Reload dashboard data
             await loadClientDashboardData();
@@ -251,7 +251,7 @@ async function createTestBooking() {
         }
         
     } catch (error) {
-        console.error('Error creating test booking:', error);
+        debugError('Error creating test booking:', error);
         showToast('Error creating test booking: ' + error.message, 'error');
     }
 }

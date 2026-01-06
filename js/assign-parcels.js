@@ -1,22 +1,22 @@
 // Assign Parcels Page
-console.log('🔍 assign-parcels.js loading...');
+debugLog('🔍 assign-parcels.js loading...');
 let currentVehicleData = {};
 let assignSelectedParcels = [];
 
 async function initAssignParcelsPage() {
-    console.log('🚛 Initializing Assign Parcels Page...');
-    console.log('🔍 Current URL:', window.location.href);
-    console.log('🔍 Search params:', window.location.search);
+    debugLog('🚛 Initializing Assign Parcels Page...');
+    debugLog('🔍 Current URL:', window.location.href);
+    debugLog('🔍 Search params:', window.location.search);
     
     // Get vehicle ID from URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const vehicleId = urlParams.get('vehicleId');
     
-    console.log('🔍 Vehicle ID from URL:', vehicleId);
-    console.log('🔍 API_BASE_URL:', API_BASE_URL);
+    debugLog('🔍 Vehicle ID from URL:', vehicleId);
+    debugLog('🔍 API_BASE_URL:', API_BASE_URL);
     
     if (!vehicleId) {
-        console.error('❌ No vehicle ID provided');
+        debugError('❌ No vehicle ID provided');
         loadPage('vehicles');
         return;
     }
@@ -28,24 +28,24 @@ async function initAssignParcelsPage() {
 
 async function loadVehicleData(vehicleId) {
     try {
-        console.log('🔍 Loading vehicle data for ID:', vehicleId);
-        console.log('🔍 Fetching from:', `${API_BASE_URL}/vehicles`);
+        debugLog('🔍 Loading vehicle data for ID:', vehicleId);
+        debugLog('� Fetchicng from:', `${API_BASE_URL}/vehicles`);
         
         // Fetch vehicle details
         const response = await fetch(`${API_BASE_URL}/vehicles`);
-        console.log('🔍 Vehicle API response status:', response.status);
+        debugLog('🔍 Vehicle API response status:', response.status);
         
         const result = await response.json();
-        console.log('🔍 Vehicle API result:', result);
+        debugLog('🔍 Vehicle API result:', result);
         
         if (!result.success) {
             throw new Error('Failed to fetch vehicle data');
         }
         
-        console.log('🔍 Available vehicles:', result.data.map(v => ({ id: v.id, reg: v.registration_number })));
+        debugLog('🔍 Available vehicles:', result.data.map(v => ({ id: v.id, reg: v.registration_number })));
         
         const vehicle = result.data.find(v => v.id === vehicleId);
-        console.log('🔍 Found vehicle:', vehicle);
+        debugLog('🔍 Found vehicle:', vehicle);
         
         if (!vehicle) {
             // Show sample vehicle data if not found
@@ -70,10 +70,10 @@ async function loadVehicleData(vehicleId) {
         document.getElementById('assignDriverName').textContent = currentVehicleData.driver_name;
         document.getElementById('assignContactNumber').textContent = currentVehicleData.driver_phone;
         
-        console.log('✅ Vehicle data loaded:', currentVehicleData);
+        debugLog('✅ Vehicle data loaded:', currentVehicleData);
         
     } catch (error) {
-        console.error('❌ Error loading vehicle data:', error);
+        debugError('❌ Error loading vehicle data:', error);
         // Don't redirect on error, just use sample data
         currentVehicleData = {
             id: vehicleId,
@@ -87,23 +87,23 @@ async function loadVehicleData(vehicleId) {
         document.getElementById('assignDriverName').textContent = currentVehicleData.driver_name;
         document.getElementById('assignContactNumber').textContent = currentVehicleData.driver_phone;
         
-        console.log('✅ Using sample vehicle data:', currentVehicleData);
+        debugLog('✅ Using sample vehicle data:', currentVehicleData);
     }
 }
 
 async function loadAvailableParcels() {
     try {
-        console.log('🔍 Loading available parcels...');
+        debugLog('🔍 Loading available parcels...');
         const tbody = document.getElementById('assignParcelsTableBody');
         tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px;">Loading available parcels...</td></tr>';
 
         // Fetch all unassigned bookings (BOOKED status only)
-        console.log('🔍 Fetching from:', `${API_BASE_URL}/bookings`);
+        debugLog('🔍 Fetching from:', `${API_BASE_URL}/bookings`);
         const response = await fetch(`${API_BASE_URL}/bookings`);
-        console.log('🔍 Bookings API response status:', response.status);
+        debugLog('🔍 Bookings API response status:', response.status);
         
         const result = await response.json();
-        console.log('🔍 Bookings API result:', result);
+        debugLog('� Bookiongs API result:', result);
 
         if (!result.success) {
             throw new Error('Failed to load parcels');
@@ -115,9 +115,9 @@ async function loadAvailableParcels() {
             b.status === 'BOOKED'
         );
 
-        console.log('🔍 Total bookings:', result.data.length);
-        console.log('🔍 Available parcels (BOOKED, unassigned):', parcels.length);
-        console.log('🔍 Sample parcels:', parcels.slice(0, 3));
+        debugLog('🔍 Total bookings:', result.data.length);
+        debugLog('🔍 Available parcels (BOOKED, unassigned):', parcels.length);
+        debugLog('🔍 Sample parcels:', parcels.slice(0, 3));
 
         // If no real data, show sample data matching the design
         if (parcels.length === 0) {
@@ -200,13 +200,13 @@ async function loadAvailableParcels() {
         `).join('');
 
         updateParcelCounts(parcels.length, 0);
-        console.log('✅ Parcels loaded successfully');
+        debugLog('✅ Parcels loaded successfully');
         
         // Force enable button for testing
         setTimeout(() => {
             const assignBtn = document.getElementById('assignSelectedBtn');
             if (assignBtn) {
-                console.log('🔍 Force enabling button for testing');
+                debugLog('🔍 Force enabling button for testing');
                 assignBtn.disabled = false;
                 assignBtn.style.backgroundColor = '#6b7280';
                 assignBtn.style.cursor = 'pointer';
@@ -214,7 +214,7 @@ async function loadAvailableParcels() {
         }, 1000);
 
     } catch (error) {
-        console.error('❌ Error loading parcels:', error);
+        debugError('❌ Error loading parcels:', error);
         // Show sample data even on error
         const sampleParcels = [
             {
@@ -297,13 +297,13 @@ async function loadAvailableParcels() {
 }
 
 function toggleParcelSelection(parcelId) {
-    console.log('🔍 toggleParcelSelection called with:', parcelId);
+    debugLog('🔍 toggleParcelSelection called with:', parcelId);
     const checkbox = document.querySelector(`input[value="${parcelId}"]`);
     const row = document.querySelector(`tr[data-parcel-id="${parcelId}"]`);
     
-    console.log('🔍 Checkbox found:', checkbox);
-    console.log('🔍 Row found:', row);
-    console.log('🔍 Checkbox checked:', checkbox?.checked);
+    debugLog('🔍 Checkbox found:', checkbox);
+    debugLog('🔍 Row found:', row);
+    debugLog('🔍 Checkbox checked:', checkbox?.checked);
 
     if (checkbox && checkbox.checked) {
         if (!assignSelectedParcels.includes(parcelId)) {
@@ -315,7 +315,7 @@ function toggleParcelSelection(parcelId) {
         if (row) row.classList.remove('selected');
     }
 
-    console.log('🔍 Selected parcels:', assignSelectedParcels);
+    debugLog('🔍 Selected parcels:', assignSelectedParcels);
     updateSelectedCount();
 }
 
@@ -330,12 +330,12 @@ function toggleAllParcels() {
 }
 
 function updateSelectedCount() {
-    console.log('🔍 updateSelectedCount called, selected:', assignSelectedParcels.length);
+    debugLog('🔍 updateSelectedCount called, selected:', assignSelectedParcels.length);
     const selectedCountEl = document.getElementById('selectedParcelCount');
     const assignCountEl = document.getElementById('assignCount');
     const assignBtn = document.getElementById('assignSelectedBtn');
     
-    console.log('🔍 Elements found:', {
+    debugLog('🔍 Elements found:', {
         selectedCountEl: !!selectedCountEl,
         assignCountEl: !!assignCountEl,
         assignBtn: !!assignBtn
@@ -360,7 +360,7 @@ function updateSelectedCount() {
             assignBtn.style.backgroundColor = '#6b7280';
             assignBtn.style.cursor = 'pointer';
         }
-        console.log('🔍 Button disabled:', assignBtn.disabled);
+        debugLog('🔍 Button disabled:', assignBtn.disabled);
     }
 }
 
@@ -378,11 +378,11 @@ function updateParcelCounts(available, selected) {
 }
 
 async function assignParcelsToVehicle() {
-    console.log('🔍 assignParcelsToVehicle called!');
-    console.log('🔍 Selected parcels:', assignSelectedParcels);
+    debugLog('🔍 assignParcelsToVehicle called!');
+    debugLog('🔍 Selected parcels:', assignSelectedParcels);
     
     if (assignSelectedParcels.length === 0) {
-        console.log('❌ No parcels selected');
+        debugLog('❌ No parcels selected');
         if (typeof showToast === 'function') {
             showToast('Please select at least one parcel to assign', 'warning');
         } else {
@@ -396,14 +396,14 @@ async function assignParcelsToVehicle() {
         assignBtn.disabled = true;
         assignBtn.innerHTML = 'Assigning...';
 
-        console.log('Assigning', assignSelectedParcels.length, 'parcels to vehicle', currentVehicleData.id);
+        debugLog('Assigning', assignSelectedParcels.length, 'parcels to vehicle', currentVehicleData.id);
         
         // Check if we're dealing with sample data
         const hasSampleData = assignSelectedParcels.some(id => id.startsWith('sample-'));
         
         if (hasSampleData) {
             // Simulate assignment for sample data
-            console.log('✅ Sample parcels assigned successfully');
+            debugLog('✅ Sample parcels assigned successfully');
             showToast(`Successfully assigned ${assignSelectedParcels.length} parcels to vehicle ${currentVehicleData.registration_number}!`, 'success');
             
             // Navigate back to vehicles page after a short delay
@@ -428,9 +428,9 @@ async function assignParcelsToVehicle() {
 
             const updateResult = await updateResponse.json();
             if (updateResult.success) {
-                console.log('✅ Parcel', parcelId, 'assigned successfully');
+                debugLog('✅ Parcel', parcelId, 'assigned successfully');
             } else {
-                console.error('❌ Failed to assign parcel', parcelId, ':', updateResult);
+                debugError('❌ Failed to assign parcel', parcelId, ':', updateResult);
             }
         }
 
@@ -447,7 +447,7 @@ async function assignParcelsToVehicle() {
 
         const vehicleUpdateResult = await updateVehicleResponse.json();
         if (vehicleUpdateResult.success) {
-            console.log('✅ Vehicle status updated to Assigned');
+            debugLog('✅ Vehicle status updated to Assigned');
         }
 
         showToast(`Successfully assigned ${assignSelectedParcels.length} parcels to vehicle ${currentVehicleData.registration_number}!`, 'success');
@@ -456,7 +456,7 @@ async function assignParcelsToVehicle() {
         loadPage('vehicles');
         
     } catch (error) {
-        console.error('❌ Error assigning parcels:', error);
+        debugError('❌ Error assigning parcels:', error);
         showToast('Error assigning parcels. Please try again.', 'error');
     } finally {
         const assignBtn = document.getElementById('assignSelectedBtn');
@@ -516,7 +516,7 @@ function clearAssignParcelFilter() {
 
 // Test function to check if button clicks work
 function testButtonClick() {
-    console.log('🔍 Test button clicked!');
+    debugLog('🔍 Test button clicked!');
     alert('Button click is working!');
 }
 
@@ -529,14 +529,14 @@ window.filterAssignParcels = filterAssignParcels;
 window.clearAssignParcelFilter = clearAssignParcelFilter;
 window.testButtonClick = testButtonClick;
 
-console.log('✅ assign-parcels.js functions defined globally');
-console.log('🔍 initAssignParcelsPage type:', typeof window.initAssignParcelsPage);
-console.log('🔍 assignSelectedParcels type:', typeof window.assignSelectedParcels);
-console.log('🔍 testButtonClick type:', typeof window.testButtonClick);
+debugLog('✅ assign-parcels.js functions defined globally');
+debugLog('🔍 initAssignParcelsPage type:', typeof window.initAssignParcelsPage);
+debugLog('🔍 assignSelectedParcels type:', typeof window.assignSelectedParcels);
+debugLog('🔍 testButtonClick type:', typeof window.testButtonClick);
 
 // Test that functions are accessible
 if (typeof window.testButtonClick === 'function') {
-    console.log('✅ testButtonClick is accessible globally');
+    debugLog('✅ testButtonClick is accessible globally');
 } else {
-    console.error('❌ testButtonClick is NOT accessible globally');
+    debugError('❌ testButtonClick is NOT accessible globally');
 }

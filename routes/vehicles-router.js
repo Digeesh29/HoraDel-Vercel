@@ -3,6 +3,22 @@ const express = require('express');
 const router = express.Router();
 const supabase = require('../config/supabase');
 
+// Server-side debug configuration
+const DEBUG_MODE = process.env.NODE_ENV !== 'production';
+
+// Server-side conditional logging functions
+function debugLog(...args) {
+    if (DEBUG_MODE) {
+        console.log(...args);
+    }
+}
+
+function debugError(...args) {
+    if (DEBUG_MODE) {
+        console.error(...args);
+    }
+}
+
 // POST /api/vehicles - Create new vehicle
 router.post('/', async (req, res) => {
     try {
@@ -34,7 +50,7 @@ router.post('/', async (req, res) => {
             data: data
         });
     } catch (error) {
-        console.error('Error creating vehicle:', error);
+        debugError('Error creating vehicle:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to create vehicle',
@@ -66,7 +82,7 @@ router.put('/:id', async (req, res) => {
             data: data
         });
     } catch (error) {
-        console.error('Error updating vehicle:', error);
+        debugError('Error updating vehicle:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to update vehicle',
@@ -78,7 +94,7 @@ router.put('/:id', async (req, res) => {
 // GET /api/vehicles - Get all vehicles
 router.get('/', async (req, res) => {
     try {
-        console.log('📍 Fetching vehicles...');
+        debugLog('📍 Fetching vehicles...');
         
         const { data, error } = await supabase
             .from('vehicles')
@@ -89,11 +105,11 @@ router.get('/', async (req, res) => {
             .order('registration_number');
 
         if (error) {
-            console.error('❌ Supabase error:', error);
+            debugError('❌ Supabase error:', error);
             throw error;
         }
 
-        console.log(`✅ Found ${data?.length || 0} vehicles`);
+        debugLog(`✅ Found ${data?.length || 0} vehicles`);
 
         // Get all IN-TRANSIT bookings (assigned to vehicles)
         const { data: bookings, error: bookingsError } = await supabase
@@ -102,7 +118,7 @@ router.get('/', async (req, res) => {
             .eq('status', 'IN-TRANSIT');
 
         if (bookingsError) {
-            console.error('Error fetching bookings:', bookingsError);
+            debugError('Error fetching bookings:', bookingsError);
         }
 
         // Count bookings per vehicle
@@ -137,7 +153,7 @@ router.get('/', async (req, res) => {
             data: vehiclesWithBookings
         });
     } catch (error) {
-        console.error('❌ Error fetching vehicles:', error);
+        debugError('❌ Error fetching vehicles:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch vehicles',

@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
     <!-- CSS -->
-    <link rel="stylesheet" href="/Client/css/style.css?v=3">
+    <link rel="stylesheet" href="/Client/css/style.css?v=4">
 </head>
 <body>
 
@@ -81,6 +81,7 @@
 </div>
 
 <!-- CONFIG + MAIN + PAGE JS -->
+<script src="/js/debug-utils.js"></script>
 <script src="/Client/js/mobile-utils.js"></script>
 <script src="/Client/js/client-config.js?v=2"></script>
 <script src="/Client/js/client-main.js?v=2"></script>
@@ -94,18 +95,18 @@
 <script>
     // Wait for DOM to be ready
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('🚀 HoraDel Client Portal Loading...');
-        console.log('🔍 Current URL:', window.location.href);
-        console.log('🔍 Script tags:', Array.from(document.querySelectorAll('script')).map(s => s.src));
-        console.log('🔍 Admin functions exist:', {
+        debugLog('🚀 HoraDel Client Portal Loading...');
+        debugLog('🔍 Current URL:', window.location.href);
+        debugLog('🔍 Script tags:', Array.from(document.querySelectorAll('script')).map(s => s.src));
+        debugLog('🔍 Admin functions exist:', {
             initDashboardPage: typeof window.initDashboardPage,
             initAdminDashboardPage: typeof window.initAdminDashboardPage
         });
         
         // Check if we're accidentally in admin interface
         if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
-            console.log('🚨 ERROR: Client is accessing admin interface!');
-            console.log('🔄 Redirecting to correct client URL...');
+            debugLog('🚨 ERROR: Client is accessing admin interface!');
+            debugLog('🔄 Redirecting to correct client URL...');
             window.location.href = '/client';
             return;
         }
@@ -115,13 +116,13 @@
         const userEmail = localStorage.getItem('userEmail');
         
         if (!userRole || !userEmail) {
-            console.log('❌ Not authenticated, redirecting to login');
+            debugLog('❌ Not authenticated, redirecting to login');
             window.location.href = '/login';
             return;
         }
         
         if (userRole !== 'client') {
-            console.log('❌ Not client user, redirecting');
+            debugLog('❌ Not client user, redirecting');
             if (userRole === 'admin') {
                 window.location.href = '/admin';
             } else {
@@ -130,7 +131,7 @@
             return;
         }
         
-        console.log('✅ Client authenticated, loading client portal');
+        debugLog('✅ Client authenticated, loading client portal');
         
         // Update user display
         const userName = localStorage.getItem('userName') || 'Client User';
@@ -140,7 +141,7 @@
         const dashboardBtn = document.querySelector('.nav-item[data-page="client-dashboard"]');
         if (dashboardBtn) {
             dashboardBtn.click();
-            console.log('✅ Client Dashboard loaded');
+            debugLog('✅ Client Dashboard loaded');
         }
     });
 </script>

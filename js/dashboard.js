@@ -2,7 +2,7 @@
 if (window.location.href.includes('/Client/') || 
     document.title.includes('Client') ||
     document.querySelector('script[src*="/Client/js/"]')) {
-    console.log('🚫 Admin dashboard.js blocked - Client interface detected');
+    debugLog('🚫 Admin dashboard.js blocked - Client interface detected');
     // Stop loading this file completely
     throw new Error('Admin dashboard.js blocked in client interface');
 }
@@ -10,15 +10,15 @@ if (window.location.href.includes('/Client/') ||
 // Fetch dashboard data from API
 async function initAdminDashboardPage() {
     // Additional runtime check
-    console.log('🔍 Admin dashboard function called');
-    console.log('🔍 Current pathname:', window.location.pathname);
-    console.log('🔍 Document title:', document.title);
-    console.log('🔍 Brand title element:', document.querySelector('.brand-title')?.textContent);
+    debugLog('🔍 Admin dashboard function called');
+    debugLog('🔍 Current pathname:', window.location.pathname);
+    debugLog('🔍 Document title:', document.title);
+    debugLog('🔍 Brand title element:', document.querySelector('.brand-title')?.textContent);
     
     if (window.location.pathname.includes('/Client/') || 
         document.title.includes('Client') ||
         document.querySelector('.brand-title')?.textContent?.includes('Client')) {
-        console.log('🚫 Admin dashboard blocked in client interface');
+        debugLog('🚫 Admin dashboard blocked in client interface');
         return;
     }
     
@@ -27,33 +27,33 @@ async function initAdminDashboardPage() {
         showLoadingState();
 
         // Debug API_BASE_URL
-        console.log('🔍 API_BASE_URL value:', API_BASE_URL);
+        debugLog('🔍 API_BASE_URL value:', API_BASE_URL);
         
         // Fetch complete dashboard summary from API
-        console.log('📊 Fetching dashboard summary from:', `${API_BASE_URL}/dashboard/summary`);
+        debugLog('📊 Fetching dashboard summary from:', `${API_BASE_URL}/dashboard/summary`);
         let response = await fetch(`${API_BASE_URL}/dashboard/summary`);
         
         // If main endpoint fails, try fallback
         if (!response.ok) {
-            console.log('⚠️ Main dashboard endpoint failed, trying fallback...');
+            debugLog('⚠️ Main dashboard endpoint failed, trying fallback...');
             response = await fetch(`${API_BASE_URL}/dashboard-summary`);
         }
         
-        console.log('📡 Response status:', response.status, response.statusText);
+        debugLog('📡 Response status:', response.status, response.statusText);
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const result = await response.json();
-        console.log('📊 Full API Response:', result);
+        debugLog('📊 Full API Response:', result);
         
         if (!result.success) {
             throw new Error(result.error || 'Failed to fetch dashboard data');
         }
 
         const { stats, recentBookings, trend, companyDistribution, statusOverview } = result.data;
-        console.log('📈 Extracted data:', { stats, recentBookings: recentBookings?.length, trend, companyDistribution, statusOverview });
+        debugLog('📈 Extracted data:', { stats, recentBookings: recentBookings?.length, trend, companyDistribution, statusOverview });
 
         // === UPDATE STATS NUMBERS ===
         const dashBookings = document.getElementById("dashBookings");
@@ -67,7 +67,7 @@ async function initAdminDashboardPage() {
         if (dashPending) dashPending.innerText = stats.pendingDeliveries || 0;
 
         // === UPDATE TOTAL STATS ===
-        console.log('📊 Total Stats Debug:', {
+        debugLog('📊 Total Stats Debug:', {
             totalBookings: stats.totalBookings,
             totalInTransit: stats.totalInTransit,
             allTimeDelivered: stats.allTimeDelivered,
@@ -75,8 +75,8 @@ async function initAdminDashboardPage() {
         });
         
         // Debug: Show all available fields in stats
-        console.log('📊 All stats fields:', Object.keys(stats));
-        console.log('📊 Stats values:', Object.entries(stats));
+        debugLog('📊 All stats fields:', Object.keys(stats));
+        debugLog('📊 Stats values:', Object.entries(stats));
         
         const dashTotalBookings = document.getElementById("dashTotalBookings");
         const dashTotalInTransit = document.getElementById("dashTotalInTransit");
@@ -87,27 +87,27 @@ async function initAdminDashboardPage() {
         const totalInTransit = stats.totalInTransit ?? 'N/A';
         const totalDelivered = stats.allTimeDelivered ?? 'N/A';
 
-        console.log('📊 Final values to display:', { totalBookings, totalInTransit, totalDelivered });
+        debugLog('📊 Final values to display:', { totalBookings, totalInTransit, totalDelivered });
 
         if (dashTotalBookings) {
             dashTotalBookings.innerText = totalBookings;
-            console.log('✅ Set totalBookings to:', totalBookings);
+            debugLog('✅ Set totalBookings to:', totalBookings);
         } else {
-            console.error('❌ dashTotalBookings element not found');
+            debugError('❌ dashTotalBookings element not found');
         }
         
         if (dashTotalInTransit) {
             dashTotalInTransit.innerText = totalInTransit;
-            console.log('✅ Set totalInTransit to:', totalInTransit);
+            debugLog('✅ Set totalInTransit to:', totalInTransit);
         } else {
-            console.error('❌ dashTotalInTransit element not found');
+            debugError('❌ dashTotalInTransit element not found');
         }
         
         if (dashTotalDelivered) {
             dashTotalDelivered.innerText = totalDelivered;
-            console.log('✅ Set totalDelivered to:', totalDelivered);
+            debugLog('✅ Set totalDelivered to:', totalDelivered);
         } else {
-            console.error('❌ dashTotalDelivered element not found');
+            debugError('❌ dashTotalDelivered element not found');
         }
 
         // Removed hardcoded test values - now showing real API data
@@ -131,7 +131,7 @@ async function initAdminDashboardPage() {
         hideLoadingState();
 
     } catch (error) {
-        console.error('Error loading dashboard:', error);
+        debugError('Error loading dashboard:', error);
         showErrorState(error.message);
     }
 }
@@ -140,7 +140,7 @@ async function initAdminDashboardPage() {
 function updateGrowthRate(elementId, growthValue) {
     const element = document.getElementById(elementId);
     if (!element) {
-        console.warn(`Element with ID '${elementId}' not found`);
+        debugWarn(`Element with ID '${elementId}' not found`);
         return;
     }
 
@@ -392,19 +392,19 @@ if (!document.getElementById('dashboard-spinner-style')) {
 // Debug function to test database data
 async function testDashboardData() {
     try {
-        console.log('🔍 Testing dashboard data...');
+        debugLog('� Testeing dashboard data...');
         const response = await fetch(`${API_BASE_URL}/dashboard/test-data`);
         const result = await response.json();
         
         if (result.success) {
-            console.log('📊 Database Test Results:', result.data);
+            debugLog('📊 Database Test Results:', result.data);
             alert(`Database Test Results:\n\nTotal Bookings Found: ${result.data.totalFound}\nStatus Counts: ${JSON.stringify(result.data.statusCounts, null, 2)}\n\nCheck console for details.`);
         } else {
-            console.error('❌ Test failed:', result.error);
+            debugError('❌ Test failed:', result.error);
             alert('Test failed: ' + result.error);
         }
     } catch (error) {
-        console.error('❌ Test error:', error);
+        debugError('❌ Test error:', error);
         alert('Test error: ' + error.message);
     }
 }
@@ -412,11 +412,11 @@ async function testDashboardData() {
 // Test the summary API directly
 async function testSummaryAPI() {
     try {
-        console.log('🔍 Testing summary API...');
+        debugLog('🔍 Testing summary API...');
         const response = await fetch(`${API_BASE_URL}/dashboard/summary`);
         const result = await response.json();
         
-        console.log('📊 Summary API Response:', result);
+        debugLog('📊 Summary API Response:', result);
         
         if (result.success && result.data && result.data.stats) {
             const stats = result.data.stats;
@@ -425,7 +425,7 @@ async function testSummaryAPI() {
             alert('Summary API returned no stats data');
         }
     } catch (error) {
-        console.error('❌ Summary API error:', error);
+        debugError('❌ Summary API error:', error);
         alert('Summary API error: ' + error.message);
     }
 }

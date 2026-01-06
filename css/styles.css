@@ -3647,3 +3647,167 @@ tr:last-child {
         font-size: 13px;
     }
 }
+/* ============================================
+   MOBILE RESPONSIVE ICON FIXES
+   ============================================ */
+
+@media (max-width: 768px) {
+    /* Universal Material Symbols Icon Alignment */
+    .material-symbols-outlined {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        vertical-align: middle !important;
+        line-height: 1 !important;
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
+    }
+    
+    /* Fix form input icons */
+    .form-group {
+        position: relative !important;
+    }
+    
+    .form-group .material-symbols-outlined {
+        position: absolute !important;
+        left: 12px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        pointer-events: none !important;
+        color: #6b7280 !important;
+        font-size: 20px !important;
+        z-index: 2 !important;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding-left: 44px !important;
+    }
+    
+    /* Fix sidebar navigation icons */
+    .nav-item {
+        display: flex !important;
+        align-items: center !important;
+        text-align: left !important;
+    }
+    
+    .nav-item .material-symbols-outlined {
+        font-size: 20px !important;
+        margin-right: 12px !important;
+        flex-shrink: 0 !important;
+        width: 20px !important;
+        height: 20px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    /* Fix topbar and icon button icons */
+    .topbar .material-symbols-outlined,
+    .icon-btn .material-symbols-outlined {
+        font-size: 20px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    /* Fix button icons */
+    .btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+    }
+    
+    .btn .material-symbols-outlined {
+        font-size: 18px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        vertical-align: middle !important;
+        margin: 0 !important;
+    }
+    
+    /* Fix table action icons */
+    .table-actions {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 4px !important;
+        align-items: stretch !important;
+    }
+    
+    .table-actions .btn {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 6px !important;
+    }
+    
+    .table-actions .material-symbols-outlined {
+        font-size: 16px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    /* Fix status badges with icons */
+    .status-badge {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 4px !important;
+    }
+    
+    .status-badge .material-symbols-outlined {
+        font-size: 14px !important;
+    }
+    
+    /* Fix dashboard card icons */
+    .dashboard-card .material-symbols-outlined {
+        font-size: 24px !important;
+        margin-bottom: 8px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+    }
+    
+    /* Fix modal header icons */
+    .modal-header .material-symbols-outlined {
+        font-size: 20px !important;
+        margin-right: 8px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    /* Fix input field icons that use background images */
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="password"],
+    input[type="number"] {
+        background-position: 12px center !important;
+        background-size: 20px 20px !important;
+        background-repeat: no-repeat !important;
+    }
+    
+    input[style*="background-image"] {
+        padding-left: 44px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Smaller icons on very small screens */
+    .material-symbols-outlined {
+        font-size: 18px !important;
+    }
+    
+    .nav-item .material-symbols-outlined {
+        font-size: 18px !important;
+        width: 18px !important;
+        height: 18px !important;
+    }
+    
+    .btn .material-symbols-outlined {
+        font-size: 16px !important;
+    }
+}

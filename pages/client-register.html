@@ -263,7 +263,7 @@
     </div>
 </div>
 
-<style></style>
+<style>
 /* Enhanced Form Styling */
 .form-group input:focus,
 .form-group textarea:focus,
@@ -308,6 +308,150 @@
     div[style*="display: flex; gap: 32px"] {
         flex-direction: column !important;
         gap: 16px !important;
+    }
+    
+    /* MOBILE ICON ALIGNMENT FIXES FOR CLIENT REGISTER PAGE */
+    
+    /* Universal Material Symbols Icon Alignment */
+    .material-symbols-outlined {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        vertical-align: middle !important;
+        line-height: 1 !important;
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
+    }
+    
+    /* Fix header icons */
+    div[style*="display: flex; align-items: center; justify-content: center"] .material-symbols-outlined {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    /* Fix button icons */
+    button {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+    }
+    
+    button .material-symbols-outlined {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 0 !important;
+    }
+    
+    /* Fix section header icons */
+    div[style*="width: 32px; height: 32px"] .material-symbols-outlined {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    /* Fix modal header icons */
+    div[style*="width: 48px; height: 48px"] .material-symbols-outlined {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    /* Fix table icons */
+    table .material-symbols-outlined {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    /* Fix form input icons if any are added */
+    .form-group {
+        position: relative !important;
+    }
+    
+    .form-group .material-symbols-outlined {
+        position: absolute !important;
+        left: 12px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        pointer-events: none !important;
+        color: #6b7280 !important;
+        font-size: 20px !important;
+        z-index: 2 !important;
+    }
+    
+    .form-group input[style*="padding-left"],
+    .form-group select[style*="padding-left"],
+    .form-group textarea[style*="padding-left"] {
+        padding-left: 44px !important;
+    }
+    
+    /* Fix notification/alert icons */
+    div[style*="background: #fef3c7"] .material-symbols-outlined,
+    div[style*="background: #dcfce7"] .material-symbols-outlined {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    /* Mobile spacing adjustments */
+    div[style*="padding: 32px"] {
+        padding: 16px !important;
+    }
+    
+    div[style*="gap: 24px"] {
+        gap: 12px !important;
+    }
+    
+    div[style*="margin-bottom: 32px"] {
+        margin-bottom: 16px !important;
+    }
+    
+    /* Mobile button adjustments */
+    button[style*="padding: 16px 32px"] {
+        padding: 12px 24px !important;
+        font-size: 14px !important;
+    }
+    
+    /* Mobile table responsiveness */
+    div[style*="overflow-x: auto"] {
+        -webkit-overflow-scrolling: touch !important;
+    }
+    
+    table th,
+    table td {
+        padding: 12px 16px !important;
+        font-size: 14px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Extra small mobile adjustments */
+    .material-symbols-outlined {
+        font-size: 18px !important;
+    }
+    
+    button .material-symbols-outlined {
+        font-size: 16px !important;
+    }
+    
+    div[style*="width: 32px; height: 32px"] .material-symbols-outlined {
+        font-size: 16px !important;
+    }
+    
+    div[style*="width: 48px; height: 48px"] .material-symbols-outlined {
+        font-size: 20px !important;
+    }
+    
+    /* Compact spacing for small screens */
+    div[style*="padding: 16px"] {
+        padding: 12px !important;
+    }
+    
+    button[style*="padding: 12px 24px"] {
+        padding: 10px 20px !important;
+        font-size: 13px !important;
     }
 }
 </style>

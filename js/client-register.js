@@ -3,17 +3,17 @@
 let recentRegistrations = [];
 
 async function initClientRegisterPage() {
-    console.log('👥 Loading client registration page...');
-    console.log('🔍 API_BASE_URL:', API_BASE_URL);
-    console.log('🔍 Current URL:', window.location.href);
+    debugLog('👥 Loading client registration page...');
+    debugLog('🔍 API_BASE_URL:', API_BASE_URL);
+    debugLog('🔍 Current URL:', window.location.href);
     
     try {
         // Check if the form exists
         const form = document.getElementById('clientRegisterForm');
-        console.log('🔍 Form found:', !!form);
+        debugLog('🔍 Form found:', !!form);
         
         if (!form) {
-            console.error('❌ Client register form not found in DOM');
+            debugError('❌ Client register form not found in DOM');
             showRegisterMessage('Registration form failed to load', 'error');
             return;
         }
@@ -22,25 +22,25 @@ async function initClientRegisterPage() {
         setupPasswordChangeListeners();
         
         // Test API connectivity first
-        console.log('🔍 Testing API connectivity...');
+        debugLog('🔍 Testing API connectivity...');
         try {
             const testResponse = await fetch(`${API_BASE_URL}/auth/users`);
-            console.log('🔍 API test response status:', testResponse.status);
+            debugLog('🔍 API test response status:', testResponse.status);
             if (testResponse.ok) {
-                console.log('✅ API is accessible');
+                debugLog('✅ API is accessible');
             } else {
-                console.log('⚠️ API returned error status:', testResponse.status);
+                debugLog('⚠️ API returned error status:', testResponse.status);
             }
         } catch (apiError) {
-            console.error('❌ API connectivity test failed:', apiError);
+            debugError('❌ API connectivity test failed:', apiError);
         }
         
         await loadRecentRegistrations();
         renderRecentRegistrations();
         
-        console.log('✅ Client registration page loaded successfully');
+        debugLog('✅ Client registration page loaded successfully');
     } catch (error) {
-        console.error('❌ Error initializing client registration page:', error);
+        debugError('❌ Error initializing client registration page:', error);
         showRegisterMessage('Failed to load registration page', 'error');
     }
 }
@@ -57,7 +57,7 @@ function setupRegisterEventListeners() {
             restoreFormFunctionality();
         });
     } else {
-        console.error('❌ Client register form not found');
+        debugError('❌ Client register form not found');
     }
 
     // Reset form button
@@ -70,14 +70,14 @@ function setupRegisterEventListeners() {
             setTimeout(restoreFormFunctionality, 100);
         });
     } else {
-        console.error('❌ Reset form button not found');
+        debugError('❌ Reset form button not found');
     }
     
     // Add double-click recovery to submit button
     const submitBtn = document.getElementById('registerClientBtn');
     if (submitBtn) {
         submitBtn.addEventListener('dblclick', () => {
-            console.log('🔧 Double-click recovery triggered');
+            debugLog('🔧 Double-click recovery triggered');
             restoreFormFunctionality();
         });
     }
@@ -90,8 +90,8 @@ async function handleClientRegistration(e) {
     const submitBtn = document.getElementById('registerClientBtn');
     const originalText = submitBtn?.innerHTML || 'Register Client';
     
-    console.log('🔍 Form submission started');
-    console.log('🔍 Submit button found:', !!submitBtn);
+    debugLog('🔍 Form submission started');
+    debugLog('🔍 Submit button found:', !!submitBtn);
     
     try {
         submitBtn.disabled = true;
@@ -110,7 +110,7 @@ async function handleClientRegistration(e) {
         const companyAddressEl = document.getElementById('companyAddress');
 
         // Debug: Log element existence and values
-        console.log('🔍 Form elements check:', {
+        debugLog('🔍 Form elements check:', {
             userEmailEl: !!userEmailEl,
             userEmailValue: userEmailEl?.value,
             userPasswordEl: !!userPasswordEl,
@@ -129,7 +129,7 @@ async function handleClientRegistration(e) {
         // Additional debug: Check if userName element exists in DOM
         const userNameTest = document.querySelector('#userName');
         const userNameTest2 = document.querySelector('input[placeholder*="full name"]');
-        console.log('🔍 Additional userName checks:', {
+        debugLog('🔍 Additional userName checks:', {
             byId: !!userNameTest,
             byIdValue: userNameTest?.value,
             byPlaceholder: !!userNameTest2,
@@ -152,7 +152,7 @@ async function handleClientRegistration(e) {
             const userNameFallback = document.getElementById('userName');
             if (userNameFallback && userNameFallback.value) {
                 userNameValue = userNameFallback.value.trim();
-                console.log('⚠️ Used fallback to get userName value');
+                debugWarn('⚠️ Used fallback to get userName value');
             }
         }
 
@@ -174,7 +174,7 @@ async function handleClientRegistration(e) {
         };
 
         // Debug: Log the exact values being processed
-        console.log('🔍 Raw values before trim:', {
+        debugLog('🔍 Raw values before trim:', {
             userNameEl: !!userNameEl,
             userNameRaw: userNameEl?.value,
             userNameRawLength: userNameEl?.value?.length,
@@ -185,7 +185,7 @@ async function handleClientRegistration(e) {
         });
 
         // Debug: Log form data to see what's missing
-        console.log('🔍 Form data collected:', {
+        debugLog('🔍 Form data collected:', {
             email: formData.email,
             password: formData.password ? '[HIDDEN]' : 'MISSING',
             full_name: formData.full_name,
@@ -200,7 +200,7 @@ async function handleClientRegistration(e) {
         // Validate required fields with detailed error messages
         const missingFields = [];
         
-        console.log('🔍 Validation check:', {
+        debugLog('🔍 Validation check:', {
             email: `"${formData.email}" (${formData.email.length} chars)`,
             password: formData.password ? `"[HIDDEN]" (${formData.password.length} chars)` : 'EMPTY',
             full_name: `"${formData.full_name}" (${formData.full_name.length} chars)`,
@@ -217,13 +217,13 @@ async function handleClientRegistration(e) {
         if (!formData.company.phone || formData.company.phone.length === 0) missingFields.push('Company Phone');
 
         if (missingFields.length > 0) {
-            console.log('❌ Validation failed for fields:', missingFields);
+            debugLog('❌ Validation failed for fields:', missingFields);
             
             // Temporary workaround: if only full_name is missing, try to get it from the form directly
             if (missingFields.length === 1 && missingFields[0] === 'User Full Name') {
                 const directUserName = document.getElementById('userName')?.value?.trim();
                 if (directUserName) {
-                    console.log('🔧 Applying workaround for full_name:', directUserName);
+                    debugLog('🔧 Applying workaround for full_name:', directUserName);
                     formData.full_name = directUserName;
                     // Clear the missing fields and continue
                     missingFields.length = 0;
@@ -235,11 +235,11 @@ async function handleClientRegistration(e) {
             }
         }
         
-        console.log('✅ All validation checks passed!');
+        debugLog('✅ All validation checks passed!');
 
-        console.log('📝 Registering client:', formData);
-        console.log('🔍 API_BASE_URL:', API_BASE_URL);
-        console.log('🔍 Full URL:', `${API_BASE_URL}/api/auth/register`);
+        debugLog('📝 Registering client:', formData);
+        debugLog('🔍 API_BASE_URL:', API_BASE_URL);
+        debugLog('🔍 Full URL:', `${API_BASE_URL}/api/auth/register`);
 
         const response = await fetch(`${API_BASE_URL}/auth/register`, {
             method: 'POST',
@@ -249,17 +249,17 @@ async function handleClientRegistration(e) {
             body: JSON.stringify(formData)
         });
 
-        console.log('🔍 Response status:', response.status);
-        console.log('🔍 Response headers:', response.headers.get('content-type'));
+        debugLog('🔍 Response status:', response.status);
+        debugLog('🔍 Response headers:', response.headers.get('content-type'));
         
         const responseText = await response.text();
-        console.log('🔍 Raw response:', responseText.substring(0, 200));
+        debugLog('🔍 Raw response:', responseText.substring(0, 200));
         
         let result;
         try {
             result = JSON.parse(responseText);
         } catch (parseError) {
-            console.error('❌ JSON parse error:', parseError);
+            debugError('❌ JSON parse error:', parseError);
             throw new Error(`Server returned invalid response: ${response.status} ${response.statusText}`);
         }
 
@@ -272,7 +272,7 @@ async function handleClientRegistration(e) {
             throw new Error(result.error || 'Registration failed');
         }
     } catch (error) {
-        console.error('❌ Error registering client:', error);
+        debugError('❌ Error registering client:', error);
         showRegisterMessage(error.message, 'error');
         
         // Ensure button is re-enabled on error
@@ -324,16 +324,16 @@ function resetRegistrationForm() {
 // Load recent registrations
 async function loadRecentRegistrations() {
     try {
-        console.log('🔍 Loading all registered clients...');
-        console.log('🔍 API URL:', `${API_BASE_URL}/auth/users`);
+        debugLog('🔍 Loading all registered clients...');
+        debugLog('🔍 API URL:', `${API_BASE_URL}/auth/users`);
         
         // Fetch all users from the auth system
         const response = await fetch(`${API_BASE_URL}/auth/users`);
-        console.log('🔍 Response status:', response.status);
-        console.log('🔍 Response headers:', response.headers.get('content-type'));
+        debugLog('🔍 Response status:', response.status);
+        debugLog('🔍 Response headers:', response.headers.get('content-type'));
         
         const result = await response.json();
-        console.log('🔍 Full API response:', result);
+        debugLog('� Full APIA response:', result);
         
         if (result.success && result.users) {
             // Filter for client users only and sort by creation date
@@ -342,15 +342,15 @@ async function loadRecentRegistrations() {
                 .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
                 .slice(0, 20); // Show last 20 registrations
             
-            console.log(`✅ Loaded ${recentRegistrations.length} client registrations`);
-            console.log('🔍 Sample user data:', recentRegistrations[0]);
-            console.log('🔍 All users data:', recentRegistrations);
+            debugLog(`✅ Loaded ${recentRegistrations.length} client registrations`);
+            debugLog('🔍 Sample user data:', recentRegistrations[0]);
+            debugLog('🔍 All users data:', recentRegistrations);
         } else {
-            console.log('⚠️ No users found or API error:', result.error);
+            debugLog('⚠️ No users found or API error:', result.error);
             recentRegistrations = [];
         }
     } catch (error) {
-        console.error('❌ Error loading recent registrations:', error);
+        debugError('❌ Error loading recent registrations:', error);
         recentRegistrations = [];
     }
 }
@@ -372,7 +372,7 @@ function renderRecentRegistrations() {
     }
 
     tableBody.innerHTML = recentRegistrations.map(user => {
-        console.log('🔍 Rendering user:', user.full_name, 'Company:', user.company);
+        debugLog('🔍 Rendering user:', user.full_name, 'Company:', user.company);
         
         return `
         <tr style="border-bottom: 1px solid #f3f4f6;">
@@ -437,7 +437,7 @@ function hideRegisterMessage() {
 
 // Recovery function to restore form functionality
 function restoreFormFunctionality() {
-    console.log('🔧 Restoring form functionality...');
+    debugLog('🔧 Restoring form functionality...');
     
     const form = document.getElementById('clientRegisterForm');
     const submitBtn = document.getElementById('registerClientBtn');
@@ -470,7 +470,7 @@ function restoreFormFunctionality() {
         });
     }
     
-    console.log('✅ Form functionality restored');
+    debugLog('✅ Form functionality restored');
 }
 
 // Password change functionality
@@ -492,7 +492,7 @@ function openPasswordChangeModal(userId, userName) {
     const modal = document.getElementById('passwordChangeModal');
     modal.style.display = 'flex';
     
-    console.log('🔐 Opening password change modal for:', userName, 'ID:', userId);
+    debugLog('🔐 Opening password change modal for:', userName, 'ID:', userId);
 }
 
 function closePasswordChangeModal() {
@@ -539,13 +539,13 @@ async function verifyAdminPassword() {
             document.getElementById('adminVerificationStep').style.display = 'none';
             document.getElementById('newPasswordStep').style.display = 'block';
             document.getElementById('clientNameDisplay').textContent = currentClientName;
-            console.log('✅ Admin verified successfully');
+            debugLog('✅ Admin verified successfully');
         } else {
             throw new Error('Invalid admin password');
         }
         
     } catch (error) {
-        console.error('❌ Admin verification failed:', error);
+        debugError('❌ Admin verification failed:', error);
         showPasswordChangeMessage('Invalid admin password', 'error');
     } finally {
         verifyBtn.disabled = false;
@@ -597,13 +597,13 @@ async function changeClientPassword() {
             setTimeout(() => {
                 closePasswordChangeModal();
             }, 2000);
-            console.log('✅ Client password changed successfully');
+            debugLog('✅ Client password changed successfully');
         } else {
             throw new Error(result.error || 'Failed to change password');
         }
         
     } catch (error) {
-        console.error('❌ Password change failed:', error);
+        debugError('❌ Password change failed:', error);
         showPasswordChangeMessage(error.message, 'error');
     } finally {
         changeBtn.disabled = false;
@@ -690,7 +690,7 @@ window.closePasswordChangeModal = closePasswordChangeModal;
 setInterval(() => {
     const submitBtn = document.getElementById('registerClientBtn');
     if (submitBtn && submitBtn.disabled && submitBtn.textContent !== 'Registering...') {
-        console.log('🔧 Auto-recovering disabled form...');
+        debugLog('🔧 Auto-recovering disabled form...');
         restoreFormFunctionality();
     }
 }, 2000); // Check every 2 seconds

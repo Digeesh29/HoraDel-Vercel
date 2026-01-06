@@ -1,12 +1,12 @@
 // Vehicles Page
 async function initVehiclesPage() {
-    console.log('🚛 Initializing Vehicles Page...');
+    debugLog('🚛 Initializing Vehicles Page...');
     
     const grid = document.getElementById("vehiclesGrid");
     const addBtn = document.getElementById("addVehicleBtn");
 
     if (!grid) {
-        console.error('❌ Vehicles grid not found!');
+        debugError('❌ Vehicles grid not found!');
         return;
     }
 
@@ -48,14 +48,14 @@ async function initVehiclesPage() {
             const response = await fetch(`${API_BASE_URL}/vehicles`);
             const result = await response.json();
 
-            console.log('📦 Vehicles API response:', result);
+            debugLog('📦 Vehicles API response:', result);
 
             if (!result.success) {
                 throw new Error(result.error || 'Failed to fetch vehicles');
             }
 
             const vehicles = result.data;
-            console.log('🚛 Vehicles with parcel counts:', vehicles.map(v => ({
+            debugLog('🚛 Vehicles with parcel counts:', vehicles.map(v => ({
                 reg: v.registration_number,
                 parcels: v.assignedParcels
             })));
@@ -118,7 +118,7 @@ async function initVehiclesPage() {
             }).join("");
 
         } catch (error) {
-            console.error('Error loading vehicles:', error);
+            debugError('Error loading vehicles:', error);
             grid.innerHTML = `
                 <div style="grid-column: 1/-1; text-align:center; padding:60px; color:#ef4444;">
                     <div style="margin-bottom:8px;">❌ Error loading vehicles</div>
@@ -193,7 +193,7 @@ document.addEventListener('click', (e) => {
 
 // View vehicle details
 async function viewVehicleDetails(vehicleId) {
-    console.log('View vehicle details:', vehicleId);
+    debugLog('View vehicle details:', vehicleId);
     
     // Store current vehicle ID for close day functionality
     currentVehicleId = vehicleId;
@@ -315,7 +315,7 @@ async function viewVehicleDetails(vehicleId) {
         document.getElementById('vehicleDetailsModal').style.display = 'flex';
         
     } catch (error) {
-        console.error('Error loading vehicle details:', error);
+        debugError('Error loading vehicle details:', error);
     }
 }
 
@@ -328,7 +328,7 @@ function closeVehicleDetailsModal() {
 
 // Assign parcels to existing vehicle - Navigate to full page
 async function assignParcels(vehicleId) {
-    console.log('Navigate to assign parcels page for vehicle:', vehicleId);
+    debugLog('Navigate to assign parcels page for vehicle:', vehicleId);
     
     // Navigate to assign parcels page with vehicle ID as parameter
     loadPage('assign-parcels', `?vehicleId=${vehicleId}`);
@@ -346,7 +346,7 @@ async function assignParcelsToExistingVehicle(vehicleId) {
             return;
         }
 
-        console.log('Assigning', selectedParcels.length, 'parcels to existing vehicle', vehicleId);
+        debugLog('Assigning', selectedParcels.length, 'parcels to existing vehicle', vehicleId);
         
         // Assign selected parcels to vehicle
         for (const parcelId of selectedParcels) {
@@ -363,9 +363,9 @@ async function assignParcelsToExistingVehicle(vehicleId) {
 
             const updateResult = await updateResponse.json();
             if (updateResult.success) {
-                console.log('✅ Parcel', parcelId, 'assigned successfully');
+                debugLog('✅ Parcel', parcelId, 'assigned successfully');
             } else {
-                console.error('❌ Failed to assign parcel', parcelId, ':', updateResult);
+                debugError('❌ Failed to assign parcel', parcelId, ':', updateResult);
             }
         }
 
@@ -382,7 +382,7 @@ async function assignParcelsToExistingVehicle(vehicleId) {
 
         const vehicleUpdateResult = await updateVehicleResponse.json();
         if (vehicleUpdateResult.success) {
-            console.log('✅ Vehicle status updated to Assigned');
+            debugLog('✅ Vehicle status updated to Assigned');
         }
 
         // Close modal and refresh
@@ -396,7 +396,7 @@ async function assignParcelsToExistingVehicle(vehicleId) {
         selectedParcels = [];
         
     } catch (error) {
-        console.error('❌ Error assigning parcels:', error);
+        debugError('❌ Error assigning parcels:', error);
         showToast('Error assigning parcels. Please try again.', 'error');
     } finally {
         const createBtn = document.getElementById('createVehicleWithParcels');
@@ -567,7 +567,7 @@ async function loadAvailableParcels() {
         updateVisibleParcelCount();
 
     } catch (error) {
-        console.error('Error loading parcels:', error);
+        debugError('Error loading parcels:', error);
         document.getElementById('parcelsTableBody').innerHTML = 
             '<tr><td colspan="8" style="text-align:center; padding:20px; color:#ef4444;">Failed to load parcels</td></tr>';
     }
@@ -630,8 +630,8 @@ async function createVehicleWithParcels() {
         createBtn.disabled = true;
         createBtn.textContent = 'Processing...';
 
-        console.log('Vehicle data:', vehicleFormData);
-        console.log('Assigning parcels:', selectedParcels);
+        debugLog('Vehicle data:', vehicleFormData);
+        debugLog('Assigning parcels:', selectedParcels);
 
         let vehicleId = vehicleFormData.vehicleId;
         let driverId = null;
@@ -671,23 +671,23 @@ async function createVehicleWithParcels() {
                     });
                     
                     const createDriverResult = await createDriverResponse.json();
-                    console.log('Driver creation result:', createDriverResult);
+                    debugLog('Driver creation result:', createDriverResult);
                     
                     if (createDriverResult.success) {
                         driverId = createDriverResult.data.id;
-                        console.log('✅ Driver created with ID:', driverId);
+                        debugLog('✅ Driver created with ID:', driverId);
                     } else {
-                        console.error('❌ Failed to create driver:', createDriverResult);
+                        debugError('❌ Failed to create driver:', createDriverResult);
                     }
                 }
             }
             
             if (!driverId) {
-                console.error('❌ No driver ID available');
+                debugError('❌ No driver ID available');
             }
 
             // Step 2: Create vehicle
-            console.log('Creating vehicle with driver ID:', driverId);
+            debugLog('Creating vehicle with driver ID:', driverId);
             
             const createVehicleResponse = await fetch(`${API_BASE_URL}/vehicles`, {
                 method: 'POST',
@@ -707,7 +707,7 @@ async function createVehicleWithParcels() {
 
             const createVehicleResult = await createVehicleResponse.json();
             
-            console.log('Vehicle creation result:', createVehicleResult);
+            debugLog('Vehicle creation result:', createVehicleResult);
             
             if (!createVehicleResult.success) {
                 throw new Error(createVehicleResult.error || 'Failed to create vehicle');
@@ -735,7 +735,7 @@ async function createVehicleWithParcels() {
 
         // Step 3: Assign selected parcels to vehicle
         if (selectedParcels.length > 0) {
-            console.log('Assigning', selectedParcels.length, 'parcels to vehicle', vehicleId);
+            debugLog('Assigning', selectedParcels.length, 'parcels to vehicle', vehicleId);
             
             for (const parcelId of selectedParcels) {
                 const updateResponse = await fetch(`${API_BASE_URL}/bookings/${parcelId}`, {
@@ -751,9 +751,9 @@ async function createVehicleWithParcels() {
                 const updateResult = await updateResponse.json();
                 
                 if (updateResult.success) {
-                    console.log('✅ Parcel', parcelId, 'assigned successfully');
+                    debugLog('✅ Parcel', parcelId, 'assigned successfully');
                 } else {
-                    console.error('❌ Failed to assign parcel', parcelId, ':', updateResult);
+                    debugError('❌ Failed to assign parcel', parcelId, ':', updateResult);
                 }
             }
             
@@ -769,14 +769,14 @@ async function createVehicleWithParcels() {
             const updateVehicleResult = await updateVehicleResponse.json();
             
             if (updateVehicleResult.success) {
-                console.log('✅ Vehicle status updated to Assigned');
+                debugLog('✅ Vehicle status updated to Assigned');
             } else {
-                console.error('❌ Failed to update vehicle status:', updateVehicleResult);
+                debugError('❌ Failed to update vehicle status:', updateVehicleResult);
             }
             
-            console.log('✅', selectedParcels.length, 'parcels assigned successfully');
+            debugLog('✅', selectedParcels.length, 'parcels assigned successfully');
         } else {
-            console.log('⚠️ No parcels selected for assignment');
+            debugLog('⚠️ No parcels selected for assignment');
         }
 
         // Close modals and refresh
@@ -792,7 +792,7 @@ async function createVehicleWithParcels() {
         }
 
     } catch (error) {
-        console.error('❌ Error:', error);
+        debugError('❌ Error:', error);
     } finally {
         const createBtn = document.getElementById('createVehicleWithParcels');
         if (createBtn) {
@@ -807,7 +807,7 @@ let currentVehicleId = null;
 
 async function closeDayAndClearAssignment() {
     if (!currentVehicleId) {
-        console.error('No vehicle ID available');
+        debugError('No vehicle ID available');
         return;
     }
 
@@ -832,7 +832,7 @@ async function closeDayAndClearAssignment() {
             b.assigned_vehicle_id === currentVehicleId && b.status === 'IN-TRANSIT'
         );
 
-        console.log(`Found ${assignedParcels.length} parcels to mark as delivered`);
+        debugLog(`Found ${assignedParcels.length} parcels to mark as delivered`);
 
         // Step 2: Mark all assigned parcels as DELIVERED and clear assignments
         for (const parcel of assignedParcels) {
@@ -850,15 +850,15 @@ async function closeDayAndClearAssignment() {
             const updateResult = await updateResponse.json();
             
             if (updateResult.success) {
-                console.log('✅ Parcel', parcel.lr_number, 'marked as delivered');
+                debugLog('✅ Parcel', parcel.lr_number, 'marked as delivered');
             } else {
-                console.error('❌ Failed to update parcel', parcel.lr_number, ':', updateResult);
+                debugError('❌ Failed to update parcel', parcel.lr_number, ':', updateResult);
             }
         }
 
         // Step 3: Vehicle status will be automatically updated by the backend logic
         // The status is now determined by assigned parcel count, so no manual update needed
-        console.log('✅ Vehicle status will be automatically updated to Available based on parcel assignments');
+        debugLog('✅ Vehicle status will be automatically updated to Available based on parcel assignments');
 
         // Step 4: Close modal and refresh vehicles page
         closeVehicleDetailsModal();
@@ -868,10 +868,10 @@ async function closeDayAndClearAssignment() {
             await initVehiclesPage();
         }
 
-        console.log('✅ Day closed successfully - all parcels delivered and vehicle available');
+        debugLog('✅ Day closed successfully - all parcels delivered and vehicle available');
 
     } catch (error) {
-        console.error('❌ Error closing day:', error);
+        debugError('❌ Error closing day:', error);
         alert('Failed to close day. Please try again.');
     } finally {
         const closeDayBtn = document.getElementById('closeDayBtn');
@@ -949,7 +949,7 @@ async function markAsDelivered(parcelId, lrNumber) {
             return;
         }
 
-        console.log('🚚 Marking parcel as delivered:', parcelId, lrNumber);
+        debugLog('🚚 Marking parcel as delivered:', parcelId, lrNumber);
 
         // Update parcel status to DELIVERED
         const response = await fetch(`${API_BASE_URL}/bookings/${parcelId}`, {
@@ -965,7 +965,7 @@ async function markAsDelivered(parcelId, lrNumber) {
         const result = await response.json();
         
         if (result.success) {
-            console.log('✅ Parcel marked as delivered successfully');
+            debugLog('✅ Parcel marked as delivered successfully');
             showToast(`Parcel ${lrNumber} marked as delivered!`, 'success');
             
             // Refresh the vehicle details modal to show updated status
@@ -983,11 +983,11 @@ async function markAsDelivered(parcelId, lrNumber) {
                 }
             }
         } else {
-            console.error('❌ Failed to mark parcel as delivered:', result.error);
+            debugError('❌ Failed to mark parcel as delivered:', result.error);
             showToast('Failed to mark parcel as delivered: ' + result.error, 'error');
         }
     } catch (error) {
-        console.error('❌ Error marking parcel as delivered:', error);
+        debugError('❌ Error marking parcel as delivered:', error);
         showToast('Error marking parcel as delivered', 'error');
     }
 }

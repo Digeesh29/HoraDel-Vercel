@@ -4,14 +4,14 @@ let pendingRequests = [];
 let currentRequest = null;
 
 async function initClientApprovalPage() {
-    console.log('👥 Loading client approval page...');
+    debugLog('👥 Loading client approval page...');
     
     try {
         await loadPendingRequests();
         setupApprovalEventListeners();
         renderRequests();
     } catch (error) {
-        console.error('❌ Error initializing client approval page:', error);
+        debugError('❌ Error initializing client approval page:', error);
         showToast('Failed to load approval requests', 'error');
     }
 }
@@ -24,13 +24,13 @@ async function loadPendingRequests() {
 
         if (result.success) {
             pendingRequests = result.data || [];
-            console.log(`✅ Loaded ${pendingRequests.length} pending requests`);
+            debugLog(`✅ Loaded ${pendingRequests.length} pending requests`);
             updateStats();
         } else {
             throw new Error(result.error || 'Failed to load pending requests');
         }
     } catch (error) {
-        console.error('❌ Error loading pending requests:', error);
+        debugError('❌ Error loading pending requests:', error);
         pendingRequests = [];
         updateStats();
         
@@ -72,7 +72,7 @@ function setupApprovalEventListeners() {
 
     // Initial action buttons
     document.getElementById('approveBtn').addEventListener('click', () => {
-        console.log('🔍 Approve button clicked');
+        debugLog('🔍 Approve button clicked');
         // Show consignee number section and hide rejection section
         document.getElementById('rejectionReasonSection').style.display = 'none';
         document.getElementById('consigneeNumberSection').style.display = 'block';
@@ -83,9 +83,9 @@ function setupApprovalEventListeners() {
         const inputField = document.getElementById('consigneeNumber');
         if (inputField) {
             inputField.focus();
-            console.log('✅ Consignee number input field found and focused');
+            debugLog('✅ Consignee number input field found and focused');
         } else {
-            console.error('❌ Consignee number input field not found!');
+            debugError('❌ Consignee number input field not found!');
         }
     });
 
@@ -110,10 +110,10 @@ function setupApprovalEventListeners() {
 
     // Final approval/rejection buttons
     document.getElementById('finalApproveBtn').addEventListener('click', () => {
-        console.log('🔍 Final approve button clicked');
+        debugLog('🔍 Final approve button clicked');
         const inputField = document.getElementById('consigneeNumber');
         if (inputField) {
-            console.log('🔍 Input field value before approval:', inputField.value);
+            debugLog('🔍 Input field value before approval:', inputField.value);
         }
         handleApproval(true);
     });
@@ -316,7 +316,7 @@ async function handleApproval(isApproval) {
             throw new Error(result.error || `Failed to ${isApproval ? 'approve' : 'reject'} consignee`);
         }
     } catch (error) {
-        console.error(`❌ Error ${isApproval ? 'approving' : 'rejecting'} consignee:`, error);
+        debugError(`❌ Error ${isApproval ? 'approving' : 'rejecting'} consignee:`, error);
         showToast(error.message, 'error');
     } finally {
         actionBtn.disabled = false;

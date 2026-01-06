@@ -2,6 +2,22 @@
 const bcrypt = require('bcrypt');
 const { createClient } = require('@supabase/supabase-js');
 
+// Server-side debug configuration
+const DEBUG_MODE = process.env.NODE_ENV !== 'production';
+
+// Server-side conditional logging functions
+function debugLog(...args) {
+    if (DEBUG_MODE) {
+        console.log(...args);
+    }
+}
+
+function debugError(...args) {
+    if (DEBUG_MODE) {
+        console.error(...args);
+    }
+}
+
 const supabase = createClient(
     process.env.SUPABASE_URL,
     process.env.SUPABASE_ANON_KEY
@@ -34,7 +50,7 @@ module.exports = async (req, res) => {
             });
         }
 
-        console.log('🔐 Login attempt for:', email);
+        debugLog('🔐 Login attempt for:', email);
 
         // Get user from database
         const { data: users, error } = await supabase
@@ -48,7 +64,7 @@ module.exports = async (req, res) => {
             .single();
 
         if (error || !users) {
-            console.log('❌ User not found:', email);
+            debugLog('❌ User not found:', email);
             return res.status(401).json({
                 success: false,
                 error: 'Invalid email or password'
@@ -59,7 +75,7 @@ module.exports = async (req, res) => {
         const validPassword = await bcrypt.compare(password, users.password_hash);
 
         if (!validPassword) {
-            console.log('❌ Invalid password for:', email);
+            debugLog('❌ Invalid password for:', email);
             return res.status(401).json({
                 success: false,
                 error: 'Invalid email or password'
@@ -75,7 +91,7 @@ module.exports = async (req, res) => {
         // Return user data (excluding password)
         const { password_hash, ...userData } = users;
         
-        console.log('✅ Login successful for:', email);
+        debugLog('✅ Login successful for:', email);
 
         res.json({
             success: true,
@@ -84,7 +100,7 @@ module.exports = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('❌ Login error:', error);
+        debugError('❌ Login error:', error);
         res.status(500).json({
             success: false,
             error: 'Login failed',

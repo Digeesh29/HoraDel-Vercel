@@ -1,6 +1,6 @@
 // Bookings Page - uses API_BASE_URL from dashboard.js
 async function initBookingsPage() {
-    console.log('📋 Initializing Bookings Page...');
+    debugLog('📋 Initializing Bookings Page...');
     
     const companySelect = document.getElementById("bookingsCompany");
     const statusSelect  = document.getElementById("bookingsStatus");
@@ -9,11 +9,11 @@ async function initBookingsPage() {
     const tbody         = document.getElementById("bookingsTableBody");
 
     if (!tbody) {
-        console.error('❌ Bookings table body not found!');
+        debugError('❌ Bookings table body not found!');
         return;
     }
 
-    console.log('✅ All elements found');
+    debugLog('✅ All elements found');
 
     // Load companies and cities for dropdowns
     await loadCompanies();
@@ -44,10 +44,10 @@ async function initBookingsPage() {
                     companySelect.appendChild(opt);
                 });
                 
-                console.log(`✅ Loaded ${result.data.length} companies`);
+                debugLog(`✅ Loaded ${result.data.length} companies`);
             }
         } catch (error) {
-            console.error('Error loading companies:', error);
+            debugError('Error loading companies:', error);
         }
     }
 
@@ -72,11 +72,11 @@ async function initBookingsPage() {
                         citySelect.appendChild(opt);
                     });
                     
-                    console.log(`✅ Loaded ${cities.length} cities`);
+                    debugLog(`✅ Loaded ${cities.length} cities`);
                 }
             }
         } catch (error) {
-            console.error('Error loading cities:', error);
+            debugError('Error loading cities:', error);
         }
     }
 
@@ -98,7 +98,7 @@ async function initBookingsPage() {
                 }
             }
         } catch (error) {
-            console.error('Error loading cities:', error);
+            debugError('Error loading cities:', error);
         }
     }
 
@@ -143,7 +143,7 @@ async function initBookingsPage() {
             if (dateFrom) params.append('dateFrom', dateFrom);
             if (dateTo) params.append('dateTo', dateTo);
 
-            console.log('Filters:', { company: companyName, status, search, dateFrom, dateTo, city });
+            debugLog('Filters:', { company: companyName, status, search, dateFrom, dateTo, city });
 
             // Fetch bookings
             const response = await fetch(`${API_BASE_URL}/bookings?${params}`);
@@ -214,7 +214,7 @@ async function initBookingsPage() {
             }).join("");
 
         } catch (error) {
-            console.error('Error loading bookings:', error);
+            debugError('Error loading bookings:', error);
             tbody.innerHTML = `
                 <tr>
                     <td colspan="10" style="text-align:center; padding:40px; color:#ef4444;">
@@ -294,7 +294,7 @@ Payment Status: ${b.payment_status}
             alert(details);
         }
     } catch (error) {
-        console.error('Error fetching booking details:', error);
+        debugError('Error fetching booking details:', error);
         alert('Failed to load booking details');
     }
 }

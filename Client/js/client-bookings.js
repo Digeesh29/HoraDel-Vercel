@@ -5,7 +5,7 @@ let totalPages = 1;
 let currentFilters = {};
 
 async function initClientBookingsPage() {
-    console.log('📦 Initializing Client Parcel Management page...');
+    debugLog('📦 Initializing Client Parcel Management page...');
     
     // Set default date filters (last 30 days)
     const today = new Date();
@@ -52,7 +52,7 @@ async function loadClientBookings(page = 1) {
             return;
         }
         
-        console.log(`📦 Loading parcels for company: ${companyName} (${companyId})`);
+        debugLog(`📦 Loading parcels for company: ${companyName} (${companyId})`);
         
         // Build query parameters
         const params = new URLSearchParams({
@@ -92,7 +92,7 @@ async function loadClientBookings(page = 1) {
         }
         
     } catch (error) {
-        console.error('Error loading client parcels:', error);
+        debugError('Error loading client parcels:', error);
         showToast('Error loading parcels: ' + error.message, 'error');
         
         document.getElementById('clientBookingsTable').innerHTML = `
@@ -194,7 +194,7 @@ function applyFilters() {
         toDate: document.getElementById('toDateFilter').value
     };
     
-    console.log('📦 Applying parcel filters:', currentFilters);
+    debugLog('📦 Applying parcel filters:', currentFilters);
     loadClientBookings(1); // Reset to first page
 }
 

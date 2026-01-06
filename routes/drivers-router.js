@@ -3,6 +3,22 @@ const express = require('express');
 const router = express.Router();
 const supabase = require('../config/supabase');
 
+// Server-side debug configuration
+const DEBUG_MODE = process.env.NODE_ENV !== 'production';
+
+// Server-side conditional logging functions
+function debugLog(...args) {
+    if (DEBUG_MODE) {
+        console.log(...args);
+    }
+}
+
+function debugError(...args) {
+    if (DEBUG_MODE) {
+        console.error(...args);
+    }
+}
+
 // GET /api/drivers - Get all drivers
 router.get('/', async (req, res) => {
     try {
@@ -18,7 +34,7 @@ router.get('/', async (req, res) => {
             data: data || []
         });
     } catch (error) {
-        console.error('Error fetching drivers:', error);
+        debugError('Error fetching drivers:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch drivers',
@@ -52,7 +68,7 @@ router.put('/:id', async (req, res) => {
             data: data
         });
     } catch (error) {
-        console.error('Error updating driver:', error);
+        debugError('Error updating driver:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to update driver',
@@ -86,7 +102,7 @@ router.post('/', async (req, res) => {
             data: data
         });
     } catch (error) {
-        console.error('Error creating driver:', error);
+        debugError('Error creating driver:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to create driver',

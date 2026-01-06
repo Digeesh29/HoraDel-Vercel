@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (page === "client-profile") initClientProfilePage();
             })
             .catch(error => {
-                console.error('Error loading page:', error);
+                debugError('Error loading page:', error);
                 content.innerHTML = `
                     <div style="text-align: center; padding: 60px; color: #6b7280;">
                         <span class="material-symbols-outlined" style="font-size: 48px; margin-bottom: 16px;">error</span>
@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Load default page (dashboard)
-    console.log('📊 Loading client dashboard...');
+    debugLog('📊 Loading client dashboard...');
     loadPage("client-dashboard");
 });
 
@@ -96,7 +96,7 @@ function trackShipment(lrNumber) {
 
 // Placeholder init functions for pages
 function initClientBookingsPage() {
-    console.log('📦 Initializing Client Parcel Management page...');
+    debugLog('📦 Initializing Client Parcel Management page...');
 }
 
 // initClientProfilePage is now defined in client-profile.js

@@ -1,6 +1,22 @@
 // Add Sample Data API for Vercel
 const { createClient } = require('@supabase/supabase-js');
 
+// Server-side debug configuration
+const DEBUG_MODE = process.env.NODE_ENV !== 'production';
+
+// Server-side conditional logging functions
+function debugLog(...args) {
+    if (DEBUG_MODE) {
+        console.log(...args);
+    }
+}
+
+function debugError(...args) {
+    if (DEBUG_MODE) {
+        console.error(...args);
+    }
+}
+
 const supabase = createClient(
     process.env.SUPABASE_URL,
     process.env.SUPABASE_ANON_KEY
@@ -17,7 +33,7 @@ module.exports = async (req, res) => {
     }
 
     try {
-        console.log('🔧 Adding sample data...');
+        debugLog('🔧 Adding sample data...');
         
         // First, check if companies exist
         const { data: existingCompanies } = await supabase
@@ -45,14 +61,14 @@ module.exports = async (req, res) => {
                 companyIds[company.name.split(' ')[0]] = company.id;
             });
             
-            console.log('✅ Created companies:', Object.keys(companyIds));
+            debugLog('✅ Created companies:', Object.keys(companyIds));
         } else {
             // Use existing companies
             existingCompanies.forEach(company => {
                 const key = company.name.split(' ')[0];
                 companyIds[key] = company.id;
             });
-            console.log('✅ Using existing companies:', Object.keys(companyIds));
+            debugLog('✅ Using existing companies:', Object.keys(companyIds));
         }
 
         // Check if bookings already exist
@@ -169,7 +185,7 @@ module.exports = async (req, res) => {
 
         if (bookingError) throw bookingError;
 
-        console.log('✅ Created sample bookings:', newBookings.length);
+        debugLog('✅ Created sample bookings:', newBookings.length);
 
         res.json({
             success: true,
@@ -186,7 +202,7 @@ module.exports = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('❌ Sample data error:', error);
+        debugError('❌ Sample data error:', error);
         res.status(500).json({
             success: false,
             error: error.message,

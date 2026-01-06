@@ -3,10 +3,26 @@ const express = require('express');
 const router = express.Router();
 const supabase = require('../config/supabase');
 
+// Server-side debug configuration
+const DEBUG_MODE = process.env.NODE_ENV !== 'production';
+
+// Server-side conditional logging functions
+function debugLog(...args) {
+    if (DEBUG_MODE) {
+        console.log(...args);
+    }
+}
+
+function debugError(...args) {
+    if (DEBUG_MODE) {
+        console.error(...args);
+    }
+}
+
 // GET /api/companies - Get all companies
 router.get('/', async (req, res) => {
     try {
-        console.log('🏢 Fetching companies...');
+        debugLog('🏢 Fetching companies...');
         
         const { data, error } = await supabase
             .from('companies')
@@ -14,18 +30,18 @@ router.get('/', async (req, res) => {
             .order('name');
 
         if (error) {
-            console.error('❌ Supabase error:', error);
+            debugError('❌ Supabase error:', error);
             throw error;
         }
 
-        console.log(`✅ Found ${data?.length || 0} companies`);
+        debugLog(`✅ Found ${data?.length || 0} companies`);
 
         res.json({
             success: true,
             data: data || []
         });
     } catch (error) {
-        console.error('❌ Error fetching companies:', error);
+        debugError('❌ Error fetching companies:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch companies',
@@ -59,7 +75,7 @@ router.post('/', async (req, res) => {
             data: data
         });
     } catch (error) {
-        console.error('Error creating company:', error);
+        debugError('Error creating company:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to create company',

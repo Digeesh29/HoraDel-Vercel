@@ -3,6 +3,22 @@ const express = require('express');
 const router = express.Router();
 const supabase = require('../config/supabase');
 
+// Server-side debug configuration
+const DEBUG_MODE = process.env.NODE_ENV !== 'production';
+
+// Server-side conditional logging functions
+function debugLog(...args) {
+    if (DEBUG_MODE) {
+        console.log(...args);
+    }
+}
+
+function debugError(...args) {
+    if (DEBUG_MODE) {
+        console.error(...args);
+    }
+}
+
 // GET /api/reports/rate-cards-debug - Debug rate cards
 router.get('/rate-cards-debug', async (req, res) => {
     try {
@@ -31,7 +47,7 @@ router.get('/rate-cards-debug', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('❌ Rate cards debug error:', error);
+        debugError('❌ Rate cards debug error:', error);
         res.status(500).json({
             success: false,
             error: 'Debug failed',
@@ -86,7 +102,7 @@ router.get('/test', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('❌ Test error:', error);
+        debugError('❌ Test error:', error);
         res.status(500).json({
             success: false,
             error: 'Test failed',
@@ -99,7 +115,7 @@ router.get('/test', async (req, res) => {
 router.get('/summary', async (req, res) => {
     try {
         const { dateFrom, dateTo, companyId, city } = req.query;
-        console.log('📊 Summary request:', { dateFrom, dateTo, companyId, city });
+        debugLog('📊 Summary request:', { dateFrom, dateTo, companyId, city });
 
         let query = supabase
             .from('bookings')
@@ -122,7 +138,7 @@ router.get('/summary', async (req, res) => {
         const { data, error } = await query;
 
         if (error) {
-            console.error('❌ Supabase error in summary:', error);
+            debugError('❌ Supabase error in summary:', error);
             throw error;
         }
 
@@ -144,7 +160,7 @@ router.get('/summary', async (req, res) => {
         const totalDispatches = bookings.filter(b => b.status === 'IN-TRANSIT' || b.status === 'DELIVERED').length;
         const avgRevenuePerBooking = totalBookings > 0 ? totalRevenue / totalBookings : 0;
 
-        console.log('✅ Summary calculated:', { totalRevenue, totalBookings, totalDispatches });
+        debugLog('✅ Summary calculated:', { totalRevenue, totalBookings, totalDispatches });
 
         res.json({
             success: true,
@@ -156,7 +172,7 @@ router.get('/summary', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Error fetching summary:', error);
+        debugError('Error fetching summary:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch summary',
@@ -212,7 +228,7 @@ router.get('/revenue-trend', async (req, res) => {
             data: trend
         });
     } catch (error) {
-        console.error('Error fetching revenue trend:', error);
+        debugError('Error fetching revenue trend:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch revenue trend',
@@ -225,7 +241,7 @@ router.get('/revenue-trend', async (req, res) => {
 router.get('/company-summary', async (req, res) => {
     try {
         const { dateFrom, dateTo, city } = req.query;
-        console.log('🏢 Company summary request:', { dateFrom, dateTo, city });
+        debugLog('🏢 Company summary request:', { dateFrom, dateTo, city });
 
         // First get bookings
         let bookingsQuery = supabase
@@ -238,7 +254,7 @@ router.get('/company-summary', async (req, res) => {
 
         const { data: bookings, error: bookingsError } = await bookingsQuery;
         if (bookingsError) {
-            console.error('❌ Bookings error:', bookingsError);
+            debugError('❌ Bookings error:', bookingsError);
             throw bookingsError;
         }
 
@@ -248,7 +264,7 @@ router.get('/company-summary', async (req, res) => {
             .select('id, name');
 
         if (companiesError) {
-            console.error('❌ Companies error:', companiesError);
+            debugError('❌ Companies error:', companiesError);
             throw companiesError;
         }
 
@@ -286,14 +302,14 @@ router.get('/company-summary', async (req, res) => {
             avgPerBooking: stats.totalBookings > 0 ? (stats.totalRevenue / stats.totalBookings).toFixed(2) : '0.00'
         })).sort((a, b) => parseFloat(b.totalRevenue) - parseFloat(a.totalRevenue));
 
-        console.log('✅ Company summary calculated:', summary.length, 'companies');
+        debugLog('✅ Company summary calculated:', summary.length, 'companies');
 
         res.json({
             success: true,
             data: summary
         });
     } catch (error) {
-        console.error('❌ Error fetching company summary:', error);
+        debugError('❌ Error fetching company summary:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch company summary',
@@ -339,7 +355,7 @@ router.get('/parcel-type-distribution', async (req, res) => {
             data: distribution
         });
     } catch (error) {
-        console.error('Error fetching parcel type distribution:', error);
+        debugError('Error fetching parcel type distribution:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch parcel type distribution',
@@ -352,7 +368,7 @@ router.get('/parcel-type-distribution', async (req, res) => {
 router.get('/vehicle-dispatch', async (req, res) => {
     try {
         const { dateFrom, dateTo, city } = req.query;
-        console.log('🚛 Vehicle dispatch request:', { dateFrom, dateTo, city });
+        debugLog('🚛 Vehicle dispatch request:', { dateFrom, dateTo, city });
 
         // Get bookings with assigned vehicles
         let bookingsQuery = supabase
@@ -366,7 +382,7 @@ router.get('/vehicle-dispatch', async (req, res) => {
 
         const { data: bookings, error: bookingsError } = await bookingsQuery;
         if (bookingsError) {
-            console.error('❌ Bookings error:', bookingsError);
+            debugError('❌ Bookings error:', bookingsError);
             throw bookingsError;
         }
 
@@ -376,7 +392,7 @@ router.get('/vehicle-dispatch', async (req, res) => {
             .select('id, registration_number');
 
         if (vehiclesError) {
-            console.error('❌ Vehicles error:', vehiclesError);
+            debugError('❌ Vehicles error:', vehiclesError);
             throw vehiclesError;
         }
 
@@ -398,14 +414,14 @@ router.get('/vehicle-dispatch', async (req, res) => {
             .sort((a, b) => b.count - a.count)
             .slice(0, 10); // Top 10 vehicles
 
-        console.log('✅ Vehicle dispatch calculated:', dispatches.length, 'vehicles');
+        debugLog('✅ Vehicle dispatch calculated:', dispatches.length, 'vehicles');
 
         res.json({
             success: true,
             data: dispatches
         });
     } catch (error) {
-        console.error('❌ Error fetching vehicle dispatch:', error);
+        debugError('❌ Error fetching vehicle dispatch:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch vehicle dispatch',
@@ -417,7 +433,7 @@ router.get('/vehicle-dispatch', async (req, res) => {
 // POST /api/reports/fix-calculations - Fix existing booking calculations
 router.post('/fix-calculations', async (req, res) => {
     try {
-        console.log('🔧 Fixing booking calculations...');
+        debugLog('🔧 Fixing booking calculations...');
         
         // Get all bookings that need fixing
         const { data: bookings, error: fetchError } = await supabase
@@ -460,7 +476,7 @@ router.post('/fix-calculations', async (req, res) => {
             }
         }
 
-        console.log(`✅ Fixed ${fixedCount} bookings`);
+        debugLog(`✅ Fixed ${fixedCount} bookings`);
 
         res.json({
             success: true,
@@ -472,7 +488,7 @@ router.post('/fix-calculations', async (req, res) => {
             message: `Successfully updated ${fixedCount} bookings to use simplified calculation`
         });
     } catch (error) {
-        console.error('❌ Error fixing calculations:', error);
+        debugError('❌ Error fixing calculations:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fix calculations',

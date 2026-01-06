@@ -3,7 +3,7 @@
 let revenueChart, pieChart, barChart;
 
 async function initReportsPage() {
-    console.log('📊 Initializing Reports page...');
+    debugLog('📊 Initializing Reports page...');
     
     // Set default dates - use wide range to capture all data
     const today = new Date();
@@ -57,7 +57,7 @@ async function loadCompaniesFilter() {
             });
         }
     } catch (error) {
-        console.error('Error loading companies:', error);
+        debugError('Error loading companies:', error);
     }
 }
 
@@ -82,7 +82,7 @@ async function loadCitiesFilter() {
             });
         }
     } catch (error) {
-        console.error('Error loading cities:', error);
+        debugError('Error loading cities:', error);
         // Fallback to some common cities
         const select = document.getElementById('reportCity');
         select.innerHTML = '<option value="All">All Cities</option>';
@@ -114,7 +114,7 @@ async function generateReport() {
             loadVehicleDispatch(params)
         ]);
     } catch (error) {
-        console.error('Error generating report:', error);
+        debugError('Error generating report:', error);
     }
 }
 
@@ -131,7 +131,7 @@ async function loadSummary(params) {
             document.getElementById('repAvg').textContent = `₹${parseFloat(data.avgRevenuePerBooking).toLocaleString('en-IN')}`;
         }
     } catch (error) {
-        console.error('Error loading summary:', error);
+        debugError('Error loading summary:', error);
     }
 }
 
@@ -181,23 +181,23 @@ async function loadRevenueTrend(params) {
             });
         }
     } catch (error) {
-        console.error('Error loading revenue trend:', error);
+        debugError('Error loading revenue trend:', error);
     }
 }
 
 async function loadCompanySummary(params) {
     try {
-        console.log('📊 Loading company summary...');
+        debugLog('📊 Loading company summary...');
         const response = await fetch(`${API_BASE_URL}/reports/company-summary?${params}`);
         const result = await response.json();
         
-        console.log('Company summary result:', result);
+        debugLog('Company summary result:', result);
         
         if (result.success) {
             const tbody = document.getElementById('repCompanyBody');
             
             if (!tbody) {
-                console.error('❌ repCompanyBody element not found!');
+                debugError('❌ repCompanyBody element not found!');
                 return;
             }
             
@@ -215,10 +215,10 @@ async function loadCompanySummary(params) {
                 </tr>
             `).join('');
             
-            console.log('✅ Company summary table updated');
+            debugLog('✅ Company summary table updated');
         }
     } catch (error) {
-        console.error('❌ Error loading company summary:', error);
+        debugError('❌ Error loading company summary:', error);
     }
 }
 
@@ -276,7 +276,7 @@ async function loadParcelTypeDistribution(params) {
             });
         }
     } catch (error) {
-        console.error('Error loading parcel type distribution:', error);
+        debugError('Error loading parcel type distribution:', error);
     }
 }
 
@@ -321,7 +321,7 @@ async function loadVehicleDispatch(params) {
             });
         }
     } catch (error) {
-        console.error('Error loading vehicle dispatch:', error);
+        debugError('Error loading vehicle dispatch:', error);
     }
 }
 
@@ -349,12 +349,12 @@ function exportCSV() {
 
 async function debugCalculations() {
     try {
-        console.log('🔍 Debugging report calculations...');
+        debugLog('🔍 Debugging report calculations...');
         const response = await fetch(`${API_BASE_URL}/reports/test`);
         const result = await response.json();
         
         if (result.success) {
-            console.log('📊 Calculation Debug Results:');
+            debugLog('📊 Calculation Debug Results:');
             console.table(result.data.calculationCheck);
             
             // Show in alert for user
@@ -376,14 +376,14 @@ async function debugCalculations() {
             }
         }
     } catch (error) {
-        console.error('Error debugging calculations:', error);
+        debugError('Error debugging calculations:', error);
         alert('Error debugging calculations: ' + error.message);
     }
 }
 
 async function fixCalculations() {
     try {
-        console.log('🔧 Fixing booking calculations...');
+        debugLog('🔧 Fixing booking calculations...');
         
         const response = await fetch(`${API_BASE_URL}/reports/fix-calculations`, {
             method: 'POST',
@@ -403,21 +403,21 @@ async function fixCalculations() {
             throw new Error(result.error || 'Failed to fix calculations');
         }
     } catch (error) {
-        console.error('Error fixing calculations:', error);
+        debugError('Error fixing calculations:', error);
         alert('Error fixing calculations: ' + error.message);
     }
 }
 
 async function debugRateCards() {
     try {
-        console.log('🔍 Debugging rate cards...');
+        debugLog('🔍 Debugging rate cards...');
         const response = await fetch(`${API_BASE_URL}/reports/rate-cards-debug`);
         const result = await response.json();
         
         if (result.success) {
-            console.log('📊 Rate Cards Debug Results:');
-            console.log('Rate Cards:', result.data.rateCards);
-            console.log('Companies:', result.data.companies);
+            debugLog('📊 Rate Cards Debug Results:');
+            debugLog('Rate Cards:', result.data.rateCards);
+            debugLog('Companies:', result.data.companies);
             
             const rateCardsSummary = result.data.rateCards.map(rc => 
                 `${rc.company?.name || 'Unknown'}: ₹${rc.per_article_rate}/article (Active: ${rc.is_active})`
@@ -432,7 +432,7 @@ async function debugRateCards() {
                   `Companies (${result.data.companiesCount}):\n${companiesSummary}`);
         }
     } catch (error) {
-        console.error('Error debugging rate cards:', error);
+        debugError('Error debugging rate cards:', error);
         alert('Error debugging rate cards: ' + error.message);
     }
 }

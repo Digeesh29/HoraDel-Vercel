@@ -4,6 +4,22 @@ const bcrypt = require('bcrypt');
 const router = express.Router();
 const supabase = require('../config/supabase');
 
+// Server-side debug configuration
+const DEBUG_MODE = process.env.NODE_ENV !== 'production';
+
+// Server-side conditional logging functions
+function debugLog(...args) {
+    if (DEBUG_MODE) {
+        console.log(...args);
+    }
+}
+
+function debugError(...args) {
+    if (DEBUG_MODE) {
+        console.error(...args);
+    }
+}
+
 const SALT_ROUNDS = 10;
 
 // POST /api/auth/login - User login
@@ -63,7 +79,7 @@ router.post('/login', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Login error:', error);
+        debugError('Login error:', error);
         res.status(500).json({
             success: false,
             error: 'Internal server error'
@@ -128,11 +144,11 @@ router.post('/register', async (req, res) => {
                 .single();
 
             if (companyError) {
-                console.error('Company creation error:', companyError);
+                debugError('Company creation error:', companyError);
                 throw companyError;
             }
             existingCompany = newCompany;
-            console.log('Created new company with unique name:', existingCompany.name);
+            debugLog('Created new company with unique name:', existingCompany.name);
         } else {
             // Create new company with original name
             const { data: newCompany, error: companyError } = await supabase
@@ -146,11 +162,11 @@ router.post('/register', async (req, res) => {
                 .single();
 
             if (companyError) {
-                console.error('Company creation error:', companyError);
+                debugError('Company creation error:', companyError);
                 throw companyError;
             }
             existingCompany = newCompany;
-            console.log('Created new company:', existingCompany.name);
+            debugLog('Created new company:', existingCompany.name);
         }
 
         // Hash password with bcrypt (salt rounds: 10)
@@ -184,7 +200,7 @@ router.post('/register', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Registration error:', error);
+        debugError('Registration error:', error);
         res.status(500).json({
             success: false,
             error: 'Internal server error'
@@ -195,7 +211,7 @@ router.post('/register', async (req, res) => {
 // GET /api/auth/users - Get all users (admin only)
 router.get('/users', async (req, res) => {
     try {
-        console.log('🔍 Fetching users with company data...');
+        debugLog('🔍 Fetching users with company data...');
         
         const { data: users, error } = await supabase
             .from('auth_users')
@@ -206,14 +222,14 @@ router.get('/users', async (req, res) => {
             .order('created_at', { ascending: false });
 
         if (error) {
-            console.error('❌ Supabase error:', error);
+            debugError('❌ Supabase error:', error);
             throw error;
         }
 
-        console.log(`✅ Found ${users?.length || 0} users`);
-        console.log('🔍 Sample user data:', users?.[0]);
-        console.log('🔍 Users with company_id:', users?.filter(u => u.company_id).length);
-        console.log('🔍 Users with company data:', users?.filter(u => u.company).length);
+        debugLog(`✅ Found ${users?.length || 0} users`);
+        debugLog('� Sampale user data:', users?.[0]);
+        debugLog('🔍 Users with company_id:', users?.filter(u => u.company_id).length);
+        debugLog('� Users with co mpany data:', users?.filter(u => u.company).length);
 
         res.json({
             success: true,
@@ -221,7 +237,7 @@ router.get('/users', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error fetching users:', error);
+        debugError('Error fetching users:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch users'
@@ -259,7 +275,7 @@ router.put('/users/:id', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error updating user:', error);
+        debugError('Error updating user:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to update user'
@@ -322,7 +338,7 @@ router.put('/change-password', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error changing password:', error);
+        debugError('Error changing password:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to change password'
@@ -393,7 +409,7 @@ router.put('/admin-change-password', async (req, res) => {
 
         if (updateError) throw updateError;
 
-        console.log(`✅ Admin ${adminEmail} changed password for client ${user.email}`);
+        debugLog(`✅ Admin ${adminEmail} changed password for client ${user.email}`);
 
         res.json({
             success: true,
@@ -401,7 +417,7 @@ router.put('/admin-change-password', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error changing client password:', error);
+        debugError('Error changing client password:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to change client password'

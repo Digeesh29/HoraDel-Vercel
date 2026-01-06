@@ -6,14 +6,14 @@ let editingConsigneeId = null;
 
 // Initialize consignees page
 async function initClientConsigneesPage() {
-    console.log('🏢 Loading client consignees page...');
+    debugLog('🏢 Loading client consignees page...');
     
     try {
         await loadConsignees();
         setupEventListeners();
         renderConsignees();
     } catch (error) {
-        console.error('❌ Error initializing consignees page:', error);
+        debugError('❌ Error initializing consignees page:', error);
         showToast('Failed to load consignees', 'error');
     }
 }
@@ -32,12 +32,12 @@ async function loadConsignees() {
         if (result.success) {
             consignees = result.data || [];
             filteredConsignees = [...consignees];
-            console.log(`✅ Loaded ${consignees.length} consignees`);
+            debugLog(`✅ Loaded ${consignees.length} consignees`);
         } else {
             throw new Error(result.error || 'Failed to load consignees');
         }
     } catch (error) {
-        console.error('❌ Error loading consignees:', error);
+        debugError('❌ Error loading consignees:', error);
         consignees = [];
         filteredConsignees = [];
     }
@@ -273,7 +273,7 @@ async function handleConsigneeSubmit(e) {
             throw new Error(result.error || 'Failed to save consignee');
         }
     } catch (error) {
-        console.error('❌ Error saving consignee:', error);
+        debugError('❌ Error saving consignee:', error);
         showToast(error.message, 'error');
     } finally {
         submitBtn.disabled = false;
@@ -324,7 +324,7 @@ async function confirmDelete() {
             throw new Error(result.error || 'Failed to delete consignee');
         }
     } catch (error) {
-        console.error('❌ Error deleting consignee:', error);
+        debugError('❌ Error deleting consignee:', error);
         showToast(error.message, 'error');
     } finally {
         confirmBtn.disabled = false;

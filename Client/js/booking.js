@@ -3,7 +3,7 @@
 let batch = [];
 
 async function initClientBookingPage() {
-    console.log('📦 Initializing Client Booking page...');
+    debugLog('📦 Initializing Client Booking page...');
     
     // Set current date
     const currentDate = new Date();
@@ -40,7 +40,7 @@ async function loadConsigneesForBooking() {
     try {
         const companyId = getCompanyId();
         if (!companyId) {
-            console.warn('No company ID found for loading consignees');
+            debugWarn('No company ID found for loading consignees');
             return;
         }
 
@@ -85,17 +85,17 @@ async function loadConsigneesForBooking() {
                         consigneeSelect.appendChild(option);
                     });
                     
-                    console.log(`✅ Loaded ${approvedConsignees.length} approved consignees for booking (${result.data.length} total)`);
+                    debugLog(`✅ Loaded ${approvedConsignees.length} approved consignees for booking (${result.data.length} total)`);
                     
                     // Enable the form
                     enableBookingForm();
                 }
                 
-                console.log(`✅ Loaded ${result.data.length} approved consignees for booking`);
+                debugLog(`✅ Loaded ${result.data.length} approved consignees for booking`);
             }
         }
     } catch (error) {
-        console.error('❌ Error loading consignees for booking:', error);
+        debugError('❌ Error loading consignees for booking:', error);
     }
 }
 
@@ -243,7 +243,7 @@ async function updateConsigneeLastUsed(consigneeId) {
             method: 'PUT'
         });
     } catch (error) {
-        console.error('Error updating consignee last used:', error);
+        debugError('Error updating consignee last used:', error);
         // Don't show error to user as this is not critical
     }
 }
@@ -411,7 +411,7 @@ function escapeHtml(str){
             lrNumber: document.getElementById('lrChip').textContent
         };
         
-        console.log('Booking data with company ID:', bookingData);
+        debugLog('Booking data with company ID:', bookingData);
         
         // Submit booking to server with company ID
         submitBookingBatch(bookingData);
@@ -479,7 +479,7 @@ async function submitSingleBooking(bookingData) {
         const result = await response.json();
         
         if (result.success) {
-            console.log('✅ Single booking submitted successfully:', result);
+            debugLog('✅ Single booking submitted successfully:', result);
             showToast(`Booking created successfully! LR: ${result.data.lr_number}`, 'success');
             
             // Clear the form
@@ -499,11 +499,11 @@ async function submitSingleBooking(bookingData) {
             document.getElementById('lrChip').textContent = newLrNumber;
             document.getElementById('lrBottom').textContent = newLrNumber;
         } else {
-            console.error('❌ Single booking submission failed:', result.error);
+            debugError('❌ Single booking submission failed:', result.error);
             showToast('Failed to create booking: ' + result.error, 'error');
         }
     } catch (error) {
-        console.error('❌ Error submitting single booking:', error);
+        debugError('❌ Error submitting single booking:', error);
         showToast('Network error while creating booking', 'error');
     }
 }
@@ -522,13 +522,13 @@ async function submitBookingBatch(bookingData) {
         const result = await response.json();
         
         if (result.success) {
-            console.log('✅ Booking batch submitted successfully:', result);
+            debugLog('✅ Booking batch submitted successfully:', result);
         } else {
-            console.error('❌ Booking submission failed:', result.error);
+            debugError('❌ Booking submission failed:', result.error);
             showToast('Failed to submit booking: ' + result.error, 'error');
         }
     } catch (error) {
-        console.error('❌ Error submitting booking:', error);
+        debugError('❌ Error submitting booking:', error);
         showToast('Network error while submitting booking', 'error');
     }
 }

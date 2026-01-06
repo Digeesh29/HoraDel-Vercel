@@ -1,13 +1,13 @@
 // CLIENT PROFILE PAGE JAVASCRIPT
 
 function initClientProfilePage() {
-    console.log('👤 Initializing Client Profile page...');
+    debugLog('👤 Initializing Client Profile page...');
     loadClientProfileData();
 }
 
 async function loadClientProfileData() {
     try {
-        console.log('📊 Loading client profile data...');
+        debugLog('📊 Loading client profile data...');
         
         // Get user data from localStorage
         const userId = localStorage.getItem('userId');
@@ -17,7 +17,7 @@ async function loadClientProfileData() {
         const companyName = localStorage.getItem('companyName');
         const companyEmail = localStorage.getItem('companyEmail');
 
-        console.log('🔍 Profile Debug - localStorage data:', {
+        debugLog('🔍 Profile Debug - localStorage data:', {
             userId,
             userEmail,
             userName,
@@ -27,13 +27,13 @@ async function loadClientProfileData() {
         });
 
         if (!userId) {
-            console.error('❌ No user ID found in localStorage');
+            debugError('❌ No user ID found in localStorage');
             showToast('Please log in again', 'error');
             return;
         }
 
         if (!companyId) {
-            console.error('❌ No company ID found in localStorage');
+            debugError('❌ No company ID found in localStorage');
             showToast('Company information missing. Please contact support.', 'error');
             return;
         }
@@ -68,14 +68,14 @@ async function loadClientProfileData() {
         await loadClientActivityStats();
 
     } catch (error) {
-        console.error('❌ Error loading client profile data:', error);
+        debugError('❌ Error loading client profile data:', error);
         showToast('Failed to load profile data', 'error');
     }
 }
 
 async function fetchUserDetails(userId) {
     try {
-        console.log('🔍 Fetching user details for ID:', userId);
+        debugLog('🔍 Fetching user details for ID:', userId);
         
         // Note: We'll need to create an endpoint for user profile data
         // For now, we'll use the auth system to get user info
@@ -88,7 +88,7 @@ async function fetchUserDetails(userId) {
                 const currentUser = data.users.find(user => user.id == userId);
                 
                 if (currentUser) {
-                    console.log('✅ Found user details:', currentUser);
+                    debugLog('✅ Found user details:', currentUser);
                     
                     // Update form fields with real data
                     if (document.getElementById('fullName')) {
@@ -132,43 +132,43 @@ async function fetchUserDetails(userId) {
                 }
             }
         } else {
-            console.warn('⚠️ Could not fetch detailed user data');
+            debugWarn('⚠️ Could not fetch detailed user data');
         }
         
     } catch (error) {
-        console.error('❌ Error fetching user details:', error);
+        debugError('❌ Error fetching user details:', error);
     }
 }
 
 async function loadClientActivityStats() {
     try {
-        console.log('📈 Loading client activity statistics...');
+        debugLog('📈 Loading client activity statistics...');
         
         const companyId = localStorage.getItem('companyId');
         const companyName = localStorage.getItem('companyName');
         
-        console.log('🏢 Company context:', { companyId, companyName });
+        debugLog('🏢 Company context:', { companyId, companyName });
         
         if (!companyId) {
-            console.warn('⚠️ No company ID found');
+            debugWarn('⚠️ No company ID found');
             return;
         }
 
         // Fetch total bookings for this company
         const bookingsUrl = `${API_BASE_URL}/bookings?companyId=${companyId}`;
-        console.log('🔗 Fetching bookings from:', bookingsUrl);
+        debugLog('🔗 Fetching bookings from:', bookingsUrl);
         
         const bookingsResponse = await fetch(bookingsUrl);
         if (bookingsResponse.ok) {
             const bookingsData = await bookingsResponse.json();
-            console.log('📊 Raw bookings response:', bookingsData);
+            debugLog('📊 Raw bookings response:', bookingsData);
             
             if (bookingsData.success && bookingsData.data) {
-                console.log('📦 Total bookings found:', bookingsData.data.length);
+                debugLog('📦 Total bookings found:', bookingsData.data.length);
                 
                 // Log first few bookings to verify company filtering
                 if (bookingsData.data.length > 0) {
-                    console.log('🔍 Sample bookings:', bookingsData.data.slice(0, 3).map(b => ({
+                    debugLog('🔍 Sample bookings:', bookingsData.data.slice(0, 3).map(b => ({
                         lr_number: b.lr_number,
                         company_id: b.company_id,
                         status: b.status,
@@ -178,11 +178,11 @@ async function loadClientActivityStats() {
                     // Verify all bookings belong to the correct company
                     const wrongCompanyBookings = bookingsData.data.filter(b => b.company_id != companyId);
                     if (wrongCompanyBookings.length > 0) {
-                        console.error('❌ Found bookings from wrong company!', wrongCompanyBookings.length);
-                        console.error('❌ Expected company ID:', companyId);
-                        console.error('❌ Wrong bookings:', wrongCompanyBookings.slice(0, 2));
+                        debugError('❌ Found bookings from wrong company!', wrongCompanyBookings.length);
+                        debugError('❌ Expected company ID:', companyId);
+                        debugError('❌ Wrong bookings:', wrongCompanyBookings.slice(0, 2));
                     } else {
-                        console.log('✅ All bookings belong to correct company');
+                        debugLog('✅ All bookings belong to correct company');
                     }
                 }
                 
@@ -191,7 +191,7 @@ async function loadClientActivityStats() {
                     booking.status === 'BOOKED' || booking.status === 'IN_TRANSIT'
                 ).length;
                 
-                console.log('📈 Calculated stats:', { totalBookings, activeShipments });
+                debugLog('📈 Calculated stats:', { totalBookings, activeShipments });
                 
                 // Update stats
                 if (document.getElementById('totalBookings')) {
@@ -201,15 +201,15 @@ async function loadClientActivityStats() {
                     document.getElementById('activeShipments').textContent = activeShipments.toLocaleString();
                 }
                 
-                console.log('✅ Updated activity stats display');
+                debugLog('✅ Updated activity stats display');
                 
                 // Show helpful message if no bookings found
                 if (totalBookings === 0) {
-                    console.log('ℹ️ No bookings found for this company');
+                    debugLog('ℹ️ No bookings found for this company');
                     showToast(`No bookings found for ${companyName}`, 'info');
                 }
             } else {
-                console.warn('⚠️ No bookings data in response');
+                debugWarn('⚠️ No bookings data in response');
                 // Set stats to 0 if no data
                 if (document.getElementById('totalBookings')) {
                     document.getElementById('totalBookings').textContent = '0';
@@ -219,16 +219,16 @@ async function loadClientActivityStats() {
                 }
             }
         } else {
-            console.warn('⚠️ Could not fetch bookings data, status:', bookingsResponse.status);
+            debugWarn('⚠️ Could not fetch bookings data, status:', bookingsResponse.status);
             const errorText = await bookingsResponse.text();
-            console.warn('⚠️ Error response:', errorText);
+            debugWarn('⚠️ Error response:', errorText);
         }
 
         // Fetch company details if not already available
         await fetchCompanyDetails();
         
     } catch (error) {
-        console.error('❌ Error loading activity stats:', error);
+        debugError('❌ Error loading activity stats:', error);
     }
 }
 
@@ -237,7 +237,7 @@ async function fetchCompanyDetails() {
         const companyId = localStorage.getItem('companyId');
         if (!companyId) return;
 
-        console.log('🏢 Fetching company details for ID:', companyId);
+        debugLog('🏢 Fetching company details for ID:', companyId);
         
         // We can try to get company details from the companies endpoint
         // This might need to be created if it doesn't exist
@@ -247,7 +247,7 @@ async function fetchCompanyDetails() {
             if (data.success && data.data) {
                 const company = data.data.find(comp => comp.id == companyId);
                 if (company) {
-                    console.log('✅ Found company details:', company);
+                    debugLog('✅ Found company details:', company);
                     
                     if (document.getElementById('companyName')) {
                         document.getElementById('companyName').value = company.name || 'Not Available';
@@ -265,7 +265,7 @@ async function fetchCompanyDetails() {
             }
         }
     } catch (error) {
-        console.error('❌ Error fetching company details:', error);
+        debugError('❌ Error fetching company details:', error);
     }
 }
 
@@ -310,7 +310,7 @@ async function saveClientProfile() {
             phone: document.getElementById('phone').value
         };
 
-        console.log('💾 Saving client profile:', profileData);
+        debugLog('💾 Saving client profile:', profileData);
         
         // Update user data via API
         const response = await fetch(`${API_BASE_URL}/auth/users/${userId}`, {
@@ -328,7 +328,7 @@ async function saveClientProfile() {
                 localStorage.setItem('userName', profileData.full_name);
                 
                 showToast('Profile updated successfully!', 'success');
-                console.log('✅ Profile saved successfully');
+                debugLog('✅ Profile saved successfully');
             } else {
                 throw new Error(data.error || 'Failed to save profile');
             }
@@ -337,7 +337,7 @@ async function saveClientProfile() {
         }
         
     } catch (error) {
-        console.error('❌ Error saving profile:', error);
+        debugError('❌ Error saving profile:', error);
         showToast('Failed to save profile. Please try again.', 'error');
     }
 }
@@ -384,7 +384,7 @@ async function changePasswordAPI(currentPassword, newPassword) {
         }
         
     } catch (error) {
-        console.error('❌ Error changing password:', error);
+        debugError('❌ Error changing password:', error);
         showToast(error.message || 'Failed to change password', 'error');
     }
 }
@@ -439,21 +439,21 @@ window.testCompanyFiltering = async function() {
     const companyId = localStorage.getItem('companyId');
     const companyName = localStorage.getItem('companyName');
     
-    console.log('🧪 Testing Company Filtering...');
-    console.log('🏢 Company:', companyName, '(ID:', companyId, ')');
+    debugLog('🧪 Testing Company Filtering...');
+    debugLog('🏢 Company:', companyName, '(ID:', companyId, ')');
     
     try {
         // Test 1: Get all bookings (no filter)
         const allBookingsResponse = await fetch(`${API_BASE_URL}/bookings`);
         const allBookingsData = await allBookingsResponse.json();
         
-        console.log('📊 All bookings:', allBookingsData.data?.length || 0);
+        debugLog('📊 All bookings:', allBookingsData.data?.length || 0);
         
         // Test 2: Get company-filtered bookings
         const filteredBookingsResponse = await fetch(`${API_BASE_URL}/bookings?companyId=${companyId}`);
         const filteredBookingsData = await filteredBookingsResponse.json();
         
-        console.log('📊 Filtered bookings:', filteredBookingsData.data?.length || 0);
+        debugLog('📊 Filtered bookings:', filteredBookingsData.data?.length || 0);
         
         // Test 3: Show company distribution
         if (allBookingsData.data && allBookingsData.data.length > 0) {
@@ -465,8 +465,8 @@ window.testCompanyFiltering = async function() {
                 companyDistribution[cId].count++;
             });
             
-            console.log('🏢 Company distribution:', companyDistribution);
-            console.log('🎯 Your company should be ID:', companyId);
+            debugLog('🏢 Company distribution:', companyDistribution);
+            debugLog('🎯 Your company should be ID:', companyId);
         }
         
         return {
@@ -477,10 +477,10 @@ window.testCompanyFiltering = async function() {
         };
         
     } catch (error) {
-        console.error('❌ Test failed:', error);
+        debugError('❌ Test failed:', error);
         return { error: error.message };
     }
 };
 
-console.log('🔧 Debug function loaded: testCompanyFiltering()');
-console.log('💡 Run testCompanyFiltering() in console to debug company filtering');
+debugLog('🔧 Debug function loaded: testCompanyFiltering()');
+debugLog('💡 Run testCompanyFiltering() in console to debug company filtering');

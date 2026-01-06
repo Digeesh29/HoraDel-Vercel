@@ -1,6 +1,22 @@
 // Dashboard API for Vercel - Direct serverless function
 const supabase = require('../config/supabase');
 
+// Server-side debug configuration
+const DEBUG_MODE = process.env.NODE_ENV !== 'production';
+
+// Server-side conditional logging functions
+function debugLog(...args) {
+    if (DEBUG_MODE) {
+        console.log(...args);
+    }
+}
+
+function debugError(...args) {
+    if (DEBUG_MODE) {
+        console.error(...args);
+    }
+}
+
 module.exports = async (req, res) => {
     // CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -12,11 +28,11 @@ module.exports = async (req, res) => {
     }
 
     try {
-        console.log('📊 Dashboard API called:', req.method, req.url);
+        debugLog('📊 Dashboard API called:', req.method, req.url);
         
         // Handle different dashboard endpoints
         const url = req.url || '';
-        console.log('🔍 Dashboard URL:', url);
+        debugLog('🔍 Dashboard URL:', url);
         
         // Handle /summary endpoint or default GET
         if (url.includes('/summary') || url === '/dashboard' || req.method === 'GET') {
@@ -25,7 +41,7 @@ module.exports = async (req, res) => {
             const today = new Date().toISOString().split('T')[0];
             const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
             
-            console.log('📊 Dashboard summary request for company:', companyId || 'All companies');
+            debugLog('📊 Dashboard summary request for company:', companyId || 'All companies');
 
             // Helper function to add company filter
             const addCompanyFilter = (query) => {
@@ -111,7 +127,7 @@ module.exports = async (req, res) => {
 
             const { data: recentBookings } = await recentBookingsQuery;
 
-            console.log('✅ Dashboard data prepared');
+            debugLog('✅ Dashboard data prepared');
 
             return res.json({
                 success: true,
@@ -169,7 +185,7 @@ module.exports = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('❌ Dashboard error:', error);
+        debugError('❌ Dashboard error:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch dashboard data',

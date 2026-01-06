@@ -1,7 +1,7 @@
 // Profile Page JavaScript
 
 function initProfilePage() {
-    console.log('👤 Initializing Profile page...');
+    debugLog('👤 Initializing Profile page...');
     loadProfileData();
 }
 
@@ -47,7 +47,7 @@ async function loadProfileData() {
         // Fetch real stats from API
         await loadActivityStats();
     } catch (error) {
-        console.error('Error loading profile data:', error);
+        debugError('Error loading profile data:', error);
     }
 }
 
@@ -73,7 +73,7 @@ async function loadActivityStats() {
             }
         }
     } catch (error) {
-        console.error('Error loading activity stats:', error);
+        debugError('Error loading activity stats:', error);
     }
 }
 
@@ -121,12 +121,12 @@ async function saveProfile() {
         };
 
         // In a real app, this would POST to an API
-        console.log('Saving profile:', profileData);
+        debugLog('Saving profile:', profileData);
         
         // Show success message
         alert('Profile updated successfully!');
     } catch (error) {
-        console.error('Error saving profile:', error);
+        debugError('Error saving profile:', error);
         alert('Failed to save profile. Please try again.');
     }
 }
@@ -135,7 +135,7 @@ function changePassword() {
     // In a real app, this would open a modal or navigate to password change page
     const newPassword = prompt('Enter new password:');
     if (newPassword) {
-        console.log('Password change requested');
+        debugLog('Password change requested');
         alert('Password changed successfully!');
     }
 }

@@ -3,6 +3,22 @@ const express = require('express');
 const router = express.Router();
 const supabase = require('../config/supabase');
 
+// Server-side debug configuration
+const DEBUG_MODE = process.env.NODE_ENV !== 'production';
+
+// Server-side conditional logging functions
+function debugLog(...args) {
+    if (DEBUG_MODE) {
+        console.log(...args);
+    }
+}
+
+function debugError(...args) {
+    if (DEBUG_MODE) {
+        console.error(...args);
+    }
+}
+
 // GET /api/bookings - Get all bookings with filters
 router.get('/', async (req, res) => {
     try {
@@ -61,7 +77,7 @@ router.get('/', async (req, res) => {
             count: filteredData.length
         });
     } catch (error) {
-        console.error('Error fetching bookings:', error);
+        debugError('Error fetching bookings:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch bookings',
@@ -95,7 +111,7 @@ router.put('/:id', async (req, res) => {
             data: data
         });
     } catch (error) {
-        console.error('Error updating booking:', error);
+        debugError('Error updating booking:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to update booking',
@@ -134,7 +150,7 @@ router.get('/:id', async (req, res) => {
             data: data
         });
     } catch (error) {
-        console.error('Error fetching booking:', error);
+        debugError('Error fetching booking:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch booking',
@@ -155,7 +171,7 @@ router.post('/', async (req, res) => {
             });
         }
 
-        console.log(`📦 Creating single booking for company: ${companyName} (${companyId})`);
+        debugLog(`📦 Creating single booking for company: ${companyName} (${companyId})`);
 
         const today = new Date().toISOString().split('T')[0];
         const lrNumber = `LR${Date.now()}`;
@@ -205,11 +221,11 @@ router.post('/', async (req, res) => {
             .single();
 
         if (error) {
-            console.error('❌ Error creating booking:', error);
+            debugError('❌ Error creating booking:', error);
             throw error;
         }
 
-        console.log(`✅ Created booking ${lrNumber} for company: ${companyName}`);
+        debugLog(`✅ Created booking ${lrNumber} for company: ${companyName}`);
 
         res.status(201).json({
             success: true,
@@ -218,7 +234,7 @@ router.post('/', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('❌ Error in booking creation:', error);
+        debugError('❌ Error in booking creation:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to create booking',
@@ -239,8 +255,8 @@ router.post('/batch', async (req, res) => {
             });
         }
 
-        console.log(`📦 Creating batch booking for company: ${companyName} (${companyId})`);
-        console.log(`📦 Number of parcels: ${parcels.length}`);
+        debugLog(`📦 Creating batch booking for company: ${companyName} (${companyId})`);
+        debugLog(`📦 Number of parcels: ${parcels.length}`);
 
         const bookings = [];
         const today = new Date().toISOString().split('T')[0];
@@ -292,11 +308,11 @@ router.post('/batch', async (req, res) => {
             .select();
 
         if (error) {
-            console.error('❌ Error creating batch bookings:', error);
+            debugError('❌ Error creating batch bookings:', error);
             throw error;
         }
 
-        console.log(`✅ Created ${createdBookings.length} bookings for company: ${companyName}`);
+        debugLog(`✅ Created ${createdBookings.length} bookings for company: ${companyName}`);
 
         res.status(201).json({
             success: true,
@@ -310,7 +326,7 @@ router.post('/batch', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('❌ Error in batch booking creation:', error);
+        debugError('❌ Error in batch booking creation:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to create batch bookings',
@@ -322,7 +338,7 @@ router.post('/batch', async (req, res) => {
 // Helper function to get rate card for a company
 async function getRateCardForCompany(companyId) {
     try {
-        console.log(`🔍 Looking for rate card for company ID: ${companyId}`);
+        debugLog(`🔍 Looking for rate card for company ID: ${companyId}`);
         
         const { data, error } = await supabase
             .from('rate_cards')
@@ -334,12 +350,12 @@ async function getRateCardForCompany(companyId) {
             .single();
 
         if (error || !data) {
-            console.log(`❌ No rate card found for company ${companyId}:`, error?.message || 'No data');
-            console.log(`🔄 Using default rate: ₹10 per article`);
+            debugLog(`❌ No rate card found for company ${companyId}:`, error?.message || 'No data');
+            debugLog(`🔄 Using default rate: ₹10 per article`);
             return null;
         }
 
-        console.log(`✅ Found rate card for company ${companyId}:`, {
+        debugLog(`✅ Found rate card for company ${companyId}:`, {
             id: data.id,
             per_article_rate: data.per_article_rate,
             base_rate: data.base_rate,
@@ -347,7 +363,7 @@ async function getRateCardForCompany(companyId) {
         });
         return data;
     } catch (error) {
-        console.error('❌ Error fetching rate card:', error);
+        debugError('❌ Error fetching rate card:', error);
         return null;
     }
 }
@@ -365,7 +381,7 @@ function calculateBookingPricing(articleCount, parcelType, rateCard) {
     const totalAmount = articleCount * perArticleRate;
     const grandTotal = totalAmount;
 
-    console.log(`💰 Simple pricing calculation:`, {
+    debugLog(`💰 Simple pricing calculation:`, {
         articleCount: `${articleCount} (type: ${typeof articleCount})`,
         perArticleRate: `${perArticleRate} (type: ${typeof perArticleRate})`,
         calculation: `${articleCount} × ${perArticleRate} = ${totalAmount}`,

@@ -9,7 +9,7 @@ let editingCompany = null;
 let isAddingNewCompany = false;
 
 function initRateCardPage() {
-    console.log('💳 Initializing Rate Card page...');
+    debugLog('💳 Initializing Rate Card page...');
     
     // Get DOM elements
     tbody = document.getElementById("rateCardTableBody");
@@ -43,11 +43,11 @@ function formatRs(v) {
 
 function renderRateCards() {
     if (!tbody) {
-        console.error('tbody element not found');
+        debugError('tbody element not found');
         return;
     }
 
-    console.log('Rendering', rateCards.length, 'rate cards');
+    debugLog('Rendering', rateCards.length, 'rate cards');
 
     tbody.innerHTML = rateCards.map(card => `
         <div class="rate-card-row">
@@ -65,13 +65,13 @@ function renderRateCards() {
 
 async function loadCompanies() {
     try {
-        console.log('🏢 Loading companies...');
+        debugLog('🏢 Loading companies...');
         const response = await fetch(`${API_BASE_URL}/companies`);
         const result = await response.json();
         
         if (result.success) {
             companies = result.data;
-            console.log('✅ Loaded', companies.length, 'companies');
+            debugLog('✅ Loaded', companies.length, 'companies');
             
             // Populate company dropdown
             const companySelect = document.getElementById('rCompany');
@@ -83,17 +83,17 @@ async function loadCompanies() {
             }
         }
     } catch (error) {
-        console.error('❌ Error loading companies:', error);
+        debugError('❌ Error loading companies:', error);
     }
 }
 
 async function loadRateCards() {
     try {
-        console.log('📋 Fetching rate cards from API...');
+        debugLog('📋 Fetching rate cards from API...');
         const response = await fetch(`${API_BASE_URL}/ratecards`);
         const result = await response.json();
         
-        console.log('API Response:', result);
+        debugLog('API Response:', result);
         
         if (result.success && result.data.length > 0) {
             // Transform API data to match our format
@@ -115,9 +115,9 @@ async function loadRateCards() {
                 };
             });
             
-            console.log('✅ Loaded', rateCards.length, 'rate cards');
+            debugLog('✅ Loaded', rateCards.length, 'rate cards');
         } else {
-            console.log('⚠️ No rate cards found, using sample data');
+            debugLog('⚠️ No rate cards found, using sample data');
             // Fallback to sample data
             rateCards = [
                 { company: "TechCorp",      base: 500, perArticle: 15, parcelType: 25, zoneRate: 100, updated: "2024-12-01" },
@@ -130,7 +130,7 @@ async function loadRateCards() {
         
         renderRateCards();
     } catch (error) {
-        console.error('❌ Error loading rate cards:', error);
+        debugError('❌ Error loading rate cards:', error);
         // Fallback to sample data
         rateCards = [
             { company: "TechCorp",      base: 500, perArticle: 15, parcelType: 25, zoneRate: 100, updated: "2024-12-01" },
@@ -226,7 +226,7 @@ async function saveRateCard() {
 
         if (existingCard && existingCard.id) {
             // Update existing rate card
-            console.log('Updating rate card:', existingCard.id);
+            debugLog('Updating rate card:', existingCard.id);
             
             const response = await fetch(`${API_BASE_URL}/ratecards/${existingCard.id}`, {
                 method: 'PUT',
@@ -247,14 +247,14 @@ async function saveRateCard() {
                 throw new Error(result.error || 'Failed to update rate card');
             }
 
-            console.log('✅ Rate card updated successfully');
+            debugLog('✅ Rate card updated successfully');
         } else {
             // Create new rate card
-            console.log('Creating new rate card for:', companyName);
+            debugLog('Creating new rate card for:', companyName);
             
             if (isAddingNewCompany) {
                 // Create new company first
-                console.log('Creating new company:', companyName);
+                debugLog('Creating new company:', companyName);
                 
                 const createCompanyResponse = await fetch(`${API_BASE_URL}/companies`, {
                     method: 'POST',
@@ -278,7 +278,7 @@ async function saveRateCard() {
                 }
                 
                 companyId = createCompanyResult.data.id;
-                console.log('Created new company:', companyId);
+                debugLog('Created new company:', companyId);
             }
             
             if (!companyId) {
@@ -306,7 +306,7 @@ async function saveRateCard() {
                 throw new Error(createRateCardResult.error || 'Failed to create rate card');
             }
             
-            console.log('✅ Rate card created successfully');
+            debugLog('✅ Rate card created successfully');
         }
 
         // Reload data from API
@@ -317,7 +317,7 @@ async function saveRateCard() {
         alert('Rate card saved successfully!');
         
     } catch (error) {
-        console.error('❌ Error saving rate card:', error);
+        debugError('❌ Error saving rate card:', error);
         alert('Failed to save rate card: ' + error.message);
     } finally {
         saveRateBtn.disabled = false;
@@ -453,7 +453,7 @@ function updateCalculationPreview() {
     const totalAmount = articles * perArticleRate;
     
     // Debug logging
-    console.log('🧮 Rate Card Calculation Debug:', {
+    debugLog('🧮 Rate Card Calculation Debug:', {
         articles: `${articles} (type: ${typeof articles})`,
         perArticleRate: `${perArticleRate} (type: ${typeof perArticleRate})`,
         calculation: `${articles} × ${perArticleRate} = ${totalAmount}`,

@@ -1,6 +1,22 @@
 // Bookings API for Vercel - Direct function
 const supabase = require('../config/supabase');
 
+// Server-side debug configuration
+const DEBUG_MODE = process.env.NODE_ENV !== 'production';
+
+// Server-side conditional logging functions
+function debugLog(...args) {
+    if (DEBUG_MODE) {
+        console.log(...args);
+    }
+}
+
+function debugError(...args) {
+    if (DEBUG_MODE) {
+        console.error(...args);
+    }
+}
+
 module.exports = async (req, res) => {
     // CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -95,7 +111,7 @@ module.exports = async (req, res) => {
         });
         
     } catch (error) {
-        console.error('❌ Bookings error:', error);
+        debugError('❌ Bookings error:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to process booking request',

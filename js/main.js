@@ -1,20 +1,20 @@
 // Prevent admin main.js from running in client interface
-console.log('🔍 Admin main.js loading...');
-console.log('🔍 Current URL:', window.location.href);
-console.log('🔍 Current pathname:', window.location.pathname);
+debugLog('🔍 Admin main.js loading...');
+debugLog('🔍 Current URL:', window.location.href);
+debugLog('🔍 Current pathname:', window.location.pathname);
 
 // Check if we're in client interface
 if (window.location.href.includes('/Client/') || 
     window.location.pathname.includes('/Client/') ||
     document.querySelector('script[src*="/Client/js/"]')) {
-    console.log('🚫 Admin main.js BLOCKED - Client interface detected');
+    debugLog('🚫 Admin main.js BLOCKED - Client interface detected');
     
     // Override any problematic functions immediately
     window.initDashboardPage = function() {
-        console.log('🚫 Admin dashboard function blocked');
+        debugLog('🚫 Admin dashboard function blocked');
     };
     window.initAdminDashboardPage = function() {
-        console.log('🚫 Admin dashboard function blocked');
+        debugLog('🚫 Admin dashboard function blocked');
     };
     
     // Stop all execution by throwing error
@@ -121,17 +121,17 @@ document.addEventListener("DOMContentLoaded", () => {
             window.history.pushState({}, '', newUrl);
         }
         
-        console.log(`🔍 Loading page: ${page}`);
+        debugLog(`🔍 Loading page: ${page}`);
         fetch(`pages/${page}.html`)
             .then(r => {
-                console.log(`🔍 Fetch response for ${page}:`, r.status, r.statusText);
+                debugLog(`🔍 Fetch response for ${page}:`, r.status, r.statusText);
                 if (!r.ok) {
                     throw new Error(`HTTP ${r.status}: ${r.statusText}`);
                 }
                 return r.text();
             })
             .then(html => {
-                console.log(`🔍 HTML loaded for ${page}:`, html.length, 'characters');
+                debugLog(`🔍 HTML loaded for ${page}:`, html.length, 'characters');
                 content.innerHTML = html;
 
                 // Call page-specific init function
@@ -139,7 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (page === "bookings") initBookingsPage();
                 if (page === "vehicles") initVehiclesPage();
                 if (page === "assign-parcels") {
-                    console.log('🔍 Loading assign parcels page...');
+                    debugLog('🔍 Loading assign parcels page...');
                     // Use the working fallback function directly
                     initAssignParcelsPageFallback();
                     
@@ -147,17 +147,17 @@ document.addEventListener("DOMContentLoaded", () => {
                     setTimeout(() => {
                         const assignBtn = document.getElementById('assignSelectedBtn');
                         if (assignBtn) {
-                            console.log('🔍 Setting up assign button click handler');
+                            debugLog('🔍 Setting up assign button click handler');
                             
                             // Define the assign function directly here
                             window.simpleAssignParcels = async function() {
-                                console.log('🔍 Assign function called!');
+                                debugLog('🔍 Assign function called!');
                                 
                                 // Get selected parcels
                                 const selectedCheckboxes = document.querySelectorAll('.parcel-checkbox:checked');
                                 const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.value);
                                 
-                                console.log('🔍 Selected parcels:', selectedIds);
+                                debugLog('🔍 Selected parcels:', selectedIds);
                                 
                                 if (selectedIds.length === 0) {
                                     alert('Please select at least one parcel to assign');
@@ -173,14 +173,14 @@ document.addEventListener("DOMContentLoaded", () => {
                                     const urlParams = new URLSearchParams(window.location.search);
                                     const vehicleId = urlParams.get('vehicleId');
                                     
-                                    console.log('🔍 Assigning to vehicle ID:', vehicleId);
-                                    console.log('🔍 Selected parcel IDs:', selectedIds);
+                                    debugLog('🔍 Assigning to vehicle ID:', vehicleId);
+                                    debugLog('🔍 Selected parcel IDs:', selectedIds);
                                     
                                     // Assign each selected parcel to the vehicle
                                     let successCount = 0;
                                     for (const parcelId of selectedIds) {
                                         try {
-                                            console.log('🔍 Assigning parcel:', parcelId);
+                                            debugLog('🔍 Assigning parcel:', parcelId);
                                             
                                             const response = await fetch(`${API_BASE_URL}/bookings/${parcelId}`, {
                                                 method: 'PUT',
@@ -194,16 +194,16 @@ document.addEventListener("DOMContentLoaded", () => {
                                             });
                                             
                                             const result = await response.json();
-                                            console.log('🔍 Assign result for', parcelId, ':', result);
+                                            debugLog('🔍 Assign result for', parcelId, ':', result);
                                             
                                             if (result.success) {
                                                 successCount++;
-                                                console.log('✅ Parcel', parcelId, 'assigned successfully');
+                                                debugLog('✅ Parcel', parcelId, 'assigned successfully');
                                             } else {
-                                                console.error('❌ Failed to assign parcel', parcelId, ':', result.error);
+                                                debugError('❌ Failed to assign parcel', parcelId, ':', result.error);
                                             }
                                         } catch (error) {
-                                            console.error('❌ Error assigning parcel', parcelId, ':', error);
+                                            debugError('❌ Error assigning parcel', parcelId, ':', error);
                                         }
                                     }
                                     
@@ -222,10 +222,10 @@ document.addEventListener("DOMContentLoaded", () => {
                                             
                                             const vehicleResult = await vehicleResponse.json();
                                             if (vehicleResult.success) {
-                                                console.log('✅ Vehicle status updated to Assigned');
+                                                debugLog('✅ Vehicle status updated to Assigned');
                                             }
                                         } catch (error) {
-                                            console.error('❌ Error updating vehicle status:', error);
+                                            debugError('❌ Error updating vehicle status:', error);
                                         }
                                     }
                                     
@@ -242,7 +242,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                     }, 1500);
                                     
                                 } catch (error) {
-                                    console.error('❌ Error in assign function:', error);
+                                    debugError('❌ Error in assign function:', error);
                                     showToast('Error assigning parcels. Please try again.', 'error');
                                     
                                     // Reset button
@@ -268,7 +268,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (page === "profile") initProfilePage();
             })
             .catch(error => {
-                console.error(`❌ Error loading page ${page}:`, error);
+                debugError(`❌ Error loading page ${page}:`, error);
                 content.innerHTML = `
                     <div style="padding: 40px; text-align: center; color: #dc2626;">
                         <h3>Error Loading Page</h3>
@@ -345,14 +345,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 localStorage.removeItem('companyEmail');
                 
                 // Redirect to login
-                console.log('🚪 Logging out and redirecting to login...');
+                debugLog('🚪 Logging out and redirecting to login...');
                 window.location.replace('/login');
             }
         });
     }
 
     // Load default page (dashboard)
-    console.log('📊 Loading dashboard...');
+    debugLog('📊 Loading dashboard...');
     loadPage("dashboard");
     
     // Load pending approval count
@@ -377,26 +377,26 @@ async function loadPendingApprovalCount() {
             }
         }
     } catch (error) {
-        console.error('Error loading pending approval count:', error);
+        debugError('Error loading pending approval count:', error);
     }
 }
 
 
 // Fallback function for assign parcels page
 async function initAssignParcelsPageFallback() {
-    console.log('🚛 Initializing Assign Parcels Page (Fallback)...');
-    console.log('🔍 Current URL:', window.location.href);
-    console.log('🔍 Search params:', window.location.search);
+    debugLog('🚛 Initializing Assign Parcels Page (Fallback)...');
+    debugLog('🔍 Current URL:', window.location.href);
+    debugLog('🔍 Search params:', window.location.search);
     
     // Get vehicle ID from URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const vehicleId = urlParams.get('vehicleId');
     
-    console.log('🔍 Vehicle ID from URL:', vehicleId);
-    console.log('🔍 API_BASE_URL:', API_BASE_URL);
+    debugLog('🔍 Vehicle ID from URL:', vehicleId);
+    debugLog('🔍 API_BASE_URL:', API_BASE_URL);
     
     if (!vehicleId) {
-        console.error('❌ No vehicle ID provided');
+        debugError('❌ No vehicle ID provided');
         showToast('No vehicle ID provided', 'error');
         loadPage('vehicles');
         return;
@@ -404,7 +404,7 @@ async function initAssignParcelsPageFallback() {
     
     try {
         // Fetch vehicle details
-        console.log('🔍 Fetching vehicle data...');
+        debugLog('🔍 Fetching vehicle data...');
         const response = await fetch(`${API_BASE_URL}/vehicles`);
         const result = await response.json();
         
@@ -417,7 +417,7 @@ async function initAssignParcelsPageFallback() {
             throw new Error('Vehicle not found');
         }
         
-        console.log('✅ Vehicle found:', vehicle.registration_number);
+        debugLog('✅ Vehicle found:', vehicle.registration_number);
         
         // Update vehicle info display
         const vehicleNumberEl = document.getElementById('assignVehicleNumber');
@@ -429,7 +429,7 @@ async function initAssignParcelsPageFallback() {
         if (contactNumberEl) contactNumberEl.textContent = vehicle.driver?.phone || 'N/A';
         
         // Load available parcels
-        console.log('🔍 Fetching available parcels...');
+        debugLog('🔍 Fetching available parcels...');
         const bookingsResponse = await fetch(`${API_BASE_URL}/bookings`);
         const bookingsResult = await bookingsResponse.json();
         
@@ -443,7 +443,7 @@ async function initAssignParcelsPageFallback() {
             ['BOOKED', 'SUBMITTED', 'VERIFIED', 'PENDING'].includes(b.status)
         );
         
-        console.log('✅ Found', parcels.length, 'available parcels');
+        debugLog('✅ Found', parcels.length, 'available parcels');
         
         const tbody = document.getElementById('assignParcelsTableBody');
         const availableCountEl = document.getElementById('availableParcelsCount');
@@ -474,19 +474,19 @@ async function initAssignParcelsPageFallback() {
         
         if (availableCountEl) availableCountEl.textContent = parcels.length;
         
-        console.log('✅ Assign parcels page loaded successfully');
+        debugLog('✅ Assign parcels page loaded successfully');
         
         // Set up button functionality for fallback
         const assignBtn = document.getElementById('assignSelectedBtn');
         if (assignBtn) {
             assignBtn.onclick = function() {
-                console.log('🔍 Fallback assign button clicked!');
+                debugLog('🔍 Fallback assign button clicked!');
                 
                 // Get selected parcels
                 const selectedCheckboxes = document.querySelectorAll('.parcel-checkbox:checked');
                 const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.value);
                 
-                console.log('🔍 Selected parcels:', selectedIds);
+                debugLog('🔍 Selected parcels:', selectedIds);
                 
                 if (selectedIds.length === 0) {
                     alert('Please select at least one parcel to assign');
@@ -534,7 +534,7 @@ async function initAssignParcelsPageFallback() {
         });
         
     } catch (error) {
-        console.error('❌ Error loading assign parcels page:', error);
+        debugError('❌ Error loading assign parcels page:', error);
         showToast('Error loading page: ' + error.message, 'error');
         setTimeout(() => loadPage('vehicles'), 2000);
     }

@@ -1,6 +1,22 @@
 // Companies API for Vercel - Serverless function
 const supabase = require('../config/supabase');
 
+// Server-side debug configuration
+const DEBUG_MODE = process.env.NODE_ENV !== 'production';
+
+// Server-side conditional logging functions
+function debugLog(...args) {
+    if (DEBUG_MODE) {
+        console.log(...args);
+    }
+}
+
+function debugError(...args) {
+    if (DEBUG_MODE) {
+        console.error(...args);
+    }
+}
+
 module.exports = async (req, res) => {
     // CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -12,7 +28,7 @@ module.exports = async (req, res) => {
     }
 
     try {
-        console.log('🏢 Companies API called:', req.method, req.url);
+        debugLog('🏢 Companies API called:', req.method, req.url);
 
         if (req.method === 'GET') {
             // GET /api/companies - Get all companies
@@ -22,11 +38,11 @@ module.exports = async (req, res) => {
                 .order('name');
 
             if (error) {
-                console.error('❌ Supabase error:', error);
+                debugError('❌ Supabase error:', error);
                 throw error;
             }
 
-            console.log(`✅ Found ${data?.length || 0} companies`);
+            debugLog(`✅ Found ${data?.length || 0} companies`);
 
             return res.json({
                 success: true,
@@ -65,7 +81,7 @@ module.exports = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('❌ Companies API error:', error);
+        debugError('❌ Companies API error:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to process companies request',

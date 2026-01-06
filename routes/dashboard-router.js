@@ -3,6 +3,22 @@ const express = require('express');
 const router = express.Router();
 const supabase = require('../config/supabase');
 
+// Server-side debug configuration
+const DEBUG_MODE = process.env.NODE_ENV !== 'production';
+
+// Server-side conditional logging functions
+function debugLog(...args) {
+    if (DEBUG_MODE) {
+        console.log(...args);
+    }
+}
+
+function debugError(...args) {
+    if (DEBUG_MODE) {
+        console.error(...args);
+    }
+}
+
 // GET /api/dashboard - Get dashboard data (total bookings + recent 10 bookings)
 router.get('/', async (req, res) => {
     try {
@@ -68,7 +84,7 @@ router.get('/', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Error fetching dashboard data:', error);
+        debugError('Error fetching dashboard data:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch dashboard data',
@@ -102,7 +118,7 @@ router.get('/test-data', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('❌ Test data error:', error);
+        debugError('❌ Test data error:', error);
         res.status(500).json({
             success: false,
             error: 'Test failed',
@@ -118,8 +134,8 @@ router.get('/summary', async (req, res) => {
         const today = new Date().toISOString().split('T')[0];
         const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
         
-        console.log('📊 Dashboard summary request for company:', companyId || 'All companies');
-        console.log('📅 Date filters:', { today, yesterday });
+        debugLog('📊 Dashboard summary request for company:', companyId || 'All companies');
+        debugLog('📅 Date filters:', { today, yesterday });
 
         // Helper function to add company filter
         const addCompanyFilter = (query) => {
@@ -203,7 +219,7 @@ router.get('/summary', async (req, res) => {
         ]);
 
         // Debug: Log all query results
-        console.log('📊 Query Results:', {
+        debugLog('📊 Query Results:', {
             todayBookings: todayBookingsResult.count,
             yesterdayBookings: yesterdayBookingsResult.count,
             pendingDeliveries: pendingDeliveriesResult.count,
@@ -245,7 +261,7 @@ router.get('/summary', async (req, res) => {
             parcelsInTransitGrowth: 0, // Placeholder
             pendingDeliveriesGrowth: 0 // Placeholder
         };
-        console.log('📊 Stats being sent:', statsToSend);
+        debugLog('📊 Stats being sent:', statsToSend);
 
         // Get recent bookings (BOOKED status without assigned vehicles)
         let recentBookingsQuery = supabase
@@ -297,7 +313,7 @@ router.get('/summary', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Error fetching dashboard summary:', error);
+        debugError('Error fetching dashboard summary:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch dashboard summary',
@@ -358,7 +374,7 @@ router.get('/bookings-trend', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Error fetching bookings trend:', error);
+        debugError('Error fetching bookings trend:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch bookings trend',
@@ -420,7 +436,7 @@ router.get('/company-distribution', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Error fetching company distribution:', error);
+        debugError('Error fetching company distribution:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch company distribution',
@@ -470,7 +486,7 @@ async function getTrendData(companyId) {
 
         return { labels, values };
     } catch (error) {
-        console.error('Error getting trend data:', error);
+        debugError('Error getting trend data:', error);
         return { labels: [], values: [] };
     }
 }
@@ -518,7 +534,7 @@ async function getCompanyDistribution(companyId) {
 
         return { labels, values };
     } catch (error) {
-        console.error('Error getting company distribution:', error);
+        debugError('Error getting company distribution:', error);
         return { labels: [], values: [] };
     }
 }

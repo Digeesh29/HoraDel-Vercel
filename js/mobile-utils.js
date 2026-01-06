@@ -46,7 +46,7 @@
             problematicElements.forEach(el => {
                 el.style.gridTemplateColumns = '1fr';
                 el.style.gap = '12px';
-                console.log('🔧 Fixed problematic 3-column grid:', el);
+                debugLog('🔧 Fixed problematic 3-column grid:', el);
             });
             
             // Target any element with 2-column grid
@@ -54,7 +54,7 @@
             twoColumnElements.forEach(el => {
                 el.style.gridTemplateColumns = '1fr';
                 el.style.gap = '12px';
-                console.log('🔧 Fixed problematic 2-column grid:', el);
+                debugLog('🔧 Fixed problematic 2-column grid:', el);
             });
             
             // Force fix for any grid with multiple 1fr values
@@ -65,7 +65,7 @@
                 if (frCount > 1) {
                     el.style.gridTemplateColumns = '1fr';
                     el.style.gap = '12px';
-                    console.log('🔧 Fixed multi-column grid:', el, 'was:', gridValue);
+                    debugLog('🔧 Fixed multi-column grid:', el, 'was:', gridValue);
                 }
             });
             
@@ -122,7 +122,7 @@
     
     // Force fix styles (can be called manually)
     window.forceMobileFix = function() {
-        console.log('🔧 Forcing mobile style fixes...');
+        debugLog('🔧 Forcing mobile style fixes...');
         fixInlineStyles();
     };
     

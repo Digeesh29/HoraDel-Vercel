@@ -51,70 +51,86 @@ app.use('/js', express.static(path.join(__dirname, 'js')));
 app.use('/css', express.static(path.join(__dirname, 'css')));
 app.use('/pages', express.static(path.join(__dirname, 'pages')));
 
+// Server-side debug configuration
+const DEBUG_MODE = process.env.NODE_ENV !== 'production';
+
+// Server-side conditional logging functions
+function debugLog(...args) {
+    if (DEBUG_MODE) {
+        console.log(...args);
+    }
+}
+
+function debugError(...args) {
+    if (DEBUG_MODE) {
+        console.error(...args);
+    }
+}
+
 // API Routes with error handling
-console.log('🔧 Loading API routes...');
+debugLog('🔧 Loading API routes...');
 
 try {
     app.use('/api/dashboard', require('./routes/dashboard-router'));
-    console.log('✅ Dashboard router loaded');
+    debugLog('✅ Dashboard router loaded');
 } catch (err) {
-    console.error('❌ Dashboard router error:', err.message);
+    debugError('❌ Dashboard router error:', err.message);
 }
 
 try {
     app.use('/api/bookings', require('./routes/bookings-router'));
-    console.log('✅ Bookings router loaded');
+    debugLog('✅ Bookings router loaded');
 } catch (err) {
-    console.error('❌ Bookings router error:', err.message);
+    debugError('❌ Bookings router error:', err.message);
 }
 
 try {
     app.use('/api/vehicles', require('./routes/vehicles-router'));
-    console.log('✅ Vehicles router loaded');
+    debugLog('✅ Vehicles router loaded');
 } catch (err) {
-    console.error('❌ Vehicles router error:', err.message);
+    debugError('❌ Vehicles router error:', err.message);
 }
 
 try {
     app.use('/api/ratecards', require('./routes/ratecards-router'));
-    console.log('✅ Ratecards router loaded');
+    debugLog('✅ Ratecards router loaded');
 } catch (err) {
-    console.error('❌ Ratecards router error:', err.message);
+    debugError('❌ Ratecards router error:', err.message);
 }
 
 try {
     app.use('/api/companies', require('./routes/companies-router'));
-    console.log('✅ Companies router loaded');
+    debugLog('✅ Companies router loaded');
 } catch (err) {
-    console.error('❌ Companies router error:', err.message);
+    debugError('❌ Companies router error:', err.message);
 }
 
 try {
     app.use('/api/drivers', require('./routes/drivers-router'));
-    console.log('✅ Drivers router loaded');
+    debugLog('✅ Drivers router loaded');
 } catch (err) {
-    console.error('❌ Drivers router error:', err.message);
+    debugError('❌ Drivers router error:', err.message);
 }
 
 try {
     app.use('/api/reports', require('./routes/reports-router'));
-    console.log('✅ Reports router loaded');
+    debugLog('✅ Reports router loaded');
 } catch (err) {
-    console.error('❌ Reports router error:', err.message);
+    debugError('❌ Reports router error:', err.message);
 }
 
 try {
     app.use('/api/consignees', require('./routes/consignees-router'));
-    console.log('✅ Consignees router loaded');
+    debugLog('✅ Consignees router loaded');
 } catch (err) {
-    console.error('❌ Consignees router error:', err.message);
+    debugError('❌ Consignees router error:', err.message);
 }
 
 try {
     app.use('/api/auth', require('./routes/auth-router'));
-    console.log('✅ Auth router loaded');
+    debugLog('✅ Auth router loaded');
 } catch (err) {
-    console.error('❌ Auth router error:', err.message);
+    debugError('❌ Auth router error:', err.message);
 }
 
 // Backward-compat alias for older clients hitting /api/login
@@ -140,11 +156,11 @@ app.get('/api/test', (req, res) => {
 // Direct dashboard summary endpoint (bypassing router)
 app.get('/api/dashboard/summary', async (req, res) => {
     try {
-        console.log('📊 Direct dashboard summary endpoint called');
+        debugLog('📊 Direct dashboard summary endpoint called');
         const supabase = require('./config/supabase');
         
         const { companyId } = req.query;
-        console.log('🏢 Company filter:', companyId || 'All companies');
+        debugLog('🏢 Company filter:', companyId || 'All companies');
         
         // Get basic counts
         let bookingsQuery = supabase.from('bookings').select('*', { count: 'exact', head: true });
@@ -167,7 +183,7 @@ app.get('/api/dashboard/summary', async (req, res) => {
         }
         const { data: recentBookings } = await recentQuery;
 
-        console.log('✅ Dashboard data:', { totalBookings, totalCompanies, recentCount: recentBookings?.length });
+        debugLog('✅ Dashboard data:', { totalBookings, totalCompanies, recentCount: recentBookings?.length });
 
         res.json({
             success: true,
@@ -193,7 +209,7 @@ app.get('/api/dashboard/summary', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('❌ Direct dashboard error:', error);
+        debugError('❌ Direct dashboard error:', error);
         res.status(500).json({
             success: false,
             error: error.message,
@@ -240,7 +256,7 @@ app.get('/api/dashboard-summary', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('❌ Fallback dashboard error:', error);
+        debugError('❌ Fallback dashboard error:', error);
         res.status(500).json({
             success: false,
             error: error.message
@@ -251,7 +267,7 @@ app.get('/api/dashboard-summary', async (req, res) => {
 // Direct companies endpoint
 app.get('/api/companies', async (req, res) => {
     try {
-        console.log('🏢 Direct companies endpoint called');
+        debugLog('🏢 Direct companies endpoint called');
         const supabase = require('./config/supabase');
         
         const { data, error } = await supabase
@@ -261,13 +277,13 @@ app.get('/api/companies', async (req, res) => {
 
         if (error) throw error;
 
-        console.log(`✅ Found ${data?.length || 0} companies`);
+        debugLog(`✅ Found ${data?.length || 0} companies`);
         res.json({
             success: true,
             data: data || []
         });
     } catch (error) {
-        console.error('❌ Direct companies error:', error);
+        debugError('❌ Direct companies error:', error);
         res.status(500).json({
             success: false,
             error: error.message
@@ -278,7 +294,7 @@ app.get('/api/companies', async (req, res) => {
 // Direct bookings endpoint
 app.get('/api/bookings', async (req, res) => {
     try {
-        console.log('📋 Direct bookings endpoint called');
+        debugLog('📋 Direct bookings endpoint called');
         const supabase = require('./config/supabase');
         const { companyId, limit } = req.query;
         
@@ -298,13 +314,13 @@ app.get('/api/bookings', async (req, res) => {
         const { data, error } = await query;
         if (error) throw error;
 
-        console.log(`✅ Found ${data?.length || 0} bookings`);
+        debugLog(`✅ Found ${data?.length || 0} bookings`);
         res.json({
             success: true,
             data: data || []
         });
     } catch (error) {
-        console.error('❌ Direct bookings error:', error);
+        debugError('❌ Direct bookings error:', error);
         res.status(500).json({
             success: false,
             error: error.message
@@ -375,6 +391,6 @@ app.get('*', (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-    console.log(`http://localhost:${PORT} `);
+    debugLog(`🚀 Server running on http://localhost:${PORT}`);
 });
 

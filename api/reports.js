@@ -1,6 +1,22 @@
 // Combined Reports & Ratecards API for Vercel
 const supabase = require('../config/supabase');
 
+// Server-side debug configuration
+const DEBUG_MODE = process.env.NODE_ENV !== 'production';
+
+// Server-side conditional logging functions
+function debugLog(...args) {
+    if (DEBUG_MODE) {
+        console.log(...args);
+    }
+}
+
+function debugError(...args) {
+    if (DEBUG_MODE) {
+        console.error(...args);
+    }
+}
+
 module.exports = async (req, res) => {
     // CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -24,7 +40,7 @@ module.exports = async (req, res) => {
                         .order('created_at', { ascending: false });
 
                     if (error) {
-                        console.log('⚠️ Ratecards table not found, returning empty array');
+                        debugLog('⚠️ Ratecards table not found, returning empty array');
                         return res.json({
                             success: true,
                             data: [],
@@ -37,7 +53,7 @@ module.exports = async (req, res) => {
                         data: data || []
                     });
                 } catch (tableError) {
-                    console.log('⚠️ Ratecards table error, returning empty array');
+                    debugLog('⚠️ Ratecards table error, returning empty array');
                     return res.json({
                         success: true,
                         data: [],
@@ -261,7 +277,7 @@ module.exports = async (req, res) => {
         }
 
     } catch (error) {
-        console.error('❌ Reports/Ratecards error:', error);
+        debugError('❌ Reports/Ratecards error:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to process request',

@@ -3,10 +3,26 @@ const express = require('express');
 const router = express.Router();
 const supabase = require('../config/supabase');
 
+// Server-side debug configuration
+const DEBUG_MODE = process.env.NODE_ENV !== 'production';
+
+// Server-side conditional logging functions
+function debugLog(...args) {
+    if (DEBUG_MODE) {
+        console.log(...args);
+    }
+}
+
+function debugError(...args) {
+    if (DEBUG_MODE) {
+        console.error(...args);
+    }
+}
+
 // GET /api/ratecards - Get all rate cards with company info
 router.get('/', async (req, res) => {
     try {
-        console.log('📋 Fetching rate cards...');
+        debugLog('📋 Fetching rate cards...');
         
         const { data, error } = await supabase
             .from('rate_cards')
@@ -18,18 +34,18 @@ router.get('/', async (req, res) => {
             .order('effective_from', { ascending: false });
 
         if (error) {
-            console.error('❌ Supabase error:', error);
+            debugError('❌ Supabase error:', error);
             throw error;
         }
 
-        console.log(`✅ Found ${data?.length || 0} rate cards`);
+        debugLog(`✅ Found ${data?.length || 0} rate cards`);
 
         res.json({
             success: true,
             data: data || []
         });
     } catch (error) {
-        console.error('❌ Error fetching rate cards:', error);
+        debugError('❌ Error fetching rate cards:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch rate cards',
@@ -66,7 +82,7 @@ router.get('/:id', async (req, res) => {
             data: data
         });
     } catch (error) {
-        console.error('Error fetching rate card:', error);
+        debugError('Error fetching rate card:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch rate card',
@@ -107,7 +123,7 @@ router.post('/', async (req, res) => {
             data: data
         });
     } catch (error) {
-        console.error('Error creating rate card:', error);
+        debugError('Error creating rate card:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to create rate card',
@@ -141,7 +157,7 @@ router.put('/:id', async (req, res) => {
             data: data
         });
     } catch (error) {
-        console.error('Error updating rate card:', error);
+        debugError('Error updating rate card:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to update rate card',

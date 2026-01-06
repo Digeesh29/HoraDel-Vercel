@@ -3,6 +3,22 @@ const express = require('express');
 const router = express.Router();
 const supabase = require('../config/supabase');
 
+// Server-side debug configuration
+const DEBUG_MODE = process.env.NODE_ENV !== 'production';
+
+// Server-side conditional logging functions
+function debugLog(...args) {
+    if (DEBUG_MODE) {
+        console.log(...args);
+    }
+}
+
+function debugError(...args) {
+    if (DEBUG_MODE) {
+        console.error(...args);
+    }
+}
+
 // GET /api/consignees - Get all consignees for a company
 router.get('/', async (req, res) => {
     try {
@@ -28,7 +44,7 @@ router.get('/', async (req, res) => {
             data: data || []
         });
     } catch (error) {
-        console.error('Error fetching consignees:', error);
+        debugError('Error fetching consignees:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch consignees',
@@ -51,7 +67,7 @@ router.get('/pending', async (req, res) => {
 
         // If status column doesn't exist, return empty array (no pending requests)
         if (error && error.message.includes('column') && error.message.includes('status')) {
-            console.log('Status column not found, returning empty pending list...');
+            debugLog('Status column not found, returning empty pending list...');
             data = [];
             error = null;
         }
@@ -63,7 +79,7 @@ router.get('/pending', async (req, res) => {
             data: data || []
         });
     } catch (error) {
-        console.error('Error fetching pending consignees:', error);
+        debugError('Error fetching pending consignees:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch pending consignees',
@@ -97,7 +113,7 @@ router.get('/debug', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Error in debug endpoint:', error);
+        debugError('Error in debug endpoint:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to debug table',
@@ -153,7 +169,7 @@ router.post('/', async (req, res) => {
 
         // If error due to missing columns, try without approval columns
         if (error && error.message.includes('column') && error.message.includes('does not exist')) {
-            console.log('Approval columns not found, inserting without them...');
+            debugLog('Approval columns not found, inserting without them...');
             const result = await supabase
                 .from('consignees')
                 .insert([{
@@ -184,7 +200,7 @@ router.post('/', async (req, res) => {
             data: data
         });
     } catch (error) {
-        console.error('Error creating consignee:', error);
+        debugError('Error creating consignee:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to create consignee',
@@ -249,7 +265,7 @@ router.put('/:id', async (req, res) => {
             data: data
         });
     } catch (error) {
-        console.error('Error updating consignee:', error);
+        debugError('Error updating consignee:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to update consignee',
@@ -275,7 +291,7 @@ router.delete('/:id', async (req, res) => {
             message: 'Consignee deleted successfully'
         });
     } catch (error) {
-        console.error('Error deleting consignee:', error);
+        debugError('Error deleting consignee:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to delete consignee',
@@ -306,7 +322,7 @@ router.put('/:id/last-used', async (req, res) => {
             data: data
         });
     } catch (error) {
-        console.error('Error updating consignee last used:', error);
+        debugError('Error updating consignee last used:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to update consignee',
@@ -322,8 +338,8 @@ router.put('/:id/approve', async (req, res) => {
         const { adminId, consigneeNumber } = req.body; // Should come from authenticated admin user
 
         // Debug logging
-        console.log('🔍 Approval request received for consignee:', id);
-        console.log('  - Consignee Number:', consigneeNumber);
+        debugLog('🔍 Approval request received for consignee:', id);
+        debugLog('  - Consignee Number:', consigneeNumber);
 
         // Validate consignee number if provided
         if (consigneeNumber) {
@@ -336,7 +352,7 @@ router.put('/:id/approve', async (req, res) => {
                 .single();
 
             if (checkError && checkError.code !== 'PGRST116') { // PGRST116 = no rows found
-                console.error('Error checking consignee number:', checkError);
+                debugError('Error checking consignee number:', checkError);
             }
 
             if (existingConsignee) {
@@ -375,7 +391,7 @@ router.put('/:id/approve', async (req, res) => {
 
         // If approval columns don't exist, just update the timestamp (consignee is already "approved")
         if (error && error.message.includes('column') && (error.message.includes('status') || error.message.includes('approved'))) {
-            console.log('Approval columns not found, treating as already approved...');
+            debugLog('Approval columns not found, treating as already approved...');
             const result = await supabase
                 .from('consignees')
                 .update({
@@ -405,7 +421,7 @@ router.put('/:id/approve', async (req, res) => {
             message: 'Consignee approved successfully'
         });
     } catch (error) {
-        console.error('Error approving consignee:', error);
+        debugError('Error approving consignee:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to approve consignee',
@@ -443,7 +459,7 @@ router.put('/:id/reject', async (req, res) => {
 
         // If approval columns don't exist, delete the consignee instead (simulate rejection)
         if (error && error.message.includes('column') && (error.message.includes('status') || error.message.includes('approved'))) {
-            console.log('Approval columns not found, deleting consignee to simulate rejection...');
+            debugLog('Approval columns not found, deleting consignee to simulate rejection...');
             const result = await supabase
                 .from('consignees')
                 .delete()
@@ -475,7 +491,7 @@ router.put('/:id/reject', async (req, res) => {
             message: 'Consignee rejected successfully'
         });
     } catch (error) {
-        console.error('Error rejecting consignee:', error);
+        debugError('Error rejecting consignee:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to reject consignee',
