@@ -1,4 +1,17 @@
 // Prevent admin main.js from running in client interface
+// Fallback debug functions in case debug-utils.js hasn't loaded yet
+if (typeof debugLog === 'undefined') {
+    window.debugLog = function(...args) { 
+        if (typeof console !== 'undefined' && console.log) console.log(...args); 
+    };
+    window.debugError = function(...args) { 
+        if (typeof console !== 'undefined' && console.error) console.error(...args); 
+    };
+    window.debugWarn = function(...args) { 
+        if (typeof console !== 'undefined' && console.warn) console.warn(...args); 
+    };
+}
+
 debugLog('🔍 Admin main.js loading...');
 debugLog('🔍 Current URL:', window.location.href);
 debugLog('🔍 Current pathname:', window.location.pathname);

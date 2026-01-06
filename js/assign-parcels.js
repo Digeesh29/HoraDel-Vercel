@@ -1,4 +1,17 @@
 // Assign Parcels Page
+// Fallback debug functions in case debug-utils.js hasn't loaded yet
+if (typeof debugLog === 'undefined') {
+    window.debugLog = function(...args) { 
+        if (typeof console !== 'undefined' && console.log) console.log(...args); 
+    };
+    window.debugError = function(...args) { 
+        if (typeof console !== 'undefined' && console.error) console.error(...args); 
+    };
+    window.debugWarn = function(...args) { 
+        if (typeof console !== 'undefined' && console.warn) console.warn(...args); 
+    };
+}
+
 debugLog('🔍 assign-parcels.js loading...');
 let currentVehicleData = {};
 let assignSelectedParcels = [];
