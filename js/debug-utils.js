@@ -55,7 +55,7 @@ const DEBUG_MODE = (() => {
     }
 })();
 
-// Conditional logging functions
+// Conditional logging functions (always override any fallback functions)
 window.debugLog = function(...args) {
     try {
         if (DEBUG_MODE && typeof console !== 'undefined' && console.log) {
@@ -96,6 +96,9 @@ window.debugInfo = function(...args) {
     }
 };
 
+// Clear fallback marker
+delete window._debugFallback;
+
 // Debug mode status
 window.isDebugMode = () => DEBUG_MODE;
 
@@ -117,7 +120,7 @@ try {
         if (DEBUG_MODE) {
             console.log('🔧 Debug mode enabled for:', hostname);
         } else {
-            console.log('🚀 Production mode - debug logging disabled for:', hostname);
+            console.log('🚀 Welcome to HoraDel ', hostname);
         }
     }
 } catch (error) {
