@@ -14,18 +14,41 @@ if (typeof console === 'undefined') {
 // Debug configuration with flexible control
 const DEBUG_MODE = (() => {
     try {
-        // Check URL parameter first
+        // Check URL parameter first (highest priority)
         const urlDebug = new URLSearchParams(window.location.search).get('debug');
         if (urlDebug === 'true') return true;
         if (urlDebug === 'false') return false;
         
-        // Check localStorage
+        // Check localStorage (second priority)
         const storageDebug = localStorage.getItem('debugMode');
         if (storageDebug === 'true') return true;
         if (storageDebug === 'false') return false;
         
-        // Default: enable for localhost, disable for production
-        return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        // Default: enable only for localhost/development, disable for all production domains
+        const hostname = window.location.hostname;
+        
+        // Development environments
+        if (hostname === 'localhost' || 
+            hostname === '127.0.0.1' || 
+            hostname.startsWith('192.168.') ||
+            hostname.startsWith('10.') ||
+            hostname.endsWith('.local')) {
+            return true;
+        }
+        
+        // Production environments (Vercel, custom domains, etc.)
+        if (hostname.includes('vercel.app') || 
+            hostname.includes('.com') || 
+            hostname.includes('.net') || 
+            hostname.includes('.org') ||
+            hostname.includes('.app') ||
+            hostname.includes('.dev') ||
+            !hostname.includes('localhost')) {
+            return false;
+        }
+        
+        // Default to production mode (safe fallback)
+        return false;
     } catch (error) {
         // Fallback to production mode if any error occurs
         return false;
@@ -89,10 +112,13 @@ window.disableDebug = () => {
 
 // Log debug mode status
 try {
-    if (DEBUG_MODE && typeof console !== 'undefined') {
-        console.log('🔧 Debug mode enabled');
-    } else if (typeof console !== 'undefined') {
-        console.log('🚀 Production mode - debug logging disabled');
+    if (typeof console !== 'undefined') {
+        const hostname = window.location.hostname;
+        if (DEBUG_MODE) {
+            console.log('🔧 Debug mode enabled for:', hostname);
+        } else {
+            console.log('🚀 Production mode - debug logging disabled for:', hostname);
+        }
     }
 } catch (error) {
     // Silently fail if console is not available
