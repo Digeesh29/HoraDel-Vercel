@@ -104,18 +104,45 @@ router.post('/register', async (req, res) => {
     try {
         const { email, password, full_name, phone, company } = req.body;
 
+        // Detailed validation with specific error messages
         if (!email || !password || !full_name) {
             return res.status(400).json({
                 success: false,
-                error: 'Email, password, and full name are required'
+                error: 'Email, password, and full name are required',
+                details: {
+                    email: !email ? 'Email is required' : null,
+                    password: !password ? 'Password is required' : null,
+                    full_name: !full_name ? 'Full name is required' : null
+                }
             });
         }
 
-        if (!company || !company.name || !company.email) {
+        // Validate email format
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             return res.status(400).json({
                 success: false,
-                error: 'Company name and email are required'
+                error: 'Invalid email format'
             });
+        }
+
+        // Validate password strength
+        if (password.length < 6) {
+            return res.status(400).json({
+                success: false,
+                error: 'Password must be at least 6 characters long'
+            });
+        }
+
+        // Handle company data - make it optional with defaults
+        const companyData = company || {};
+        if (!companyData.name) {
+            companyData.name = `${full_name}'s Company`;
+        }
+        if (!companyData.email) {
+            companyData.email = email;
+        }
+        if (!companyData.phone) {
+            companyData.phone = phone || '0000000000';
         }
 
         // Check if user already exists
@@ -137,27 +164,33 @@ router.post('/register', async (req, res) => {
         const { data: companyCheck } = await supabase
             .from('companies')
             .select('*')
-            .ilike('name', company.name)
+            .ilike('name', companyData.name)
             .single();
 
         if (companyCheck) {
             // Company name already exists, create with unique suffix
             const timestamp = Date.now();
-            const uniqueName = `${company.name} (${timestamp})`;
+            const uniqueName = `${companyData.name} (${timestamp})`;
             
             const { data: newCompany, error: companyError } = await supabase
                 .from('companies')
                 .insert([{
                     name: uniqueName,
-                    email: company.email,
-                    phone: company.phone
+                    email: companyData.email,
+                    phone: companyData.phone,
+                    company_type: 'Corporate',
+                    status: 'Active'
                 }])
                 .select()
                 .single();
 
             if (companyError) {
                 debugError('Company creation error:', companyError);
-                throw companyError;
+                return res.status(500).json({
+                    success: false,
+                    error: 'Failed to create company',
+                    details: companyError.message
+                });
             }
             existingCompany = newCompany;
             debugLog('Created new company with unique name:', existingCompany.name);
@@ -166,28 +199,49 @@ router.post('/register', async (req, res) => {
             const { data: newCompany, error: companyError } = await supabase
                 .from('companies')
                 .insert([{
-                    name: company.name,
-                    email: company.email,
-                    phone: company.phone
+                    name: companyData.name,
+                    email: companyData.email,
+                    phone: companyData.phone,
+                    company_type: 'Corporate',
+                    status: 'Active'
                 }])
                 .select()
                 .single();
 
             if (companyError) {
                 debugError('Company creation error:', companyError);
-                throw companyError;
+                return res.status(500).json({
+                    success: false,
+                    error: 'Failed to create company',
+                    details: companyError.message
+                });
+            }.trim(),
+                password_hash,
+                full_name: full_name.trim(),
+                phone: phone ? phone.trim() : null,
+                role: 'client', // All registrations are client accounts
+                company_id: existingCompany.id,
+                is_active: true
+            }])
+            .select()
+            .single();
+
+        if (error) {
+            debugError('User creation error:', error);
+            
+            // Handle duplicate email error specifically
+            if (error.code === '23505') {
+                return res.status(409).json({
+                    success: false,
+                    error: 'User with this email already exists'
+                });
             }
-            existingCompany = newCompany;
-            debugLog('Created new company:', existingCompany.name);
-        }
-
-        // Hash password with bcrypt (salt rounds: 10)
-        const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
-
-        // Insert new user (always as client) with company_id
-        const { data: newUser, error } = await supabase
-            .from('auth_users')
-            .insert([{
+            
+            return res.status(500).json({
+                success: false,
+                error: 'Failed to create user',
+                details: error.message
+            })
                 email: email.toLowerCase(),
                 password_hash,
                 full_name,

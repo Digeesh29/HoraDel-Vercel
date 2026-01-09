@@ -22,7 +22,13 @@ function debugError(...args) {
 // GET /api/bookings - Get all bookings with filters
 router.get('/', async (req, res) => {
     try {
-        const { company, companyId, status, lrNumber, dateFrom, dateTo, limit } = req.query;
+        const { company, companyId, status, lrNumber, dateFrom, dateTo, limit, page } = req.query;
+
+        // Default limit to 100 to prevent large data fetches
+        const defaultLimit = 100;
+        const queryLimit = limit ? Math.min(parseInt(limit), 500) : defaultLimit;
+        const currentPage = page ? parseInt(page) : 1;
+        const offset = (currentPage - 1) * queryLimit;
 
         let query = supabase
             .from('bookings')
@@ -31,8 +37,9 @@ router.get('/', async (req, res) => {
                 company:companies(id, name, phone, email),
                 vehicle:vehicles(id, registration_number, vehicle_type, capacity),
                 driver:drivers(id, name, phone)
-            `)
-            .order('booking_date', { ascending: false });
+            `, { count: 'exact' })
+            .order('booking_date', { ascending: false })
+            .range(offset, offset + queryLimit - 1);
 
         // Apply filters
         if (companyId) {
@@ -54,12 +61,8 @@ router.get('/', async (req, res) => {
         if (dateTo) {
             query = query.lte('booking_date', dateTo);
         }
-        
-        if (limit) {
-            query = query.limit(parseInt(limit));
-        }
 
-        const { data, error } = await query;
+        const { data, error, count } = await query;
 
         if (error) throw error;
 
@@ -74,7 +77,11 @@ router.get('/', async (req, res) => {
         res.json({
             success: true,
             data: filteredData,
-            count: filteredData.length
+            count: filteredData.length,
+            total: count,
+            page: currentPage,
+            limit: queryLimit,
+            totalPages: Math.ceil((count || 0) / queryLimit)
         });
     } catch (error) {
         debugError('Error fetching bookings:', error);

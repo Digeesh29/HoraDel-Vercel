@@ -112,26 +112,33 @@ router.get('/', async (req, res) => {
     try {
         debugLog('📍 Fetching vehicles...');
         
-        const { data, error } = await supabase
+        const { limit, page } = req.query;
+        const queryLimit = limit ? Math.min(parseInt(limit), 500) : 200;
+        const currentPage = page ? parseInt(page) : 1;
+        const offset = (currentPage - 1) * queryLimit;
+        
+        const { data, error, count } = await supabase
             .from('vehicles')
             .select(`
                 *,
                 driver:drivers!current_driver_id(id, name, phone)
-            `)
-            .order('registration_number');
+            `, { count: 'exact' })
+            .order('registration_number')
+            .range(offset, offset + queryLimit - 1);
 
         if (error) {
             debugError('❌ Supabase error:', error);
             throw error;
         }
 
-        debugLog(`✅ Found ${data?.length || 0} vehicles`);
+        debugLog(`✅ Found ${data?.length || 0} vehicles (page ${currentPage})`);
 
-        // Get all IN-TRANSIT bookings (assigned to vehicles)
+        // Get all IN-TRANSIT bookings (assigned to vehicles) - limit to 1000
         const { data: bookings, error: bookingsError } = await supabase
             .from('bookings')
             .select('assigned_vehicle_id')
-            .eq('status', 'IN-TRANSIT');
+            .eq('status', 'IN-TRANSIT')
+            .limit(1000);
 
         if (bookingsError) {
             debugError('Error fetching bookings:', bookingsError);
@@ -166,7 +173,10 @@ router.get('/', async (req, res) => {
 
         res.json({
             success: true,
-            data: vehiclesWithBookings
+            data: vehiclesWithBookings,
+            total: count,
+            page: currentPage,
+            limit: queryLimit
         });
     } catch (error) {
         debugError('❌ Error fetching vehicles:', error);

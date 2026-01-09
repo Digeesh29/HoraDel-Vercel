@@ -137,22 +137,31 @@ router.get('/summary', async (req, res) => {
         debugLog('📊 Dashboard summary request for company:', companyId || 'All companies');
         debugLog('📅 Date filters:', { today, yesterday });
 
+        // Set timeout for the entire operation
+        const timeoutMs = 25000;
+        let timeoutId;
+        const timeoutPromise = new Promise((_, reject) => {
+            timeoutId = setTimeout(() => reject(new Error('Dashboard query timeout')), timeoutMs);
+        });
+
         // Helper function to add company filter
         const addCompanyFilter = (query) => {
             return companyId ? query.eq('company_id', companyId) : query;
         };
 
-        // Fetch all data in parallel
-        const [
-            todayBookingsResult,
-            yesterdayBookingsResult,
-            pendingDeliveriesResult,
-            deliveredBookingsResult,
-            inTransitBookingsResult,
-            totalBookingsResult,
-            totalInTransitResult,
-            totalDeliveredResult
-        ] = await Promise.all([
+        // Wrap the query in a race with timeout
+        const queryPromise = (async () => {
+            // Fetch all data in parallel with optimized queries
+            const [
+                todayBookingsResult,
+                yesterdayBookingsResult,
+                pendingDeliveriesResult,
+                deliveredBookingsResult,
+                inTransitBookingsResult,
+                totalBookingsResult,
+                totalInTransitResult,
+                totalDeliveredResult
+            ] = await Promise.all([
             // Today's bookings
             addCompanyFilter(
                 supabase
@@ -239,7 +248,8 @@ router.get('/summary', async (req, res) => {
         // Get all vehicles count (simplified active vehicles)
         const { data: allVehicles } = await supabase
             .from('vehicles')
-            .select('id');
+            .select('id')
+            .limit(1000);
 
         const activeVehiclesCount = (allVehicles || []).length;
 
@@ -312,8 +322,43 @@ router.get('/summary', async (req, res) => {
                 statusOverview: statusOverview
             }
         });
+        
+        return; // Exit the async function
+        })(); // End of queryPromise
+
+        // Race between query and timeout
+        await Promise.race([queryPromise, timeoutPromise]);
+        clearTimeout(timeoutId);
+
     } catch (error) {
         debugError('Error fetching dashboard summary:', error);
+        
+        // Return graceful fallback data on timeout or error
+        if (error.message && (error.message.includes('timeout') || error.message.includes('abort'))) {
+            return res.json({
+                success: true,
+                data: {
+                    stats: {
+                        todayBookings: 0,
+                        pendingDeliveries: 0,
+                        totalDelivered: 0,
+                        inTransit: 0,
+                        activeVehicles: 0,
+                        parcelsInTransit: 0,
+                        totalBookings: 0,
+                        todayBookingsGrowth: 0,
+                        activeVehiclesGrowth: 0,
+                        parcelsInTransitGrowth: 0
+                    },
+                    recentBookings: [],
+                    trend: { labels: [], values: [] },
+                    companyDistribution: { labels: [], values: [] },
+                    statusOverview: { booked: 0, inTransit: 0, delivered: 0 }
+                },
+                warning: 'Dashboard data load timeout - showing cached/default data'
+            });
+        }
+        
         res.status(500).json({
             success: false,
             error: 'Failed to fetch dashboard summary',

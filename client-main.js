@@ -1,4 +1,42 @@
 // CLIENT MAIN JS - Page Loading System (like admin main.js)
+// Fallback debug functions in case debug-utils.js hasn't loaded yet
+if (typeof debugLog === 'undefined') {
+    // Production-aware fallback functions
+    const isProduction = (() => {
+        try {
+            const hostname = window.location.hostname;
+            return hostname.includes('vercel.app') || 
+                   hostname.includes('.com') || 
+                   hostname.includes('.net') || 
+                   hostname.includes('.org') ||
+                   hostname.includes('.app') ||
+                   hostname.includes('.dev') ||
+                   (!hostname.includes('localhost') && hostname !== '127.0.0.1');
+        } catch (error) {
+            return true; // Default to production mode
+        }
+    })();
+    
+    // Temporary fallback functions that will be replaced by debug-utils.js
+    window.debugLog = function(...args) { 
+        if (!isProduction && typeof console !== 'undefined' && console.log) {
+            console.log(...args); 
+        }
+    };
+    window.debugError = function(...args) { 
+        if (!isProduction && typeof console !== 'undefined' && console.error) {
+            console.error(...args); 
+        }
+    };
+    window.debugWarn = function(...args) { 
+        if (!isProduction && typeof console !== 'undefined' && console.warn) {
+            console.warn(...args); 
+        }
+    };
+    
+    // Mark these as fallback functions
+    window._debugFallback = true;
+}
 
 // NAV + PAGE LOADING
 document.addEventListener("DOMContentLoaded", () => {

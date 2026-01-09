@@ -26,7 +26,7 @@ if (!supabaseUrl || !supabaseKey) {
     throw new Error('Missing Supabase environment variables');
 }
 
-// Create Supabase client with optimized settings
+// Create Supabase client with optimized settings for production
 const supabase = createClient(supabaseUrl, supabaseKey, {
     auth: {
         autoRefreshToken: false,
@@ -35,6 +35,16 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
     global: {
         headers: {
             'X-Client-Info': 'horadel-transport'
+        },
+        fetch: (url, options = {}) => {
+            // Add 30-second timeout to all requests
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000);
+            
+            return fetch(url, {
+                ...options,
+                signal: controller.signal
+            }).finally(() => clearTimeout(timeoutId));
         }
     },
     db: {
@@ -47,6 +57,6 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
     }
 });
 
-debugLog('✅ Supabase client initialized');
+debugLog('✅ Supabase client initialized with 30s timeout');
 
 module.exports = supabase;

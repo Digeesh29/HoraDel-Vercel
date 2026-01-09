@@ -24,21 +24,30 @@ router.get('/', async (req, res) => {
     try {
         debugLog('🏢 Fetching companies...');
         
-        const { data, error } = await supabase
+        const { limit, page } = req.query;
+        const queryLimit = limit ? Math.min(parseInt(limit), 500) : 200;
+        const currentPage = page ? parseInt(page) : 1;
+        const offset = (currentPage - 1) * queryLimit;
+        
+        const { data, error, count } = await supabase
             .from('companies')
-            .select('*')
-            .order('name');
+            .select('*', { count: 'exact' })
+            .order('name')
+            .range(offset, offset + queryLimit - 1);
 
         if (error) {
             debugError('❌ Supabase error:', error);
             throw error;
         }
 
-        debugLog(`✅ Found ${data?.length || 0} companies`);
+        debugLog(`✅ Found ${data?.length || 0} companies (page ${currentPage})`);
 
         res.json({
             success: true,
-            data: data || []
+            data: data || [],
+            total: count,
+            page: currentPage,
+            limit: queryLimit
         });
     } catch (error) {
         debugError('❌ Error fetching companies:', error);
