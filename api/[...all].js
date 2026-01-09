@@ -38,8 +38,24 @@ app.use((req, res, next) => {
   next();
 });
 
-// Body parser
-app.use(express.json());
+// Body parser with error handling for malformed JSON
+app.use(express.json({ 
+  limit: '10mb',
+  strict: true
+}));
+
+// JSON parsing error handler
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({ 
+      success: false,
+      error: 'Invalid JSON in request body',
+      message: err.message,
+      details: 'Please check your JSON syntax'
+    });
+  }
+  next(err);
+});
 
 // Mount routers at both with and without '/api' prefix to account for Vercel path stripping
 const prefixes = ['', '/api'];

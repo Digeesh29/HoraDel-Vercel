@@ -62,13 +62,27 @@ router.get('/', async (req, res) => {
 // POST /api/companies - Create new company
 router.post('/', async (req, res) => {
     try {
+        // Validate request body exists
+        if (!req.body || Object.keys(req.body).length === 0) {
+            return res.status(400).json({
+                success: false,
+                error: 'Request body is required',
+                details: 'No data provided in request body'
+            });
+        }
+
         const { name, contact_person, phone, email, company_type, status } = req.body;
 
-        // Validate required fields
+        // Validate required fields with detailed feedback
         if (!name || !phone) {
             return res.status(400).json({
                 success: false,
-                error: 'Company name and phone are required'
+                error: 'Missing required fields',
+                required: ['name', 'phone'],
+                received: {
+                    name: !!name,
+                    phone: !!phone
+                }
             });
         }
 

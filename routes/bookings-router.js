@@ -132,6 +132,15 @@ router.get('/:id', async (req, res) => {
     try {
         const { id } = req.params;
 
+        // Validate UUID format to prevent database errors
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (!uuidRegex.test(id)) {
+            return res.status(404).json({
+                success: false,
+                error: 'Booking not found'
+            });
+        }
+
         const { data, error } = await supabase
             .from('bookings')
             .select(`
@@ -143,7 +152,16 @@ router.get('/:id', async (req, res) => {
             .eq('id', id)
             .single();
 
-        if (error) throw error;
+        if (error) {
+            // Handle "not found" errors as 404
+            if (error.code === 'PGRST116' || error.message.includes('0 rows')) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'Booking not found'
+                });
+            }
+            throw error;
+        }
 
         if (!data) {
             return res.status(404).json({
@@ -169,12 +187,38 @@ router.get('/:id', async (req, res) => {
 // POST /api/bookings - Create a single booking
 router.post('/', async (req, res) => {
     try {
+        // Validate request body exists
+        if (!req.body || Object.keys(req.body).length === 0) {
+            return res.status(400).json({
+                success: false,
+                error: 'Request body is required',
+                details: 'No data provided in request body'
+            });
+        }
+
         const { companyId, companyName, consigneeName, consigneeContact, destination, articleCount, parcelType, address } = req.body;
 
+        // Detailed validation
         if (!companyId || !consigneeName || !destination || !articleCount) {
             return res.status(400).json({
                 success: false,
-                error: 'Company ID, consignee name, destination, and article count are required'
+                error: 'Missing required fields',
+                required: ['companyId', 'consigneeName', 'destination', 'articleCount'],
+                received: {
+                    companyId: !!companyId,
+                    consigneeName: !!consigneeName,
+                    destination: !!destination,
+                    articleCount: !!articleCount
+                }
+            });
+        }
+
+        // Validate articleCount is a number
+        const articleCountNum = parseInt(articleCount);
+        if (isNaN(articleCountNum) || articleCountNum <= 0) {
+            return res.status(400).json({
+                success: false,
+                error: 'Article count must be a positive number'
             });
         }
 
@@ -192,17 +236,17 @@ router.post('/', async (req, res) => {
             origin: 'Warehouse', // Default origin
             destination: destination,
             destination_pincode: '000000', // Default pincode
-            article_count: parseInt(articleCount),
+            article_count: articleCountNum,
             parcel_type: parcelType || 'Standard',
-            weight: parseInt(articleCount) * 1.0, // Assume 1kg per article
+            weight: articleCountNum * 1.0, // Assume 1kg per article
             description: `${parcelType || 'Standard'} parcel for ${consigneeName}`,
             base_rate: 0.00,
             per_article_rate: 10.00,
             parcel_type_charge: 0.00,
             zone_charge: 0.00,
-            total_amount: (parseInt(articleCount) * 10),
+            total_amount: (articleCountNum * 10),
             gst_amount: 0.00,
-            grand_total: (parseInt(articleCount) * 10),
+            grand_total: (articleCountNum * 10),
             status: 'BOOKED'
         };
 
@@ -216,6 +260,16 @@ router.post('/', async (req, res) => {
         bookingData.base_rate = pricing.baseRate;
         bookingData.per_article_rate = pricing.perArticleRate;
         bookingData.parcel_type_charge = pricing.parcelTypeCharge;
+        
+        // Handle JSON parsing errors specifically
+        if (error instanceof SyntaxError || error.message?.includes('JSON')) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid JSON in request body',
+                message: 'Please check your request format'
+            });
+        }
+        
         bookingData.zone_charge = pricing.zoneCharge;
         bookingData.total_amount = pricing.totalAmount;
         bookingData.grand_total = pricing.grandTotal;

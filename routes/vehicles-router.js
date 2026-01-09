@@ -22,13 +22,27 @@ function debugError(...args) {
 // POST /api/vehicles - Create new vehicle
 router.post('/', async (req, res) => {
     try {
+        // Validate request body exists
+        if (!req.body || Object.keys(req.body).length === 0) {
+            return res.status(400).json({
+                success: false,
+                error: 'Request body is required',
+                details: 'No data provided in request body'
+            });
+        }
+
         const { registration_number, vehicle_type, capacity, capacity_kg, make, model, year, status, current_driver_id } = req.body;
 
-        // Validate required fields
+        // Validate required fields with detailed feedback
         if (!registration_number || !vehicle_type) {
             return res.status(400).json({
                 success: false,
-                error: 'Registration number and vehicle type are required'
+                error: 'Missing required fields',
+                required: ['registration_number', 'vehicle_type'],
+                received: {
+                    registration_number: !!registration_number,
+                    vehicle_type: !!vehicle_type
+                }
             });
         }
 

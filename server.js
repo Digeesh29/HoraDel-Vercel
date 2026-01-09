@@ -41,9 +41,25 @@ app.use((req, res, next) => {
     next();
 });
 
-// Middleware
-app.use(express.json({ limit: '10mb' }));
+// Middleware with JSON error handling
+app.use(express.json({ 
+  limit: '10mb',
+  strict: true
+}));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// JSON parsing error handler
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({ 
+      success: false,
+      error: 'Invalid JSON in request body',
+      message: err.message,
+      details: 'Please check your JSON syntax'
+    });
+  }
+  next(err);
+});
 
 // Security headers for production
 if (process.env.NODE_ENV === 'production') {

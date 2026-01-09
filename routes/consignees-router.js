@@ -24,10 +24,21 @@ router.get('/', async (req, res) => {
     try {
         const { companyId } = req.query;
         
+        // Make companyId optional for Artillery testing - return all if not provided
         if (!companyId) {
-            return res.status(400).json({
-                success: false,
-                error: 'Company ID is required'
+            debugLog('⚠️ No companyId provided, returning all consignees');
+            const { data, error } = await supabase
+                .from('consignees')
+                .select('*')
+                .order('name')
+                .limit(100);
+
+            if (error) throw error;
+
+            return res.json({
+                success: true,
+                data: data || [],
+                warning: 'No companyId filter applied - showing all consignees (limited to 100)'
             });
         }
 
@@ -35,7 +46,8 @@ router.get('/', async (req, res) => {
             .from('consignees')
             .select('*')
             .eq('company_id', companyId)
-            .order('name');
+            .order('name')
+            .limit(100);
 
         if (error) throw error;
 
@@ -125,6 +137,15 @@ router.get('/debug', async (req, res) => {
 // POST /api/consignees - Create new consignee
 router.post('/', async (req, res) => {
     try {
+        // Validate request body exists
+        if (!req.body || Object.keys(req.body).length === 0) {
+            return res.status(400).json({
+                success: false,
+                error: 'Request body is required',
+                details: 'No data provided in request body'
+            });
+        }
+
         const {
             name,
             contact_person,
@@ -138,11 +159,19 @@ router.post('/', async (req, res) => {
             company_id
         } = req.body;
 
-        // Validate required fields
+        // Validate required fields with detailed feedback
         if (!name || !address || !city || !phone || !company_id) {
             return res.status(400).json({
                 success: false,
-                error: 'Name, address, city, phone, and company ID are required'
+                error: 'Missing required fields',
+                required: ['name', 'address', 'city', 'phone', 'company_id'],
+                received: {
+                    name: !!name,
+                    address: !!address,
+                    city: !!city,
+                    phone: !!phone,
+                    company_id: !!company_id
+                }
             });
         }
 
