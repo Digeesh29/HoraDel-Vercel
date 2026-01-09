@@ -215,11 +215,23 @@ router.post('/register', async (req, res) => {
                     error: 'Failed to create company',
                     details: companyError.message
                 });
-            }.trim(),
+            }
+            existingCompany = newCompany;
+            debugLog('Created new company:', existingCompany.name);
+        }
+
+        // Hash password
+        const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
+
+        // Create user
+        const { data: newUser, error } = await supabase
+            .from('auth_users')
+            .insert([{
+                email: email.toLowerCase().trim(),
                 password_hash,
                 full_name: full_name.trim(),
                 phone: phone ? phone.trim() : null,
-                role: 'client', // All registrations are client accounts
+                role: 'client',
                 company_id: existingCompany.id,
                 is_active: true
             }])
@@ -229,7 +241,7 @@ router.post('/register', async (req, res) => {
         if (error) {
             debugError('User creation error:', error);
             
-            // Handle duplicate email error specifically
+            // Handle duplicate email error
             if (error.code === '23505') {
                 return res.status(409).json({
                     success: false,
@@ -241,19 +253,7 @@ router.post('/register', async (req, res) => {
                 success: false,
                 error: 'Failed to create user',
                 details: error.message
-            })
-                email: email.toLowerCase(),
-                password_hash,
-                full_name,
-                phone,
-                role: 'client', // All registrations are client accounts
-                company_id: existingCompany.id
-            }])
-            .select()
-            .single();
-
-        if (error) {
-            throw error;
+            });
         }
 
         // Return user data (excluding password)
@@ -293,9 +293,9 @@ router.get('/users', async (req, res) => {
         }
 
         debugLog(`✅ Found ${users?.length || 0} users`);
-        debugLog('� Sampale user data:', users?.[0]);
+        debugLog('📄 Sample user data:', users?.[0]);
         debugLog('🔍 Users with company_id:', users?.filter(u => u.company_id).length);
-        debugLog('� Users with co mpany data:', users?.filter(u => u.company).length);
+        debugLog('📄 Users with company data:', users?.filter(u => u.company).length);
 
         res.json({
             success: true,
