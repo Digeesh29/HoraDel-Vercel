@@ -54,13 +54,29 @@ module.exports = async (req, res) => {
             // POST /api/companies - Create new company
             const { name, contact_person, phone, email, company_type, status } = req.body;
 
+            // Validate required fields
+            if (!name || !phone) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Company name and phone are required'
+                });
+            }
+
+            // Validate email format if provided
+            if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Invalid email format'
+                });
+            }
+
             const { data, error } = await supabase
                 .from('companies')
                 .insert([{
-                    name,
-                    contact_person,
-                    phone,
-                    email,
+                    name: name.trim(),
+                    contact_person: contact_person ? contact_person.trim() : null,
+                    phone: phone.trim(),
+                    email: email ? email.trim().toLowerCase() : null,
                     company_type: company_type || 'Corporate',
                     status: status || 'Active'
                 }])

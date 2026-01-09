@@ -48,43 +48,48 @@ module.exports = async (req, res) => {
                 return companyId ? query.eq('company_id', companyId) : query;
             };
 
-            // Get basic counts - SAME AS YOUR ROUTER
+            // Get basic counts - SAME AS YOUR ROUTER with timeout optimization
             const [
                 todayBookingsResult,
                 yesterdayBookingsResult,
                 totalBookingsResult,
                 inTransitResult,
                 deliveredResult
-            ] = await Promise.all([
-                addCompanyFilter(
-                    supabase
-                        .from('bookings')
-                        .select('*', { count: 'exact', head: true })
-                        .gte('booking_date', today)
-                ),
-                addCompanyFilter(
-                    supabase
-                        .from('bookings')
-                        .select('*', { count: 'exact', head: true })
-                        .gte('booking_date', yesterday)
-                        .lt('booking_date', today)
-                ),
-                addCompanyFilter(
-                    supabase
-                        .from('bookings')
-                        .select('*', { count: 'exact', head: true })
-                ),
-                addCompanyFilter(
-                    supabase
-                        .from('bookings')
-                        .select('*', { count: 'exact', head: true })
-                        .eq('status', 'IN-TRANSIT')
-                ),
-                addCompanyFilter(
-                    supabase
-                        .from('bookings')
-                        .select('*', { count: 'exact', head: true })
-                        .eq('status', 'DELIVERED')
+            ] = await Promise.race([
+                Promise.all([
+                    addCompanyFilter(
+                        supabase
+                            .from('bookings')
+                            .select('*', { count: 'exact', head: true })
+                            .gte('booking_date', today)
+                    ),
+                    addCompanyFilter(
+                        supabase
+                            .from('bookings')
+                            .select('*', { count: 'exact', head: true })
+                            .gte('booking_date', yesterday)
+                            .lt('booking_date', today)
+                    ),
+                    addCompanyFilter(
+                        supabase
+                            .from('bookings')
+                            .select('*', { count: 'exact', head: true })
+                    ),
+                    addCompanyFilter(
+                        supabase
+                            .from('bookings')
+                            .select('*', { count: 'exact', head: true })
+                            .eq('status', 'IN-TRANSIT')
+                    ),
+                    addCompanyFilter(
+                        supabase
+                            .from('bookings')
+                            .select('*', { count: 'exact', head: true })
+                            .eq('status', 'DELIVERED')
+                    )
+                ]),
+                new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Dashboard query timeout')), 8000)
                 )
             ]);
 
@@ -186,10 +191,30 @@ module.exports = async (req, res) => {
 
     } catch (error) {
         debugError('❌ Dashboard error:', error);
+        
+        // Handle timeout errors gracefully
+        if (error.message === 'Dashboard query timeout') {
+            return res.status(503).json({
+                success: false,
+                error: 'Dashboard query timeout - please try again',
+                message: 'The server is experiencing high load'
+            });
+        }
+        
+        // Return minimal data on error for better UX
         res.status(500).json({
             success: false,
             error: 'Failed to fetch dashboard data',
-            message: error.message
+            message: process.env.NODE_ENV === 'production' ? 'Server error' : error.message,
+            fallback: {
+                stats: {
+                    todayBookings: 0,
+                    totalBookings: 0,
+                    totalInTransit: 0,
+                    allTimeDelivered: 0
+                },
+                recentBookings: []
+            }
         });
     }
 };

@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/styles.css?v=12">
+    <link rel="stylesheet" href="css/styles.css?v=13">
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -20,7 +20,7 @@
         // Check if user is a client and redirect immediately
         const userRole = localStorage.getItem('userRole');
         if (userRole === 'client') {
-            console.log('🔄 Client user detected in admin interface, redirecting to client dashboard');
+            debugLog('🔄 Client user detected in admin interface, redirecting to client dashboard');
             // Stop all script execution and redirect immediately
             document.addEventListener('DOMContentLoaded', function(e) {
                 e.stopImmediatePropagation();
@@ -114,13 +114,14 @@
 <script>
     // Final check before loading admin scripts
     if (localStorage.getItem('userRole') === 'client') {
-        console.log('🚫 BLOCKING admin scripts for client user');
+        debugLog('🚫 BLOCKING admin scripts for client user');
         window.location.replace('/client.html');
         throw new Error('Admin scripts blocked for client user');
     }
 </script>
 
 <!-- CONFIG + MAIN + PAGE JS -->
+<script src="js/debug-utils.js"></script>
 <script src="js/config.js"></script>
 <script src="js/mobile-utils.js"></script>
 <script src="js/dashboard.js"></script>
@@ -138,7 +139,7 @@
 <script>
     // Wait for DOM to be ready
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('🚀 HoraDel Admin Panel Loading...');
+        debugLog('🚀 HoraDel Admin Panel Loading...');
         
         // Check authentication
         const userRole = localStorage.getItem('userRole');
@@ -146,14 +147,14 @@
         
         if (!userRole || !userEmail) {
             // Not authenticated, redirect to login
-            console.log('❌ Not authenticated, redirecting to login');
+            debugLog('❌ Not authenticated, redirecting to login');
             window.location.href = '/login';
             return;
         }
         
         if (userRole !== 'admin') {
             // Not admin, redirect to appropriate page
-            console.log('❌ Not admin user, redirecting');
+            debugLog('❌ Not admin user, redirecting');
             if (userRole === 'client') {
                 window.location.href = '/client';
             } else {
@@ -162,7 +163,7 @@
             return;
         }
         
-        console.log('✅ Admin authenticated, loading admin panel');
+        debugLog('✅ Admin authenticated, loading admin panel');
         
         // Update user display
         const userName = localStorage.getItem('userName') || 'Admin';
@@ -172,7 +173,7 @@
         const dashboardBtn = document.querySelector('.nav-item[data-page="dashboard"]');
         if (dashboardBtn) {
             dashboardBtn.click();
-            console.log('✅ Dashboard loaded');
+            debugLog('✅ Dashboard loaded');
         }
     });
 </script>

@@ -86,8 +86,8 @@ module.exports = async (req, res) => {
             }
         }
         
-        // Handle reports endpoints
-        else if (url.includes('/summary')) {
+        // Handle reports endpoints - support both /summary and default /
+        else if (url.includes('/summary') || url === '/reports' || url === '/') {
             // Reports Summary
             const { dateFrom, dateTo, companyId, city } = req.query;
             

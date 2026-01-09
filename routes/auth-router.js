@@ -34,6 +34,14 @@ router.post('/login', async (req, res) => {
             });
         }
 
+        // Validate email format
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid email format'
+            });
+        }
+
         // For demo purposes, we'll use simple password checking
         // In production, use proper password hashing (bcrypt)
         const { data: users, error } = await supabase
@@ -42,11 +50,12 @@ router.post('/login', async (req, res) => {
                 *,
                 company:companies(id, name, email, phone)
             `)
-            .eq('email', email.toLowerCase())
+            .eq('email', email.toLowerCase().trim())
             .eq('is_active', true)
-            .single();
+            .maybeSingle();
 
         if (error || !users) {
+            debugLog('Login failed for:', email);
             return res.status(401).json({
                 success: false,
                 error: 'Invalid email or password'
@@ -57,6 +66,7 @@ router.post('/login', async (req, res) => {
         const validPassword = await bcrypt.compare(password, users.password_hash);
 
         if (!validPassword) {
+            debugLog('Invalid password for:', email);
             return res.status(401).json({
                 success: false,
                 error: 'Invalid email or password'
@@ -71,6 +81,8 @@ router.post('/login', async (req, res) => {
 
         // Return user data (excluding password)
         const { password_hash, ...userData } = users;
+        
+        debugLog('Login successful for:', email);
         
         res.json({
             success: true,

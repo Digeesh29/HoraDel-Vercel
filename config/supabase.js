@@ -26,11 +26,24 @@ if (!supabaseUrl || !supabaseKey) {
     throw new Error('Missing Supabase environment variables');
 }
 
-// Create Supabase client
+// Create Supabase client with optimized settings
 const supabase = createClient(supabaseUrl, supabaseKey, {
     auth: {
         autoRefreshToken: false,
         persistSession: false
+    },
+    global: {
+        headers: {
+            'X-Client-Info': 'horadel-transport'
+        }
+    },
+    db: {
+        schema: 'public'
+    },
+    realtime: {
+        params: {
+            eventsPerSecond: 2
+        }
     }
 });
 

@@ -7,7 +7,13 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "build": "echo 'No build step required'",
-    "vercel-build": "echo 'Vercel build complete'"
+    "vercel-build": "echo 'Vercel build complete'",
+    "test": "node -e \"console.log('Tests not configured yet')\"",
+    "artillery": "artillery run artillery-config.yml",
+    "artillery:smoke": "artillery run artillery-smoke-test.yml",
+    "artillery:stress": "artillery run artillery-stress-test.yml",
+    "lint": "echo 'Linting not configured'",
+    "validate": "node -e \"require('./config/supabase'); console.log('Configuration valid')\""
   },
   "engines": {
     "node": ">=18.0.0"

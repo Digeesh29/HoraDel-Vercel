@@ -54,9 +54,13 @@ function renderRateCards() {
             <div class="rate-card-col">${card.company}</div>
             <div class="rate-card-col">${formatRs(card.perArticle)}</div>
             <div class="rate-card-col">
-                <button class="btn js-edit-rate" data-company="${card.company}">
+                <button class="btn js-edit-rate" data-company="${card.company}" style="margin-right: 8px;">
                     <span class="material-symbols-outlined">edit</span>
                     Edit Rate Card
+                </button>
+                <button class="btn btn-outline btn-sm js-recalc-rate" data-company="${card.company}" data-id="${card.id}" title="Recalculate all bookings with current rate">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">calculate</span>
+                    Recalculate Bookings
                 </button>
             </div>
         </div>
@@ -224,6 +228,8 @@ async function saveRateCard() {
         // Check if we're editing an existing rate card
         const existingCard = rateCards.find(r => r.company === companyName);
 
+        let rateCardId = null;
+
         if (existingCard && existingCard.id) {
             // Update existing rate card
             debugLog('Updating rate card:', existingCard.id);
@@ -247,6 +253,7 @@ async function saveRateCard() {
                 throw new Error(result.error || 'Failed to update rate card');
             }
 
+            rateCardId = existingCard.id;
             debugLog('✅ Rate card updated successfully');
         } else {
             // Create new rate card
@@ -306,6 +313,7 @@ async function saveRateCard() {
                 throw new Error(createRateCardResult.error || 'Failed to create rate card');
             }
             
+            rateCardId = createRateCardResult.data.id;
             debugLog('✅ Rate card created successfully');
         }
 
@@ -313,8 +321,24 @@ async function saveRateCard() {
         await loadRateCards();
         closeModal();
         
-        // Show success message
-        alert('Rate card saved successfully!');
+        // Show success message and offer to recalculate existing bookings
+        if (rateCardId && existingCard) {
+            // For existing rate cards, check if there are bookings to update
+            const shouldRecalculate = confirm(
+                `Rate card updated successfully!\n\n` +
+                `Do you want to recalculate all existing bookings for "${companyName}" ` +
+                `with the new rate (₹${perArt}/article)?\n\n` +
+                `This will update the pricing on all past bookings to reflect the new rate.`
+            );
+            
+            if (shouldRecalculate) {
+                await recalculateBookingsForRateCard(rateCardId, companyName);
+            } else {
+                alert('Rate card saved! New bookings will use the updated rate.');
+            }
+        } else {
+            alert('Rate card saved successfully!');
+        }
         
     } catch (error) {
         debugError('❌ Error saving rate card:', error);
@@ -322,6 +346,40 @@ async function saveRateCard() {
     } finally {
         saveRateBtn.disabled = false;
         saveRateBtn.textContent = 'Save Changes';
+    }
+}
+
+// Recalculate all bookings for a rate card
+async function recalculateBookingsForRateCard(rateCardId, companyName) {
+    try {
+        debugLog('🔄 Recalculating bookings for rate card:', rateCardId);
+        
+        const response = await fetch(`${API_BASE_URL}/ratecards/${rateCardId}/recalculate-bookings`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            const { updatedCount, totalBookings, newRate } = result.data;
+            
+            alert(
+                `✅ Successfully updated ${updatedCount} of ${totalBookings} bookings!\n\n` +
+                `Company: ${companyName}\n` +
+                `New Rate: ₹${newRate}/article\n\n` +
+                `Reports will now show the updated pricing for all bookings.`
+            );
+            
+            debugLog('✅ Bookings recalculated:', result.data);
+        } else {
+            throw new Error(result.error || 'Failed to recalculate bookings');
+        }
+    } catch (error) {
+        debugError('❌ Error recalculating bookings:', error);
+        alert('Failed to recalculate bookings: ' + error.message);
     }
 }
 
@@ -428,13 +486,81 @@ function setupEventListeners() {
 
     // Edit buttons (event delegation)
     document.body.addEventListener("click", (e) => {
-        const btn = e.target.closest(".js-edit-rate");
-        if (!btn) return;
-
-        const company = btn.dataset.company;
-        openModal(company);
+        const editBtn = e.target.closest(".js-edit-rate");
+        if (editBtn) {
+            const company = editBtn.dataset.company;
+            openModal(company);
+            return;
+        }
+        
+        const recalcBtn = e.target.closest(".js-recalc-rate");
+        if (recalcBtn) {
+            const company = recalcBtn.dataset.company;
+            const rateCardId = recalcBtn.dataset.id;
+            handleRecalculateBookings(rateCardId, company);
+            return;
+        }
     });
 
+}
+
+// Recalculate all bookings for a rate card
+async function recalculateBookingsForRateCard(rateCardId, companyName) {
+    try {
+        debugLog('🔄 Recalculating bookings for rate card:', rateCardId);
+        
+        const response = await fetch(`${API_BASE_URL}/ratecards/${rateCardId}/recalculate-bookings`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            const { updatedCount, totalBookings, newRate } = result.data;
+            
+            alert(
+                `✅ Successfully updated ${updatedCount} of ${totalBookings} bookings!\n\n` +
+                `Company: ${companyName}\n` +
+                `New Rate: ₹${newRate}/article\n\n` +
+                `Reports will now show the updated pricing for all bookings.`
+            );
+            
+            debugLog('✅ Bookings recalculated:', result.data);
+        } else {
+            throw new Error(result.error || 'Failed to recalculate bookings');
+        }
+    } catch (error) {
+        debugError('❌ Error recalculating bookings:', error);
+        alert('Failed to recalculate bookings: ' + error.message);
+    }
+}
+
+// Handle manual recalculation request
+async function handleRecalculateBookings(rateCardId, companyName) {
+    if (!rateCardId) {
+        alert('Rate card ID not found. Please refresh the page and try again.');
+        return;
+    }
+    
+    const card = rateCards.find(r => r.id == rateCardId);
+    if (!card) {
+        alert('Rate card not found. Please refresh the page and try again.');
+        return;
+    }
+    
+    const shouldRecalculate = confirm(
+        `Recalculate all bookings for "${companyName}"?\n\n` +
+        `This will update all existing bookings to use the current rate (₹${card.perArticle}/article).\n\n` +
+        `The reports will then reflect the updated pricing.\n\n` +
+        `Do you want to continue?`
+    );
+    
+    if (shouldRecalculate) {
+        await recalculateBookingsForRateCard(rateCardId, companyName);
+    }
 }
 
 // Update calculation preview in real-time

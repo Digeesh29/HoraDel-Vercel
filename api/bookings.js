@@ -58,13 +58,42 @@ module.exports = async (req, res) => {
         } else if (req.method === 'POST') {
             const bookingData = req.body;
             
+            // Validate required fields
+            if (!bookingData.company_id) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Company ID is required'
+                });
+            }
+
+            if (!bookingData.consignee_name || !bookingData.destination) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Consignee name and destination are required'
+                });
+            }
+
+            if (!bookingData.article_count || isNaN(bookingData.article_count) || bookingData.article_count <= 0) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Valid article count is required (must be positive number)'
+                });
+            }
+
+            // Set defaults and sanitize data
+            bookingData.status = bookingData.status || 'BOOKED';
+            bookingData.booking_date = bookingData.booking_date || new Date().toISOString();
+            bookingData.consignee_name = bookingData.consignee_name.trim();
+            bookingData.destination = bookingData.destination.trim();
+            
             // Calculate pricing: Articles × Rate = Total
             if (bookingData.article_count && bookingData.per_article_rate) {
                 bookingData.grand_total = bookingData.article_count * bookingData.per_article_rate;
+            } else {
+                // Default pricing if not provided
+                bookingData.per_article_rate = bookingData.per_article_rate || 10;
+                bookingData.grand_total = bookingData.article_count * bookingData.per_article_rate;
             }
-            
-            bookingData.status = bookingData.status || 'BOOKED';
-            bookingData.booking_date = bookingData.booking_date || new Date().toISOString();
             
             const { data, error } = await supabase
                 .from('bookings')

@@ -24,18 +24,34 @@ router.post('/', async (req, res) => {
     try {
         const { registration_number, vehicle_type, capacity, capacity_kg, make, model, year, status, current_driver_id } = req.body;
 
+        // Validate required fields
+        if (!registration_number || !vehicle_type) {
+            return res.status(400).json({
+                success: false,
+                error: 'Registration number and vehicle type are required'
+            });
+        }
+
+        // Validate capacity if provided
+        if (capacity && (isNaN(capacity) || capacity <= 0)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Capacity must be a positive number'
+            });
+        }
+
         const { data, error } = await supabase
             .from('vehicles')
             .insert([{
-                registration_number,
-                vehicle_type,
-                capacity,
-                capacity_kg,
-                make,
-                model,
-                year,
+                registration_number: registration_number.trim().toUpperCase(),
+                vehicle_type: vehicle_type.trim(),
+                capacity: capacity || null,
+                capacity_kg: capacity_kg || null,
+                make: make ? make.trim() : null,
+                model: model ? model.trim() : null,
+                year: year || null,
                 status: status || 'Available',
-                current_driver_id
+                current_driver_id: current_driver_id || null
             }])
             .select(`
                 *,
